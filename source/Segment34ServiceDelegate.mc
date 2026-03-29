@@ -19,15 +19,33 @@ class Segment34ServiceDelegate extends System.ServiceDelegate {
         var apiKey = Application.Properties.getValue("owmApiKey") as String;
         if (apiKey.length() == 0) { return; }
 
-        var now = Time.now().value();
-        var lastUpdate = Application.Storage.getValue("owm_last_update") as Number?;
-        if (lastUpdate != null && now - lastUpdate <= 7200) { return; }
-
         var garminCc = Weather.getCurrentConditions();
         if (garminCc == null || garminCc.observationLocationPosition == null) { return; }
 
         var deg = garminCc.observationLocationPosition.toDegrees();
+        var lat = (deg[0] as Decimal).toFloat();
+        var lon = (deg[1] as Decimal).toFloat();
+
+        var now = Time.now().value();
+        var lastUpdate = Application.Storage.getValue("owm_last_update") as Number?;
+        if (lastUpdate != null && now - lastUpdate < 7200 && !locationChangedSignificantly(lat, lon)) {
+            return;
+        }
+
         var service = new OpenWeatherService();
-        service.fetchWeather((deg[0] as Decimal).toFloat(), (deg[1] as Decimal).toFloat(), apiKey);
+        service.fetchWeather(lat, lon, apiKey);
+    }
+
+    // Returns true if current position is >~55km from the stored weather location.
+    hidden function locationChangedSignificantly(lat as Float, lon as Float) as Boolean {
+        var stored = Application.Storage.getValue("current_conditions") as Dictionary?;
+        if (stored == null) { return false; }
+        var pos = stored.get("observationLocationPosition") as Array?;
+        if (pos == null) { return false; }
+        var latDiff = lat - (pos[0] as Decimal).toFloat();
+        var lonDiff = lon - (pos[1] as Decimal).toFloat();
+        if (latDiff < 0.0f) { latDiff = -latDiff; }
+        if (lonDiff < 0.0f) { lonDiff = -lonDiff; }
+        return latDiff > 0.5f || lonDiff > 0.5f;
     }
 }

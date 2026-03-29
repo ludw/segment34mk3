@@ -53,6 +53,11 @@ For refactorings and optimizations keep in mind that:
 - clock font without segments
 - separate 24h mode for alt tz
 
+- OWM: Fix remaining weather data fields with fallbacks
+- YR?
+- OWM: check if hourly forecast cached values work
+- OWM: error handling. What happens when no network, wrong api key etc.
+
 ## Change log
 2026-03-20 v4.6.2
 - Changed default for AM/PM

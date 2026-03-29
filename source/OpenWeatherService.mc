@@ -8,13 +8,15 @@ import Toybox.Weather;
 (:background)
 class OpenWeatherService {
 
-    function initialize() {
-        // no state needed — results go directly to Application.Storage
-    }
+    hidden var _lat as Float = 0.0;
+    hidden var _lon as Float = 0.0;
+
+    function initialize() {}
 
     // Fire both current-conditions and forecast requests simultaneously.
     function fetchWeather(lat as Float, lon as Float, apiKey as String) as Void {
-        System.println(["OWM fetchWeather", lat, lon, apiKey]);
+        _lat = lat;
+        _lon = lon;
         Communications.makeWebRequest(
             "https://api.openweathermap.org/data/2.5/weather",
             { "lat" => lat, "lon" => lon, "appid" => apiKey, "units" => "metric" },
@@ -35,7 +37,15 @@ class OpenWeatherService {
     // using the same format as Segment34View.storeWeatherData().
     function onCurrentResponse(responseCode as Number, data as Dictionary?) as Void {
         System.println(["OWM onCurrentResponse", responseCode, data]);
-        if (responseCode != 200 || data == null) { return; }
+        if (responseCode == 401 || responseCode == 403) {
+            Application.Storage.setValue("owm_error", "OWM: INVALID API KEY");
+            return;
+        }
+        if (responseCode != 200 || data == null) {
+            // Network error or server error — keep cached data, do not touch owm_error.
+            return;
+        }
+        Application.Storage.deleteValue("owm_error");
 
         var now = Time.now().value();
         var cc_data = {};
@@ -77,6 +87,7 @@ class OpenWeatherService {
             cc_data["uvIndex"] = garminCc.uvIndex;
         }
 
+        cc_data["observationLocationPosition"] = [_lat, _lon];
         cc_data["timestamp"] = now;
         Application.Storage.setValue("current_conditions", cc_data);
         Application.Storage.setValue("owm_last_update", now);
@@ -86,7 +97,7 @@ class OpenWeatherService {
 
     // Receives 3-hour forecast JSON from OWM and stores it in Application.Storage.
     function onForecastResponse(responseCode as Number, data as Dictionary?) as Void {
-        System.println(["OWM onForecastResponse", responseCode, data]);
+        //System.println(["OWM onForecastResponse", responseCode, data]);
         if (responseCode != 200 || data == null) { return; }
 
         var list = data.get("list") as Array?;
@@ -128,6 +139,16 @@ class OpenWeatherService {
         }
 
         Application.Storage.setValue("hourly_forecast", hf_data);
+
+        // Patch precipitationChance into current_conditions from the nearest forecast slot.
+        var firstPop = (hf_data.size() > 0) ? hf_data[0].get("precipitationChance") : null;
+        if (firstPop != null) {
+            var cc = Application.Storage.getValue("current_conditions") as Dictionary?;
+            if (cc != null) {
+                cc["precipitationChance"] = firstPop;
+                Application.Storage.setValue("current_conditions", cc);
+            }
+        }
     }
 
     // Maps OWM weather code to Garmin Weather.Condition enum (0–53).

@@ -78,6 +78,7 @@ class Segment34View extends WatchUi.WatchFace {
     hidden var nightMode as Boolean?;
     hidden var weatherCondition as CurrentConditions or StoredWeather or Null;
     hidden var propWeatherProvider as Number = 0;
+    hidden var owmError as String or Null = null;
     hidden var hrHistoryData as Array<Number>?;
     hidden var canBurnIn as Boolean = false;
     hidden var isSleeping as Boolean = false;
@@ -1860,9 +1861,11 @@ class Segment34View extends WatchUi.WatchFace {
         if (propWeatherProvider == 1) {
             // OWM provider: background service delegate handles fetching.
             // The view only reads the results from Application.Storage.
+            owmError = Application.Storage.getValue("owm_error") as String?;
             try { weatherCondition = readWeatherData(); } catch(e) {}
         } else {
             // Garmin provider: original behavior unchanged.
+            owmError = null;
             if (Weather.getCurrentConditions() != null) {
                 weatherCondition = Weather.getCurrentConditions();
                 try { storeWeatherData(); } catch(e) {}
@@ -1968,7 +1971,17 @@ class Segment34View extends WatchUi.WatchFace {
         if (pos != null) {
             ret.observationLocationPosition = new Position.Location({:latitude => pos[0], :longitude => pos[1], :format => :degrees});
         }
-        if(data_age_s > 0 and data_age_s < 3600) {
+        var hf_data = Application.Storage.getValue("hourly_forecast") as Array?;
+        // Current conditions are valid for at least 1 hour (Garmin path), or until the
+        // first forecast slot starts — whichever is later. For OWM the first slot is always
+        // in the future (~3h boundary), so this covers the gap without regressing Garmin.
+        var ccTimestamp = cc_data.get("timestamp") as Number;
+        var ccValidUntil = ccTimestamp + 3600;
+        if (hf_data != null && hf_data.size() > 0) {
+            var firstForecastTime = hf_data[0].get("forecastTime") as Number;
+            if (firstForecastTime > ccValidUntil) { ccValidUntil = firstForecastTime; }
+        }
+        if(data_age_s > 0 and now < ccValidUntil) {
             ret.condition = cc_data.get("condition") as Number;
             ret.highTemperature = cc_data.get("highTemperature") as Number;
             ret.lowTemperature = cc_data.get("lowTemperature") as Number;
@@ -1980,18 +1993,25 @@ class Segment34View extends WatchUi.WatchFace {
             ret.windSpeed = cc_data.get("windSpeed") as Float;
             ret.uvIndex = cc_data.get("uvIndex") as Float;
         } else {
-            var hf_data = Application.Storage.getValue("hourly_forecast") as Array?;
             if(hf_data == null) { return ret; }
+            // Find the most recently passed slot. When now >= firstForecastTime there is
+            // always at least one past entry, so no nearest-future fallback is needed.
+            var bestEntry = null;
+            var bestAge = 86401;
             for(var i=0; i<hf_data.size(); i++) {
                 var forecast_age = now - (hf_data[i].get("forecastTime") as Number);
-                if(forecast_age > 0 and forecast_age < 3600) {
-                    ret.condition = hf_data[i].get("condition") as Number;
-                    ret.temperature = hf_data[i].get("temperature") as Number;
-                    ret.precipitationChance = hf_data[i].get("precipitationChance") as Number;
-                    ret.windBearing = hf_data[i].get("windBearing") as Number;
-                    ret.windSpeed = hf_data[i].get("windSpeed") as Float;
-                    ret.uvIndex = cc_data.get("uvIndex") as Float;
+                if(forecast_age >= 0 and forecast_age < bestAge) {
+                    bestAge = forecast_age;
+                    bestEntry = hf_data[i];
                 }
+            }
+            if(bestEntry != null) {
+                ret.condition = bestEntry.get("condition") as Number;
+                ret.temperature = bestEntry.get("temperature") as Number;
+                ret.precipitationChance = bestEntry.get("precipitationChance") as Number;
+                ret.windBearing = bestEntry.get("windBearing") as Number;
+                ret.windSpeed = bestEntry.get("windSpeed") as Float;
+                ret.uvIndex = cc_data.get("uvIndex") as Float;
             }
         }
         
@@ -2652,6 +2672,7 @@ class Segment34View extends WatchUi.WatchFace {
     }
 
     hidden function getWeatherCondition() as String {
+        if (owmError != null) { return owmError; }
         // Early return if no weather data
         if (weatherCondition == null || weatherCondition.condition == null) {
             return "";
@@ -2943,7 +2964,6 @@ class Segment34View extends WatchUi.WatchFace {
                 var compLabel = comp.shortLabel;
                 if (compType == Complications.COMPLICATION_TYPE_INVALID && compLabel != null) {
                     if (compLabel.equals(targetLabel)) {
-                        Complications.subscribeToUpdates(comp.complicationId);
                         return comp.complicationId;
                     }
                 }

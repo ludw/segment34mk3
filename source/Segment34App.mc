@@ -34,6 +34,9 @@ class Segment34App extends Application.AppBase {
     }
 
     function onSettingsChanged() as Void {
+        // Reset OWM state so the next temporal event fetches immediately with the new settings.
+        Application.Storage.deleteValue("owm_last_update");
+        Application.Storage.deleteValue("owm_error");
         updateTemporalEvent();
         mView.onSettingsChanged();
         WatchUi.requestUpdate();
