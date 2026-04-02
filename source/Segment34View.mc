@@ -2631,7 +2631,7 @@ class Segment34View extends WatchUi.WatchFace {
     hidden function getHighLow() as String {
         var ret = "";
         if(weatherCondition != null) {
-            if(weatherCondition.highTemperature != null or weatherCondition.lowTemperature != null) {
+            if(weatherCondition.highTemperature != null and weatherCondition.lowTemperature != null) {
                 var high = convertTemperature(weatherCondition.highTemperature, cachedTempUnit);
                 var low = convertTemperature(weatherCondition.lowTemperature, cachedTempUnit);
                 ret = formatTemperature(high) + "/" + formatTemperature(low);
@@ -2710,6 +2710,10 @@ class Segment34View extends WatchUi.WatchFace {
     hidden function getRestCalories() as Number {
         var today = Time.Gregorian.info(Time.now(), Time.FORMAT_SHORT);
         var profile = UserProfile.getProfile();
+
+        if (profile.birthYear == null || profile.weight == null || profile.height == null) {
+            return 0;
+        }
 
         var age = today.year - profile.birthYear;
         var weight = profile.weight / 1000.0;
