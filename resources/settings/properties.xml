@@ -69,4 +69,5 @@
     <property id="stressDynamicColor" type="boolean">false</property>
     <property id="weatherProvider" type="number">0</property>
     <property id="owmApiKey" type="string"></property>
+    <property id="owmLocationOverride" type="string"></property>
 </properties>

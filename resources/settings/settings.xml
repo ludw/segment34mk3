@@ -273,14 +273,18 @@
             </settingConfig>
     </setting>
 
-    <setting propertyKey="@Properties.weatherProvider" title="Weather provider">
+    <setting propertyKey="@Properties.weatherProvider" title="@Strings.settings_weather_provider">
         <settingConfig type="list">
-            <listEntry value="0">Garmin</listEntry>
-            <listEntry value="1">OpenWeatherMap</listEntry>
+            <listEntry value="0">@Strings.settings_garmin</listEntry>
+            <listEntry value="1">@Strings.settings_openweathermap</listEntry>
         </settingConfig>
     </setting>
 
-    <setting propertyKey="@Properties.owmApiKey" title="OWM API key">
+    <setting propertyKey="@Properties.owmApiKey" title="@Strings.settings_owm_api_key">
+        <settingConfig type="alphanumeric" />
+    </setting>
+
+    <setting propertyKey="@Properties.owmLocationOverride" title="@Strings.settings_owm_location_override">
         <settingConfig type="alphanumeric" />
     </setting>
 

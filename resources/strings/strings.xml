@@ -308,8 +308,8 @@
     <string id="settings_date" scope="settings">Date</string>
     <string id="settings_weather_data_1" scope="settings">Weather data 1 (specify format below)</string>
     <string id="settings_weather_data_2" scope="settings">Weather data 2 (specify format below)</string>
-    <string id="settings_weather_format_1" scope="settings">Weather data 1 format (t=temp w=wind h=humidity p=precip u=UV l=high/low f=feels c=condition)</string>
-    <string id="settings_weather_format_2" scope="settings">Weather data 2 format (t=temp w=wind h=humidity p=precip u=UV l=high/low f=feels c=condition)</string>
+    <string id="settings_weather_format_1" scope="settings">Weather data 1 format (t=temp w=wind h=humidity p=precip u=UV l=high/low f=feels c=condition n=city(OWM only))</string>
+    <string id="settings_weather_format_2" scope="settings">Weather data 2 format (t=temp w=wind h=humidity p=precip u=UV l=high/low f=feels c=condition n=city(OWM only))</string>
     <string id="settings_steps_day" scope="settings">Steps / day</string>
     <string id="settings_wheelchair_pushes_day" scope="settings">Wheelchair pushes / day</string>
     <string id="settings_calories_kcal_day_2" scope="settings">Calories (kcal) / day</string>
@@ -443,4 +443,9 @@
     <string id="settings_temperature_uv_wind" scope="settings">Temperature, UV Index, Wind</string>
     <string id="settings_cgm_glucose_trend" scope="settings">CGM Glucose + Trend</string>
     <string id="settings_cgm_age" scope="settings">CGM Age (minutes)</string>
+    <string id="settings_weather_provider" scope="settings">Weather provider</string>
+    <string id="settings_garmin" scope="settings">Garmin</string>
+    <string id="settings_openweathermap" scope="settings">OpenWeatherMap (see FAQ 5.0.0 at ludw.github.io/faq for setup)</string>
+    <string id="settings_owm_api_key" scope="settings">OWM API key</string>
+    <string id="settings_owm_location_override" scope="settings">OWM location override (lat,lon e.g. 51.5,-0.1 — leave empty to use Garmin location)</string>
 </strings>

@@ -19,12 +19,35 @@ class Segment34ServiceDelegate extends System.ServiceDelegate {
         var apiKey = Application.Properties.getValue("owmApiKey") as String;
         if (apiKey.length() == 0) { return; }
 
-        var garminCc = Weather.getCurrentConditions();
-        if (garminCc == null || garminCc.observationLocationPosition == null) { return; }
+        var lat = 0.0f;
+        var lon = 0.0f;
+        var hasLocation = false;
 
-        var deg = garminCc.observationLocationPosition.toDegrees();
-        var lat = (deg[0] as Decimal).toFloat();
-        var lon = (deg[1] as Decimal).toFloat();
+        var locationOverride = Application.Properties.getValue("owmLocationOverride") as String;
+        if (locationOverride != null && locationOverride.length() > 0) {
+            var commaPos = locationOverride.find(",");
+            if (commaPos != null && commaPos > 0) {
+                var latStr = locationOverride.substring(0, commaPos);
+                var lonStr = locationOverride.substring(commaPos + 1, locationOverride.length());
+                if (latStr != null && lonStr != null) {
+                    var parsedLat = latStr.toFloat();
+                    var parsedLon = lonStr.toFloat();
+                    if (parsedLat != null && parsedLon != null) {
+                        lat = parsedLat;
+                        lon = parsedLon;
+                        hasLocation = true;
+                    }
+                }
+            }
+        }
+
+        if (!hasLocation) {
+            var garminCc = Weather.getCurrentConditions();
+            if (garminCc == null || garminCc.observationLocationPosition == null) { return; }
+            var deg = garminCc.observationLocationPosition.toDegrees();
+            lat = (deg[0] as Decimal).toFloat();
+            lon = (deg[1] as Decimal).toFloat();
+        }
 
         var now = Time.now().value();
         var lastUpdate = Application.Storage.getValue("owm_last_update") as Number?;

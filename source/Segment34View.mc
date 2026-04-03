@@ -1810,6 +1810,7 @@ class Segment34View extends WatchUi.WatchFace {
             ret.windBearing = cc_data.get("windBearing") as Number;
             ret.windSpeed = cc_data.get("windSpeed") as Float;
             ret.uvIndex = cc_data.get("uvIndex") as Float;
+            ret.cityName = cc_data.get("cityName") as String?;
         } else {
             if(hf_data == null) { return ret; }
             // Find the most recently passed slot. When now >= firstForecastTime there is
@@ -2402,6 +2403,7 @@ class Segment34View extends WatchUi.WatchFace {
             else if(ch.equals("l")) { result = result + getHighLow(); }
             else if(ch.equals("f")) { result = result + getFeelsLike(); }
             else if(ch.equals("c")) { result = result + getWeatherCondition(); }
+            else if(ch.equals("n")) { result = result + getCityName(); }
             else { result = result + ch; }
             i += 1;
         }
@@ -2487,6 +2489,11 @@ class Segment34View extends WatchUi.WatchFace {
         } else {  // width == 5
             return distance < 1000 ? distance.format("%05.1f") : distance.format("%05d");
         }
+    }
+
+    hidden function getCityName() as String {
+        if (weatherCondition == null || !(weatherCondition has :cityName) || weatherCondition.cityName == null) { return ""; }
+        return weatherCondition.cityName.toUpper();
     }
 
     hidden function getWeatherCondition() as String {
@@ -3157,4 +3164,5 @@ class StoredWeather {
     public var relativeHumidity as Lang.Number or Null;
     public var condition as Lang.Number or Null;
     public var uvIndex as Lang.Float or Null;
+    public var cityName as Lang.String or Null;
 }

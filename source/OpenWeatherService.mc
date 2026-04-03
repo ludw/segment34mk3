@@ -87,6 +87,9 @@ class OpenWeatherService {
             cc_data["uvIndex"] = garminCc.uvIndex;
         }
 
+        var cityName = data.get("name");
+        if (cityName != null) { cc_data["cityName"] = cityName as String; }
+
         cc_data["observationLocationPosition"] = [_lat, _lon];
         cc_data["timestamp"] = now;
         Application.Storage.setValue("current_conditions", cc_data);
