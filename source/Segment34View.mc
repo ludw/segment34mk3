@@ -99,7 +99,6 @@ class Segment34View extends WatchUi.WatchFace {
     hidden var cgmComplicationId as Complications.Id? = null;
     hidden var cgmAgeComplicationId as Complications.Id? = null;
     
-    hidden var propAdj as Integer = 0;
     hidden var propIs24H as Boolean = false;
     hidden var propTheme as Integer = 0;
     hidden var propNightTheme as Integer = -1;
@@ -1390,7 +1389,6 @@ class Segment34View extends WatchUi.WatchFace {
 
     hidden function updateProperties() as Void {
         var p = Application.Properties;
-        propAdj = p.getValue("adj") as Number;
         propTheme = p.getValue("colorTheme") as Number;
         propNightTheme = p.getValue("nightColorTheme") as Number;
         propNightThemeActivation = p.getValue("nightThemeActivation") as Number;
