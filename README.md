@@ -59,3 +59,4 @@ v0.4
 - More options for bottom field layout
 - Adjustment in pink color theme
 - AM/PM on by default for 12h time
+- Option for histogram size

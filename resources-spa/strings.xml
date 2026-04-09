@@ -176,7 +176,7 @@
     <!-- Settings strings with scope="settings" -->
     <string id="settings_color_theme" scope="settings">Tema Colores</string>
     <string id="settings_yellow_on_turquoise" scope="settings">Amarillo en turquesa</string>
-    <string id="settings_yellow_on_blue" scope="settings">Amarillo en azul</string>
+    <string id="settings_orange_on_teal" scope="settings">Naranja sobre verde azulado</string>
     <string id="settings_hot_pink" scope="settings">Rosa caliente</string>
     <string id="settings_blue" scope="settings">Azul</string>
     <string id="settings_blueish_green" scope="settings">Verde azulado</string>

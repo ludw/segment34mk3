@@ -177,7 +177,7 @@
     <!-- Settings strings with scope="settings" -->
     <string id="settings_color_theme" scope="settings">Color Theme</string>
     <string id="settings_yellow_on_turquoise" scope="settings">Yellow on turquoise</string>
-    <string id="settings_yellow_on_blue" scope="settings">Yellow on blue</string>
+    <string id="settings_orange_on_teal" scope="settings">Orange on teal</string>
     <string id="settings_hot_pink" scope="settings">Hot pink</string>
     <string id="settings_blue" scope="settings">Blue</string>
     <string id="settings_blueish_green" scope="settings">Blueish green</string>

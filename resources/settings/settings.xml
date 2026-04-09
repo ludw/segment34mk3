@@ -3,7 +3,7 @@
     <setting propertyKey="@Properties.colorTheme" title="@Strings.settings_color_theme">
         <settingConfig type="list">
             <listEntry value="0">@Strings.settings_yellow_on_turquoise</listEntry>
-            <listEntry value="8">@Strings.settings_yellow_on_blue</listEntry>
+            <listEntry value="8">@Strings.settings_orange_on_teal</listEntry>
             <listEntry value="1">@Strings.settings_hot_pink</listEntry>
             <listEntry value="10">@Strings.settings_blue</listEntry>
             <listEntry value="2">@Strings.settings_blueish_green</listEntry>
@@ -35,7 +35,7 @@
         <settingConfig type="list">
             <listEntry value="-1">@Strings.settings_no_change</listEntry>
             <listEntry value="0">@Strings.settings_yellow_on_turquoise</listEntry>
-            <listEntry value="8">@Strings.settings_yellow_on_blue</listEntry>
+            <listEntry value="8">@Strings.settings_orange_on_teal</listEntry>
             <listEntry value="1">@Strings.settings_hot_pink</listEntry>
             <listEntry value="10">@Strings.settings_blue</listEntry>
             <listEntry value="2">@Strings.settings_blueish_green</listEntry>

@@ -178,7 +178,7 @@
     <!-- Settings strings with scope="settings" -->
     <string id="settings_color_theme" scope="settings">Färgtema</string>
     <string id="settings_yellow_on_turquoise" scope="settings">Gul på turkos</string>
-    <string id="settings_yellow_on_blue" scope="settings">Gul på blå</string>
+    <string id="settings_orange_on_teal" scope="settings">Orange på blågrönt</string>
     <string id="settings_hot_pink" scope="settings">Stark rosa</string>
     <string id="settings_blue" scope="settings">Blå</string>
     <string id="settings_blueish_green" scope="settings">Blåaktigt grön</string>
