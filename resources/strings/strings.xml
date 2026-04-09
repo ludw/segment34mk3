@@ -296,6 +296,9 @@
     <string id="settings_next_calendar_event_time" scope="settings">Next calendar event time</string>
     <string id="settings_top_right_small" scope="settings">Top right small data field:</string>
     <string id="settings_histogram_shows" scope="settings">Histogram shows (must be enabled in Top Part shows)</string>
+    <string id="settings_histogram_size" scope="settings">Histogram size</string>
+    <string id="settings_histogram_small" scope="settings">Small (default)</string>
+    <string id="settings_histogram_large" scope="settings">Large</string>
     <string id="settings_body_battery_history" scope="settings">Body battery history</string>
     <string id="settings_elevation_history" scope="settings">Elevation history</string>
     <string id="settings_heart_rate_history" scope="settings">Heart rate history</string>

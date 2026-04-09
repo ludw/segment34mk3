@@ -42,6 +42,7 @@ class Segment34View extends WatchUi.WatchFace {
     hidden var histogramBarSpacing as Number = 2;
     hidden var histogramHeight as Number = 20;
     hidden var histogramTargetWidth as Number = 40;
+    hidden var propHistogramSize as Number = 0;
     hidden var bottomFieldWidths as Array<Number> = [3, 3, 3, 0];
 
     hidden var fontMoon as WatchUi.FontResource?;
@@ -332,9 +333,10 @@ class Segment34View extends WatchUi.WatchFace {
         baseX = centerX + 1;
         fieldSpaceingAdj = 5;
         barBottomAdj = 1;
-        histogramBarWidth = 1;
-        histogramBarSpacing = 1;
-        histogramHeight = 18;
+        histogramBarWidth = (propHistogramSize == 1) ? 2 : 1;
+        histogramBarSpacing = (propHistogramSize == 1) ? 2 : 1;
+        histogramHeight = (propHistogramSize == 1) ? 25 : 18;
+        histogramTargetWidth = (propHistogramSize == 1) ? 25 : 40;
     }
 
     (:Round280)
@@ -386,9 +388,10 @@ class Segment34View extends WatchUi.WatchFace {
         bottomDataWidth = 18;
         baseX = centerX;
         barBottomAdj = 1;
-        histogramBarWidth = 1;
-        histogramBarSpacing = 1;
-        histogramHeight = 20;
+        histogramBarWidth = (propHistogramSize == 1) ? 2 : 1;
+        histogramBarSpacing = (propHistogramSize == 1) ? 2 : 1;
+        histogramHeight = (propHistogramSize == 1) ? 28 : 20;
+        histogramTargetWidth = (propHistogramSize == 1) ? 25 : 40;
     }
 
     (:Round390)
@@ -445,7 +448,7 @@ class Segment34View extends WatchUi.WatchFace {
         bottomDataWidth = 24;
         baseX = centerX;
         barBottomAdj = 2;
-        histogramHeight = 25;
+        histogramHeight = (propHistogramSize == 1) ? 35 : 25;
     }
 
     (:Round416)
@@ -502,7 +505,7 @@ class Segment34View extends WatchUi.WatchFace {
         baseX = centerX;
         barBottomAdj = 2;
         bottomFiveAdj = 8;
-        histogramHeight = 25;
+        histogramHeight = (propHistogramSize == 1) ? 35 : 25;
     }
 
     (:Round454)
@@ -560,7 +563,7 @@ class Segment34View extends WatchUi.WatchFace {
         largeDataWidth = 24;
         bottomDataWidth = 24;
         barBottomAdj = 2;
-        histogramHeight = 30;
+        histogramHeight = (propHistogramSize == 1) ? 40 : 30;
         histogramTargetWidth = 45;
     }
 
@@ -619,7 +622,7 @@ class Segment34View extends WatchUi.WatchFace {
         largeDataWidth = 24;
         bottomDataWidth = 24;
         barBottomAdj = 2;
-        histogramHeight = 30;
+        histogramHeight = (propHistogramSize == 1) ? 40 : 30;
         histogramTargetWidth = 45;
     }
 
@@ -1398,6 +1401,7 @@ class Segment34View extends WatchUi.WatchFace {
         propFontSize = p.getValue("fontSize") as Number;
         propTopPartShows = p.getValue("topPartShows") as Number;
         propHistogramData = p.getValue("histogramData") as Number;
+        propHistogramSize = p.getValue("histogramSize") as Number;
         propSunriseFieldShows = p.getValue("sunriseFieldShows") as Number;
         propSunsetFieldShows = p.getValue("sunsetFieldShows") as Number;
         propWeatherLine1Shows = p.getValue("weatherLine1Shows") as Number;

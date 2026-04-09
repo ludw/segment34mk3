@@ -18,6 +18,7 @@
     <property id="sunriseFieldShows" type="number">35</property>
     <property id="sunsetFieldShows" type="number">36</property>
     <property id="histogramData" type="number">0</property>
+    <property id="histogramSize" type="number">0</property>
     <property id="clockOutlineStyle" type="number">0</property>
     <property id="clockGradientOverlay" type="number">0</property>
     <property id="clockFont" type="number">0</property>

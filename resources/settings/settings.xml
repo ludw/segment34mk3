@@ -280,6 +280,13 @@
             </settingConfig>
     </setting>
 
+    <setting propertyKey="@Properties.histogramSize" title="@Strings.settings_histogram_size">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.settings_histogram_small</listEntry>
+            <listEntry value="1">@Strings.settings_histogram_large</listEntry>
+        </settingConfig>
+    </setting>
+
     <setting propertyKey="@Properties.weatherProvider" title="@Strings.settings_weather_provider">
         <settingConfig type="list">
             <listEntry value="0">@Strings.settings_garmin</listEntry>
