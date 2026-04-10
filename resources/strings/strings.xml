@@ -272,6 +272,8 @@
     <string id="settings_sunrise_time" scope="settings">Sunrise time</string>
     <string id="settings_sunset_time" scope="settings">Sunset time</string>
     <string id="settings_next_sun_event" scope="settings">Next sun event (sunset/sunrise) time</string>
+    <string id="settings_civil_dawn" scope="settings">Civil dawn time</string>
+    <string id="settings_civil_dusk" scope="settings">Civil dusk time</string>
     <string id="settings_hrs_next_sun_event" scope="settings">Hours to next sun event (sunset/sunrise)</string>
     <string id="settings_resting_heart_rate" scope="settings">Resting Heart Rate</string>
     <string id="settings_alternative_timezone_1" scope="settings">Alternative Timezone 1</string>

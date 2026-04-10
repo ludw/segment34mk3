@@ -59,6 +59,7 @@ v0.5
 - Fixed issue with seconds clipping in always active mode with large font
 - Fixed issue with battery bar going outside outline
 - More options for bottom 5 field, incl next sun event
+- Dawn / Dusk as option (calculated)
 
 v0.4
 - Font style options for bottom fields

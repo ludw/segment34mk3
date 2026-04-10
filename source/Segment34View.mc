@@ -2227,6 +2227,22 @@ class Segment34View extends WatchUi.WatchFace {
             val = getWeatherByFormat(propWeatherFormat1);
         } else if(complicationType == 61) { // Weather data 2 format string
             val = getWeatherByFormat(propWeatherFormat2);
+        } else if(complicationType == 63 || complicationType == 64) { // Civil dawn / Civil dusk
+            if(weatherCondition != null) {
+                var loc = weatherCondition.observationLocationPosition;
+                if(loc != null) {
+                    var now = Time.now();
+                    var sunrise = Weather.getSunrise(loc, now);
+                    var sunset = Weather.getSunset(loc, now);
+                    if(sunrise != null && sunset != null) {
+                        var latDeg = loc.toDegrees()[0];
+                        var twilight = getCivilTwilight(latDeg as Double, sunrise, sunset);
+                        if(twilight != null) {
+                            val = formatSunTime(complicationType == 63 ? twilight[0] : twilight[1], width);
+                        }
+                    }
+                }
+            }
         }
 
         return val;
@@ -2739,6 +2755,41 @@ class Segment34View extends WatchUi.WatchFace {
             }
         }
         return [];
+    }
+
+    // Returns [dawn, dusk] as Time.Moment objects, or null if unavailable.
+    // dawn = civil dawn (sun at -6°), dusk = civil dusk (sun at -6°).
+    // Requires: lat_deg (latitude in degrees), sunrise and sunset as Time.Moment.
+    hidden function getCivilTwilight(lat_deg as Double, sunrise as Time.Moment, sunset as Time.Moment) as Array? {
+        var PI = Math.PI;
+        var lat = lat_deg * PI / 180.0;
+
+        // Half-day length as hour angle in radians (Earth rotates 2π in 86400s)
+        var half_day_s = (sunset.value() - sunrise.value()) / 2.0;
+        var H0 = half_day_s / 86400.0 * 2.0 * PI;
+
+        // Back-calculate solar declination from H0 and latitude.
+        // sunrise formula: cos(H0) = (sin(h0) - sin(lat)*sin(dec)) / (cos(lat)*cos(dec))
+        // where h0 = -0.8333° (includes atmospheric refraction + solar disc)
+        var sin_h0 = Math.sin(-0.8333 * PI / 180.0);
+        var a = Math.cos(H0) * Math.cos(lat);
+        var b = Math.sin(lat);
+        var R = Math.sqrt(a * a + b * b);
+        var ratio = sin_h0 / R;
+        if (ratio < -1.0 || ratio > 1.0) { return null; }
+        var alpha = Math.atan2(b, a);
+        var dec = alpha - Math.acos(ratio); // valid root; other root is always ~180°+
+
+        // Hour angle for civil twilight (sun at -6°)
+        var cos_H_civil = (Math.sin(-6.0 * PI / 180.0) - Math.sin(lat) * Math.sin(dec)) /
+                          (Math.cos(lat) * Math.cos(dec));
+        if (cos_H_civil > 1.0) { return null; } // polar twilight — sun never drops below -6°
+        if (cos_H_civil < -1.0) { return null; } // shouldn't happen when sunrise is valid
+        var H_civil = Math.acos(cos_H_civil);
+
+        var delta_s = (H_civil - H0) / (2.0 * PI) * 86400.0;
+        var delta = new Time.Duration(delta_s.toNumber());
+        return [sunrise.subtract(delta), sunset.add(delta)];
     }
 
     hidden function getRestCalories() as Number {

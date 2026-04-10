@@ -257,6 +257,8 @@
     <string id="settings_sunrise_time" scope="settings">Soluppgångstid</string>
     <string id="settings_sunset_time" scope="settings">Solnedgångstid</string>
     <string id="settings_next_sun_event" scope="settings">Nästa solhändelse tid (solnedgång/soluppgång)</string>
+    <string id="settings_civil_dawn" scope="settings">Civil gryning tid</string>
+    <string id="settings_civil_dusk" scope="settings">Civil skymning tid</string>
     <string id="settings_hrs_next_sun_event" scope="settings">Timmar till nästa solhändelse (solnedgång/soluppgång)</string>
     <string id="settings_resting_heart_rate" scope="settings">Vilande hjärtfrekvens</string>
     <string id="settings_alternative_timezone_1" scope="settings">Alternativ tidszon 1</string>
