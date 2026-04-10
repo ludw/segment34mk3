@@ -37,6 +37,7 @@ class Segment34View extends WatchUi.WatchFace {
     hidden var bottomFiveAdj as Number = 0;
     hidden var fieldSpaceingAdj as Number = 0;
     hidden var textSideAdj as Number = 0;
+    hidden var secondsClipWidth as Number = 24;
     hidden var iconYAdj as Number = 3;
     hidden var histogramBarWidth as Number = 2;
     hidden var histogramBarSpacing as Number = 2;
@@ -303,6 +304,7 @@ class Segment34View extends WatchUi.WatchFace {
             labelHeight = 8;
             tinyDataHeight = 10;
             smallDataHeight = 13;
+            secondsClipWidth = 24;
             bottomFiveAdj = 2;
             baseY = centerY - smallDataHeight;
             aboveLine2Adjustment = 5;
@@ -319,6 +321,7 @@ class Segment34View extends WatchUi.WatchFace {
             labelHeight = 10;
             tinyDataHeight = 10;
             smallDataHeight = 20;
+            secondsClipWidth = 36;
             bottomFiveAdj = 2;
             baseY = centerY - 6;
             aboveLine2Adjustment = 3;
@@ -360,6 +363,7 @@ class Segment34View extends WatchUi.WatchFace {
             marginY = 8;
             labelHeight = 8;
             smallDataHeight = 13;
+            secondsClipWidth = 24;
             bottomFiveAdj = 5;
             baseY = centerY - smallDataHeight - 4;
             aboveLine2Adjustment = 2;
@@ -375,6 +379,7 @@ class Segment34View extends WatchUi.WatchFace {
             marginY = 6;
             labelHeight = 10;
             smallDataHeight = 20;
+            secondsClipWidth = 36;
             bottomFiveAdj = 5;
             baseY = centerY - 5;
             aboveLine2Adjustment = 2;
@@ -770,14 +775,12 @@ class Segment34View extends WatchUi.WatchFace {
         if(!propAlwaysShowSeconds) { return; }
         doesPartialUpdate = true;
 
-        var clip_width = 24;
-        var clip_height = 20;
         var now = Time.Gregorian.info(Time.now(), Time.FORMAT_SHORT);
         var y1 = baseY + halfClockHeight + marginY;
 
         var seconds = now.sec.format("%02d");
-        
-        dc.setClip(baseX + halfClockWidth - textSideAdj - clip_width, y1, clip_width, clip_height);
+
+        dc.setClip(baseX + halfClockWidth - textSideAdj - secondsClipWidth, y1, secondsClipWidth, smallDataHeight+1);
         dc.setColor(themeColors[bg], themeColors[bg]);
         dc.clear();
 

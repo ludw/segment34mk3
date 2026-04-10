@@ -55,6 +55,10 @@ For refactorings and optimizations keep in mind that:
 - Next sun event in bottom field
 
 ## Change log
+v0.5
+- Fixed issue with High / Low temp via OWM
+- Fixed issue with seconds clipping in always active mode with large font
+
 v0.4
 - Font style options for bottom fields
 - More options for bottom field layout
