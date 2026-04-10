@@ -674,6 +674,10 @@
             <listEntry value="26">@Strings.settings_barometric_pressure_sea</listEntry>
             <listEntry value="15">@Strings.settings_alternative_timezone_1</listEntry>
             <listEntry value="37">@Strings.settings_alternative_timezone_2</listEntry>
+            <listEntry value="35">@Strings.settings_sunrise_time</listEntry>
+            <listEntry value="36">@Strings.settings_sunset_time</listEntry>
+            <listEntry value="43">@Strings.settings_next_sun_event</listEntry>
+            <listEntry value="56">@Strings.settings_hrs_next_sun_event</listEntry>
             <listEntry value="50">@Strings.settings_current_location_accuracy</listEntry>
             <listEntry value="45">@Strings.settings_next_calendar_event_time</listEntry>
             <listEntry value="53">@Strings.settings_cgm_glucose_trend</listEntry>
@@ -703,6 +707,10 @@
             <listEntry value="26">@Strings.settings_barometric_pressure_sea</listEntry>
             <listEntry value="15">@Strings.settings_alternative_timezone_1</listEntry>
             <listEntry value="37">@Strings.settings_alternative_timezone_2</listEntry>
+            <listEntry value="35">@Strings.settings_sunrise_time</listEntry>
+            <listEntry value="36">@Strings.settings_sunset_time</listEntry>
+            <listEntry value="43">@Strings.settings_next_sun_event</listEntry>
+            <listEntry value="56">@Strings.settings_hrs_next_sun_event</listEntry>
             <listEntry value="50">@Strings.settings_current_location_accuracy</listEntry>
             <listEntry value="45">@Strings.settings_next_calendar_event_time</listEntry>
             <listEntry value="53">@Strings.settings_cgm_glucose_trend</listEntry>

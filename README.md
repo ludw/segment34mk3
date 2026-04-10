@@ -49,16 +49,16 @@ For refactorings and optimizations keep in mind that:
 - Pressure trend
 - Monthly run/bike distance
 - Notifications as icon
-- Line font for bottom fields
-- clock font without segments
+
 - separate 24h mode for alt tz
-- Next sun event in bottom field
+- swim distance past 7 days
 
 ## Change log
 v0.5
 - Fixed issue with High / Low temp via OWM
 - Fixed issue with seconds clipping in always active mode with large font
 - Fixed issue with battery bar going outside outline
+- More options for bottom 5 field, incl next sun event
 
 v0.4
 - Font style options for bottom fields
