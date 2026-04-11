@@ -162,6 +162,7 @@
             <listEntry value="58">@Strings.settings_run_distance_7_days</listEntry>
             <listEntry value="20">@Strings.settings_bike_distance_week</listEntry>
             <listEntry value="59">@Strings.settings_bike_distance_7_days</listEntry>
+            <listEntry value="65">@Strings.settings_swim_distance_7_days</listEntry>
             <listEntry value="28">@Strings.settings_total_distance_7_days</listEntry>
             <listEntry value="3">@Strings.settings_floors_climbed_day</listEntry>
             <listEntry value="4">@Strings.settings_meters_climbed_day</listEntry>
@@ -223,6 +224,7 @@
             <listEntry value="58">@Strings.settings_run_distance_7_days</listEntry>
             <listEntry value="20">@Strings.settings_bike_distance_week</listEntry>
             <listEntry value="59">@Strings.settings_bike_distance_7_days</listEntry>
+            <listEntry value="65">@Strings.settings_swim_distance_7_days</listEntry>
             <listEntry value="28">@Strings.settings_total_distance_7_days</listEntry>
             <listEntry value="3">@Strings.settings_floors_climbed_day</listEntry>
             <listEntry value="4">@Strings.settings_meters_climbed_day</listEntry>
@@ -431,6 +433,7 @@
             <listEntry value="58">@Strings.settings_run_distance_7_days</listEntry>
             <listEntry value="20">@Strings.settings_bike_distance_week</listEntry>
             <listEntry value="59">@Strings.settings_bike_distance_7_days</listEntry>
+            <listEntry value="65">@Strings.settings_swim_distance_7_days</listEntry>
             <listEntry value="28">@Strings.settings_total_distance_7_days</listEntry>
             <listEntry value="3">@Strings.settings_floors_climbed_day</listEntry>
             <listEntry value="4">@Strings.settings_meters_climbed_day</listEntry>
@@ -492,6 +495,7 @@
             <listEntry value="58">@Strings.settings_run_distance_7_days</listEntry>
             <listEntry value="20">@Strings.settings_bike_distance_week</listEntry>
             <listEntry value="59">@Strings.settings_bike_distance_7_days</listEntry>
+            <listEntry value="65">@Strings.settings_swim_distance_7_days</listEntry>
             <listEntry value="28">@Strings.settings_total_distance_7_days</listEntry>
             <listEntry value="3">@Strings.settings_floors_climbed_day</listEntry>
             <listEntry value="4">@Strings.settings_meters_climbed_day</listEntry>
@@ -553,6 +557,7 @@
             <listEntry value="58">@Strings.settings_run_distance_7_days</listEntry>
             <listEntry value="20">@Strings.settings_bike_distance_week</listEntry>
             <listEntry value="59">@Strings.settings_bike_distance_7_days</listEntry>
+            <listEntry value="65">@Strings.settings_swim_distance_7_days</listEntry>
             <listEntry value="28">@Strings.settings_total_distance_7_days</listEntry>
             <listEntry value="3">@Strings.settings_floors_climbed_day</listEntry>
             <listEntry value="4">@Strings.settings_meters_climbed_day</listEntry>
@@ -614,6 +619,7 @@
             <listEntry value="58">@Strings.settings_run_distance_7_days</listEntry>
             <listEntry value="20">@Strings.settings_bike_distance_week</listEntry>
             <listEntry value="59">@Strings.settings_bike_distance_7_days</listEntry>
+            <listEntry value="65">@Strings.settings_swim_distance_7_days</listEntry>
             <listEntry value="28">@Strings.settings_total_distance_7_days</listEntry>
             <listEntry value="3">@Strings.settings_floors_climbed_day</listEntry>
             <listEntry value="4">@Strings.settings_meters_climbed_day</listEntry>
@@ -672,6 +678,7 @@
             <listEntry value="58">@Strings.settings_run_distance_7_days</listEntry>
             <listEntry value="20">@Strings.settings_bike_distance_week</listEntry>
             <listEntry value="59">@Strings.settings_bike_distance_7_days</listEntry>
+            <listEntry value="65">@Strings.settings_swim_distance_7_days</listEntry>
             <listEntry value="28">@Strings.settings_total_distance_7_days</listEntry>
             <listEntry value="3">@Strings.settings_floors_climbed_day</listEntry>
             <listEntry value="4">@Strings.settings_meters_climbed_day</listEntry>
@@ -707,6 +714,7 @@
             <listEntry value="58">@Strings.settings_run_distance_7_days</listEntry>
             <listEntry value="20">@Strings.settings_bike_distance_week</listEntry>
             <listEntry value="59">@Strings.settings_bike_distance_7_days</listEntry>
+            <listEntry value="65">@Strings.settings_swim_distance_7_days</listEntry>
             <listEntry value="28">@Strings.settings_total_distance_7_days</listEntry>
             <listEntry value="3">@Strings.settings_floors_climbed_day</listEntry>
             <listEntry value="4">@Strings.settings_meters_climbed_day</listEntry>
@@ -805,6 +813,7 @@
             <listEntry value="58">@Strings.settings_run_distance_7_days</listEntry>
             <listEntry value="20">@Strings.settings_bike_distance_week</listEntry>
             <listEntry value="59">@Strings.settings_bike_distance_7_days</listEntry>
+            <listEntry value="65">@Strings.settings_swim_distance_7_days</listEntry>
             <listEntry value="28">@Strings.settings_total_distance_7_days</listEntry>
             <listEntry value="3">@Strings.settings_floors_climbed_day</listEntry>
             <listEntry value="4">@Strings.settings_meters_climbed_day</listEntry>

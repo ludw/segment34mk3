@@ -89,6 +89,7 @@ class Segment34View extends WatchUi.WatchFace {
     hidden var cachedTempUnit as String = "C";
     hidden var cachedRunDist7Days as Number = 0;
     hidden var cachedBikeDist7Days as Number = 0;
+    hidden var cachedSwimDist7Days as Number = 0;
     hidden var lastActivityDistUpdate as Number = 0;
 
     hidden var lastHfTime as Number? = null;
@@ -2223,6 +2224,13 @@ class Segment34View extends WatchUi.WatchFace {
             }
             var distFactor = propIsMetricDistance ? 0.001 : 0.000621371;
             val = formatDistanceByWidth((complicationType == 58 ? cachedRunDist7Days : cachedBikeDist7Days) * distFactor, width);
+        } else if(complicationType == 65) { // Swim distance past 7 days
+            if(Time.now().value() - lastActivityDistUpdate >= 60*5) {
+                lastActivityDistUpdate = Time.now().value();
+                updateActivityDistCache();
+            }
+            var distFactor = propIsMetricDistance ? 0.001 : 0.000621371;
+            val = formatDistanceByWidth(cachedSwimDist7Days * distFactor, width);
         } else if(complicationType == 60) { // Weather data 1 format string
             val = getWeatherByFormat(propWeatherFormat1);
         } else if(complicationType == 61) { // Weather data 2 format string
@@ -2391,6 +2399,11 @@ class Segment34View extends WatchUi.WatchFace {
             case 55: return formatLabel(Rez.Strings.LABEL_FL, Rez.Strings.LABEL_FL_2, labelSize);
             case 56: return formatLabel(Rez.Strings.LABEL_HRS_NEXT_SUN_EVENT_1, Rez.Strings.LABEL_HRS_NEXT_SUN_EVENT_1, labelSize);
             case 57: return formatLabel(Rez.Strings.LABEL_RHR_1, Rez.Strings.LABEL_RHR_2, labelSize);
+            case 63: return Application.loadResource(Rez.Strings.LABEL_DAWN_1) as String;
+            case 64: return Application.loadResource(Rez.Strings.LABEL_DUSK_1) as String;
+            case 65:
+                if(propIsMetricDistance) { return formatLabel(Rez.Strings.LABEL_WKM_1, Rez.Strings.LABEL_WSWIMKM_2, labelSize); }
+                return formatLabel(Rez.Strings.LABEL_WMI_1, Rez.Strings.LABEL_WSWIMMI_2, labelSize);
         }
         return "";
     }
@@ -2838,17 +2851,20 @@ class Segment34View extends WatchUi.WatchFace {
         var sevenDaysAgoVal = Time.now().value() - (7 * 24 * 3600);
         var runDist = 0;
         var bikeDist = 0;
+        var swimDist = 0;
         var iter = UserProfile.getUserActivityHistory();
         var act = iter.next();
         while (act != null) {
             if (act.startTime != null && act.startTime.value() >= sevenDaysAgoVal && act.distance != null) {
                 if (act.type == Activity.SPORT_RUNNING) { runDist += act.distance; }
                 else if (act.type == Activity.SPORT_CYCLING) { bikeDist += act.distance; }
+                else if (act.type == Activity.SPORT_SWIMMING) { swimDist += act.distance; }
             }
             act = iter.next();
         }
         cachedRunDist7Days = runDist;
         cachedBikeDist7Days = bikeDist;
+        cachedSwimDist7Days = swimDist;
     }
 
     hidden function getWeeklyDistanceFromComplication(isRun as Boolean, conversionFactor as Float, width as Number) as String {

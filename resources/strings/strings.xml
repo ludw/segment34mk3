@@ -97,7 +97,7 @@
     <string id="LABEL_DKM_2">KM TODAY</string>
     <string id="LABEL_DMI_1">D MI</string>
     <string id="LABEL_DMI_2">MI TODAY</string>
-    <string id="LABEL_FLOORS">FLOORS:</string>
+    <string id="LABEL_FLOORS">FLOORS</string>
     <string id="LABEL_CLIMB_1">CLIMB</string>
     <string id="LABEL_CLIMB_2">M CLIMBED</string>
     <string id="LABEL_RECOV_1">RECOV</string>
@@ -108,32 +108,34 @@
     <string id="LABEL_VO2BIKE_2">BIKE VO2</string>
     <string id="LABEL_RESP_1">RESP</string>
     <string id="LABEL_RESP_2">RESP RATE</string>
-    <string id="LABEL_HR">HR:</string>
+    <string id="LABEL_HR">HR</string>
     <string id="LABEL_CAL_1">CAL</string>
     <string id="LABEL_CAL_2">CALORIES</string>
     <string id="LABEL_ALT_1">ALT</string>
     <string id="LABEL_ALT_2">ALTITUDE</string>
-    <string id="LABEL_STRESS">STRESS:</string>
+    <string id="LABEL_STRESS">STRESS</string>
     <string id="LABEL_BBAT_1">B BAT</string>
     <string id="LABEL_BBAT_2">BODY BATT</string>
-    <string id="LABEL_STEPS">STEPS:</string>
+    <string id="LABEL_STEPS">STEPS</string>
     <string id="LABEL_DIST_1">DIST</string>
     <string id="LABEL_DIST_2">M TODAY</string>
-    <string id="LABEL_PUSHES">PUSHES:</string>
+    <string id="LABEL_PUSHES">PUSHES</string>
     <string id="LABEL_WKM_1">W KM</string>
     <string id="LABEL_WRUNM_2">W RUN KM</string>
     <string id="LABEL_WMI_1">W MI</string>
     <string id="LABEL_WRUNMI_2">W RUN MI</string>
     <string id="LABEL_WBIKEKM_2">W BIKE KM</string>
     <string id="LABEL_WBIKEMI_2">W BIKE MI</string>
-    <string id="LABEL_TRAINING">TRAINING:</string>
-    <string id="LABEL_PRESSURE">PRESSURE:</string>
+    <string id="LABEL_WSWIMKM_2">W SWIM KM</string>
+    <string id="LABEL_WSWIMMI_2">W SWIM MI</string>
+    <string id="LABEL_TRAINING">TRAINING</string>
+    <string id="LABEL_PRESSURE">PRESSURE</string>
     <string id="LABEL_KG_1">KG</string>
     <string id="LABEL_WEIGHT_2">WEIGHT</string>
     <string id="LABEL_LBS_1">LBS</string>
     <string id="LABEL_ACAL_1">A CAL</string>
     <string id="LABEL_ACAL_2">ACT. CAL</string>
-    <string id="LABEL_WEEK">WEEK:</string>
+    <string id="LABEL_WEEK">WEEK</string>
     <string id="LABEL_WDISTKM_2">WEEK KM</string>
     <string id="LABEL_WDISTMI_2">WEEK MI</string>
     <string id="LABEL_BATT_1">BATT</string>
@@ -149,6 +151,8 @@
     <string id="LABEL_SUNRISE_2">SUNRISE</string>
     <string id="LABEL_SUNSET_1">SET</string>
     <string id="LABEL_SUNSET_2">SUNSET</string>
+    <string id="LABEL_DAWN_1">DAWN</string>
+    <string id="LABEL_DUSK_1">DUSK</string>
     <string id="LABEL_ALARM_1">ALARM</string>
     <string id="LABEL_ALARM_2">ALARMS</string>
     <string id="LABEL_HIGH_1">HIGH</string>
@@ -254,6 +258,7 @@
     <string id="settings_run_distance_7_days" scope="settings">Run distance past 7 days (on device activities only)</string>
     <string id="settings_bike_distance_week" scope="settings">Bike distance / week</string>
     <string id="settings_bike_distance_7_days" scope="settings">Bike distance past 7 days (on device activities only)</string>
+    <string id="settings_swim_distance_7_days" scope="settings">Swim distance past 7 days (on device activities only)</string>
     <string id="settings_total_distance_7_days" scope="settings">Total distance past 7 days</string>
     <string id="settings_floors_climbed_day" scope="settings">Floors climbed / day</string>
     <string id="settings_meters_climbed_day" scope="settings">Meters climbed / day</string>
