@@ -126,6 +126,8 @@
     <string id="LABEL_WRUNMI_2">MI COUR SEM</string>
     <string id="LABEL_WBIKEKM_2">KM VÉLO</string>
     <string id="LABEL_WBIKEMI_2">MI VÉLO</string>
+    <string id="LABEL_WSWIMKM_2">KM NAT SEM</string>
+    <string id="LABEL_WSWIMMI_2">MI NAT SEM</string>
     <string id="LABEL_TRAINING">ENTRAIN.:</string>
     <string id="LABEL_PRESSURE">PRESSION:</string>
     <string id="LABEL_KG_1">KG</string>
@@ -149,6 +151,8 @@
     <string id="LABEL_SUNRISE_2">LEVER</string>
     <string id="LABEL_SUNSET_1">COUC</string>
     <string id="LABEL_SUNSET_2">COUCHER</string>
+    <string id="LABEL_DAWN_1">AUBE</string>
+    <string id="LABEL_DUSK_1">CRÉP</string>
     <string id="LABEL_ALARM_1">ALARME</string>
     <string id="LABEL_ALARM_2">ALARMES</string>
     <string id="LABEL_HIGH_1">HAUT</string>

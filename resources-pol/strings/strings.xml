@@ -126,6 +126,8 @@
     <string id="LABEL_WRUNMI_2">BIEG MI TG</string>
     <string id="LABEL_WBIKEKM_2">ROWER KM</string>
     <string id="LABEL_WBIKEMI_2">ROWER MI</string>
+    <string id="LABEL_WSWIMKM_2">PŁYW KM</string>
+    <string id="LABEL_WSWIMMI_2">PŁYW MI</string>
     <string id="LABEL_TRAINING">TRENING:</string>
     <string id="LABEL_PRESSURE">CIŚNIENIE:</string>
     <string id="LABEL_KG_1">KG</string>
@@ -149,6 +151,8 @@
     <string id="LABEL_SUNRISE_2">WSCHÓD</string>
     <string id="LABEL_SUNSET_1">ZACH</string>
     <string id="LABEL_SUNSET_2">ZACHÓD</string>
+    <string id="LABEL_DAWN_1">ŚWIT</string>
+    <string id="LABEL_DUSK_1">ZMIERZ</string>
     <string id="LABEL_ALARM_1">ALARM</string>
     <string id="LABEL_ALARM_2">ALARMY</string>
     <string id="LABEL_HIGH_1">WYSOKA</string>

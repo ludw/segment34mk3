@@ -126,6 +126,8 @@
     <string id="LABEL_WRUNMI_2">V LÖPN MI</string>
     <string id="LABEL_WBIKEKM_2">V CYKEL KM</string>
     <string id="LABEL_WBIKEMI_2">V CYKEL MI</string>
+    <string id="LABEL_WSWIMKM_2">V SIM KM</string>
+    <string id="LABEL_WSWIMMI_2">V SIM MI</string>
     <string id="LABEL_TRAINING">TRÄNING:</string>
     <string id="LABEL_PRESSURE">TRYCK:</string>
     <string id="LABEL_KG_1">KG</string>
@@ -149,6 +151,8 @@
     <string id="LABEL_SUNRISE_2">SOLUPPGÅNG</string>
     <string id="LABEL_SUNSET_1">SOLNED</string>
     <string id="LABEL_SUNSET_2">SOLNEDGÅNG</string>
+    <string id="LABEL_DAWN_1">GRYNING</string>
+    <string id="LABEL_DUSK_1">SKYMNING</string>
     <string id="LABEL_ALARM_1">ALARM</string>
     <string id="LABEL_ALARM_2">ALARM</string>
     <string id="LABEL_HIGH_1">HÖG</string>

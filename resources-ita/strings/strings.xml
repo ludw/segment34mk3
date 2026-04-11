@@ -126,6 +126,8 @@
     <string id="LABEL_WRUNMI_2">MI CORSA S</string>
     <string id="LABEL_WBIKEKM_2">KM BICI S</string>
     <string id="LABEL_WBIKEMI_2">MI BICI S</string>
+    <string id="LABEL_WSWIMKM_2">KM NUOTO S</string>
+    <string id="LABEL_WSWIMMI_2">MI NUOTO S</string>
     <string id="LABEL_TRAINING">ALLENAMENTO:</string>
     <string id="LABEL_PRESSURE">PRESSIONE:</string>
     <string id="LABEL_KG_1">KG</string>
@@ -149,6 +151,8 @@
     <string id="LABEL_SUNRISE_2">ALBA</string>
     <string id="LABEL_SUNSET_1">TRAM</string>
     <string id="LABEL_SUNSET_2">TRAMONTO</string>
+    <string id="LABEL_DAWN_1">AURORA</string>
+    <string id="LABEL_DUSK_1">CREPUSC</string>
     <string id="LABEL_ALARM_1">SVEGL</string>
     <string id="LABEL_ALARM_2">SVEGLIE</string>
     <string id="LABEL_HIGH_1">MAX</string>

@@ -126,6 +126,8 @@
     <string id="LABEL_WRUNMI_2">W LAUF MI</string>
     <string id="LABEL_WBIKEKM_2">W RAD KM</string>
     <string id="LABEL_WBIKEMI_2">W RAD MI</string>
+    <string id="LABEL_WSWIMKM_2">W SWIM KM</string>
+    <string id="LABEL_WSWIMMI_2">W SWIM MI</string>
     <string id="LABEL_TRAINING">TRAINING:</string>
     <string id="LABEL_PRESSURE">DRUCK:</string>
     <string id="LABEL_KG_1">KG</string>
@@ -149,6 +151,8 @@
     <string id="LABEL_SUNRISE_2">SONNENAUFGANG</string>
     <string id="LABEL_SUNSET_1">S UNTG</string>
     <string id="LABEL_SUNSET_2">SONNENUNTERGANG</string>
+    <string id="LABEL_DAWN_1">MORGEN</string>
+    <string id="LABEL_DUSK_1">ABEND</string>
     <string id="LABEL_ALARM_1">ALARM</string>
     <string id="LABEL_ALARM_2">ALARME</string>
     <string id="LABEL_HIGH_1">HOCH</string>
