@@ -447,4 +447,41 @@
     <string id="settings_temperature_uv_wind" scope="settings">Temperatur, UV-index, Vind</string>
     <string id="settings_cgm_glucose_trend" scope="settings">CGM Glukos + Trend</string>
     <string id="settings_cgm_age" scope="settings">CGM Ålder (minuter)</string>
+    <string id="settings_just_outline" scope="settings">Visa bara konturen</string>
+    <string id="settings_clock_gradient_overlay" scope="settings">Klocka gradientöverlager</string>
+    <string id="settings_gradient_clock_and_aod" scope="settings">Gradient för både klocka och AOD (standard)</string>
+    <string id="settings_gradient_aod_only" scope="settings">Ingen gradient för klocka, gradient i AOD</string>
+    <string id="settings_gradient_clock_only" scope="settings">Gradient för klocka, ingen gradient i AOD</string>
+    <string id="settings_gradient_clock_scanlines_aod" scope="settings">Gradient för klocka, skanlinjer i AOD</string>
+    <string id="settings_gradient_no_clock_scanlines_aod" scope="settings">Ingen gradient för klocka, skanlinjer i AOD</string>
+    <string id="settings_gradient_none" scope="settings">Inga gradienter</string>
+    <string id="settings_clock_font" scope="settings">Klockfont</string>
+    <string id="settings_font_34_segments" scope="settings">34 segment, standard</string>
+    <string id="settings_font_17_segments" scope="settings">17 segment</string>
+    <string id="settings_font_17_segments_rounded" scope="settings">17 segment (avrundade)</string>
+    <string id="settings_font_7_segments" scope="settings">7 segment</string>
+    <string id="settings_font_dots" scope="settings">Punkter</string>
+    <string id="settings_font_size" scope="settings">Teckenstorlek</string>
+    <string id="settings_font_small" scope="settings">Liten (standard)</string>
+    <string id="settings_font_large" scope="settings">Stor (justera andra inställningar för att minska trånghet)</string>
+    <string id="settings_every_30_seconds" scope="settings">Var 30:e sekund</string>
+    <string id="settings_histogram_size" scope="settings">Histogramstorlek</string>
+    <string id="settings_histogram_small" scope="settings">Liten (standard)</string>
+    <string id="settings_histogram_large" scope="settings">Stor</string>
+    <string id="settings_auto" scope="settings">Auto - AM/PM för 12h-tid</string>
+    <string id="settings_ampm" scope="settings">Ingen separator, visa AM/PM efter istället</string>
+    <string id="settings_show_temp_unit" scope="settings">Visa temperaturenhet</string>
+    <string id="settings_swim_distance_7_days" scope="settings">Simavstånd senaste 7 dagarna (endast aktiviteter på enheten)</string>
+    <string id="settings_weather_data_1" scope="settings">Väderdata 1 (ange format nedan)</string>
+    <string id="settings_weather_data_2" scope="settings">Väderdata 2 (ange format nedan)</string>
+    <string id="settings_weather_format_1" scope="settings">Format väderdata 1 (t=temp w=vind h=fuktighet p=nbd u=UV l=hög/låg f=känns c=förhållanden s=korta förhållanden n=stad(endast OWM))</string>
+    <string id="settings_weather_format_2" scope="settings">Format väderdata 2 (t=temp w=vind h=fuktighet p=nbd u=UV l=hög/låg f=känns c=förhållanden s=korta förhållanden n=stad(endast OWM))</string>
+    <string id="settings_weather_feels_like" scope="settings">Väder: Känns som temperatur</string>
+    <string id="settings_weather_provider" scope="settings">Väderleverantör</string>
+    <string id="settings_garmin" scope="settings">Garmin</string>
+    <string id="settings_openweathermap" scope="settings">OpenWeatherMap (se FAQ 5.0.0 på ludw.github.io/faq för installation)</string>
+    <string id="settings_owm_api_key" scope="settings">OWM API-nyckel</string>
+    <string id="settings_owm_location_override" scope="settings">OWM platsöverstyrning (lat,lon t.ex. 51.5,-0.1 — lämna tomt för att använda Garmin-plats)</string>
+    <string id="settings_seconds_shows" scope="settings">Sekundfält visar</string>
+    <string id="settings_seconds" scope="settings">Sekunder</string>
 </strings>

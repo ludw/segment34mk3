@@ -13,6 +13,7 @@
     <property id="windUnit" type="number">0</property>
     <property id="pressureUnit" type="number">0</property>
     <property id="notificationCountShows" type="number">32</property>
+    <property id="secondsShows" type="number">-3</property>
     <property id="showSeconds" type="boolean">true</property>
     <property id="topPartShows" type="number">0</property>
     <property id="sunriseFieldShows" type="number">35</property>

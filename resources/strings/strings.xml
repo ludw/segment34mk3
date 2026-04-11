@@ -291,6 +291,7 @@
     <string id="settings_battery_percentage" scope="settings">Battery percentage</string>
     <string id="settings_battery_days_remaining" scope="settings">Battery days remaining</string>
     <string id="settings_notification_count" scope="settings">Notification count</string>
+    <string id="settings_seconds" scope="settings">Seconds</string>
     <string id="settings_solar_intensity" scope="settings">Solar intensity</string>
     <string id="settings_sensor_temperature" scope="settings">Sensor temperature</string>
     <string id="settings_alarms_count" scope="settings">Alarms (count)</string>
@@ -325,8 +326,8 @@
     <string id="settings_date" scope="settings">Date</string>
     <string id="settings_weather_data_1" scope="settings">Weather data 1 (specify format below)</string>
     <string id="settings_weather_data_2" scope="settings">Weather data 2 (specify format below)</string>
-    <string id="settings_weather_format_1" scope="settings">Weather data 1 format (t=temp w=wind h=humidity p=precip u=UV l=high/low f=feels c=condition n=city(OWM only))</string>
-    <string id="settings_weather_format_2" scope="settings">Weather data 2 format (t=temp w=wind h=humidity p=precip u=UV l=high/low f=feels c=condition n=city(OWM only))</string>
+    <string id="settings_weather_format_1" scope="settings">Weather data 1 format (t=temp w=wind h=humidity p=precip u=UV l=high/low f=feels c=conditions s=shortened conditions n=city(OWM only))</string>
+    <string id="settings_weather_format_2" scope="settings">Weather data 2 format (t=temp w=wind h=humidity p=precip u=UV l=high/low f=feels c=conditions s=shortened conditions n=city(OWM only))</string>
     <string id="settings_steps_day" scope="settings">Steps / day</string>
     <string id="settings_wheelchair_pushes_day" scope="settings">Wheelchair pushes / day</string>
     <string id="settings_calories_kcal_day_2" scope="settings">Calories (kcal) / day</string>
@@ -435,6 +436,7 @@
     <string id="settings_show_clock_background" scope="settings">Show clock background</string>
     <string id="settings_show_data_fields_background" scope="settings">Show data fields background</string>
     <string id="settings_notification_field_shows" scope="settings">Number left of seconds shows</string>
+    <string id="settings_seconds_shows" scope="settings">Seconds field shows</string>
     <string id="settings_zeropad_hour_clock" scope="settings">Zeropad hour on clock</string>
     <string id="settings_separator_hours_minutes" scope="settings">Separator between Hours and Minutes, AM/PM</string>
     <string id="settings_auto" scope="settings">Auto - AM/PM for 12h time</string>

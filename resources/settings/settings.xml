@@ -397,8 +397,31 @@
             <listEntry value="12">@Strings.settings_stress_score</listEntry>
             <listEntry value="47">@Strings.settings_pulse_ox</listEntry>
             <listEntry value="3">@Strings.settings_floors_climbed_day</listEntry>
+            <listEntry value="9">@Strings.settings_heart_rate</listEntry>
         </settingConfig>
     </setting>
+
+    <setting propertyKey="@Properties.secondsShows" title="@Strings.settings_seconds_shows">
+        <settingConfig type="list">
+            <listEntry value="-2">@Strings.settings_hidden</listEntry>
+            <listEntry value="-3">@Strings.settings_seconds</listEntry>
+            <listEntry value="32">@Strings.settings_notification_count</listEntry>
+            <listEntry value="27">@Strings.settings_week_number</listEntry>
+            <listEntry value="30">@Strings.settings_battery_percentage</listEntry>
+            <listEntry value="31">@Strings.settings_battery_days_remaining</listEntry>
+            <listEntry value="38">@Strings.settings_alarms_count</listEntry>
+            <listEntry value="51">@Strings.settings_weather_uv_index</listEntry>
+            <listEntry value="13">@Strings.settings_body_battery</listEntry>
+            <listEntry value="12">@Strings.settings_stress_score</listEntry>
+            <listEntry value="47">@Strings.settings_pulse_ox</listEntry>
+            <listEntry value="3">@Strings.settings_floors_climbed_day</listEntry>
+            <listEntry value="9">@Strings.settings_heart_rate</listEntry>
+            <listEntry value="16">@Strings.settings_steps_day</listEntry>
+
+        </settingConfig>
+    </setting>
+
+    
 
     <setting propertyKey="@Properties.fieldLayout" title="@Strings.settings_bottom_field_layout">
         <settingConfig type="list">

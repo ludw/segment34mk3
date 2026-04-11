@@ -443,4 +443,44 @@
     <string id="settings_temperature_uv_wind" scope="settings">Température, Indice UV, Vent</string>
     <string id="settings_cgm_glucose_trend" scope="settings">CGM Glycémie + Tendance</string>
     <string id="settings_cgm_age" scope="settings">CGM Âge (minutes)</string>
+    <string id="settings_just_outline" scope="settings">Afficher uniquement le contour</string>
+    <string id="settings_clock_gradient_overlay" scope="settings">Superposition de dégradé de l'horloge</string>
+    <string id="settings_gradient_clock_and_aod" scope="settings">Dégradé pour l'horloge et l'AOD (défaut)</string>
+    <string id="settings_gradient_aod_only" scope="settings">Pas de dégradé pour l'horloge, dégradé en AOD</string>
+    <string id="settings_gradient_clock_only" scope="settings">Dégradé pour l'horloge, pas de dégradé en AOD</string>
+    <string id="settings_gradient_clock_scanlines_aod" scope="settings">Dégradé pour l'horloge, scanlines en AOD</string>
+    <string id="settings_gradient_no_clock_scanlines_aod" scope="settings">Pas de dégradé pour l'horloge, scanlines en AOD</string>
+    <string id="settings_gradient_none" scope="settings">Pas de dégradés</string>
+    <string id="settings_clock_font" scope="settings">Police de l'horloge</string>
+    <string id="settings_font_34_segments" scope="settings">34 segments, défaut</string>
+    <string id="settings_font_17_segments" scope="settings">17 segments</string>
+    <string id="settings_font_17_segments_rounded" scope="settings">17 segments (arrondi)</string>
+    <string id="settings_font_7_segments" scope="settings">7 segments</string>
+    <string id="settings_font_dots" scope="settings">Points</string>
+    <string id="settings_font_size" scope="settings">Taille de la police</string>
+    <string id="settings_font_small" scope="settings">Petit (défaut)</string>
+    <string id="settings_font_large" scope="settings">Grand (ajustez les autres paramètres pour moins d'encombrement)</string>
+    <string id="settings_every_30_seconds" scope="settings">Toutes les 30 secondes</string>
+    <string id="settings_histogram_size" scope="settings">Taille de l'histogramme</string>
+    <string id="settings_histogram_small" scope="settings">Petit (défaut)</string>
+    <string id="settings_histogram_large" scope="settings">Grand</string>
+    <string id="settings_bottom_font_variant" scope="settings">Variante de police des champs inférieurs :</string>
+    <string id="settings_auto" scope="settings">Auto - AM/PM pour l'heure 12h</string>
+    <string id="settings_ampm" scope="settings">Pas de séparateur, afficher AM/PM après</string>
+    <string id="settings_show_temp_unit" scope="settings">Afficher l'unité de température</string>
+    <string id="settings_swim_distance_7_days" scope="settings">Distance de natation des 7 derniers jours (activités sur appareil uniquement)</string>
+    <string id="settings_civil_dawn" scope="settings">Heure de l'aube civile</string>
+    <string id="settings_civil_dusk" scope="settings">Heure du crépuscule civil</string>
+    <string id="settings_weather_data_1" scope="settings">Données météo 1 (indiquer le format ci-dessous)</string>
+    <string id="settings_weather_data_2" scope="settings">Données météo 2 (indiquer le format ci-dessous)</string>
+    <string id="settings_weather_format_1" scope="settings">Format données météo 1 (t=temp w=vent h=humidité p=précip u=UV l=max/min f=ressenti c=conditions s=conditions courtes n=ville(OWM seulement))</string>
+    <string id="settings_weather_format_2" scope="settings">Format données météo 2 (t=temp w=vent h=humidité p=précip u=UV l=max/min f=ressenti c=conditions s=conditions courtes n=ville(OWM seulement))</string>
+    <string id="settings_weather_feels_like" scope="settings">Météo : Température ressentie</string>
+    <string id="settings_weather_provider" scope="settings">Fournisseur météo</string>
+    <string id="settings_garmin" scope="settings">Garmin</string>
+    <string id="settings_openweathermap" scope="settings">OpenWeatherMap (voir FAQ 5.0.0 sur ludw.github.io/faq pour la configuration)</string>
+    <string id="settings_owm_api_key" scope="settings">Clé API OWM</string>
+    <string id="settings_owm_location_override" scope="settings">Remplacement de la localisation OWM (lat,lon ex. 51.5,-0.1 — laisser vide pour utiliser la localisation Garmin)</string>
+    <string id="settings_seconds_shows" scope="settings">Le champ secondes affiche</string>
+    <string id="settings_seconds" scope="settings">Secondes</string>
 </strings>

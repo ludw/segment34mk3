@@ -297,8 +297,8 @@
     <string id="settings_date" scope="settings">Datum</string>
     <string id="settings_weather_data_1" scope="settings">Wetterdaten 1 (Format unten angeben)</string>
     <string id="settings_weather_data_2" scope="settings">Wetterdaten 2 (Format unten angeben)</string>
-    <string id="settings_weather_format_1" scope="settings">Wetterdaten 1 Format (t=Temp w=Wind h=Feuchte p=Regen u=UV l=Hoch/Tief f=Gefühlt c=Lage)</string>
-    <string id="settings_weather_format_2" scope="settings">Wetterdaten 2 Format (t=Temp w=Wind h=Feuchte p=Regen u=UV l=Hoch/Tief f=Gefühlt c=Lage)</string>
+    <string id="settings_weather_format_1" scope="settings">Wetterdaten 1 Format (t=Temp w=Wind h=Feuchte p=Regen u=UV l=Hoch/Tief f=Gefühlt c=Lage s=Kurzlage)</string>
+    <string id="settings_weather_format_2" scope="settings">Wetterdaten 2 Format (t=Temp w=Wind h=Feuchte p=Regen u=UV l=Hoch/Tief f=Gefühlt c=Lage s=Kurzlage)</string>
     <string id="settings_steps_day" scope="settings">Schritte / Tag</string>
     <string id="settings_wheelchair_pushes_day" scope="settings">Rollstuhl-Schübe / Tag</string>
     <string id="settings_calories_kcal_day_2" scope="settings">Kalorien (kcal) / Tag</string>
@@ -426,4 +426,45 @@
     <string id="settings_text_alignment_bottom_labels" scope="settings">Textausrichtung untere Feld-Beschriftungen:</string>
     <string id="settings_temperature_uv_precipitation" scope="settings">Temp, UV Index, Regenwahrsch.</string>
     <string id="settings_temperature_uv_wind" scope="settings">Temp, UV Index, Wind</string>
+    <string id="settings_just_outline" scope="settings">Nur Kontur anzeigen</string>
+    <string id="settings_clock_gradient_overlay" scope="settings">Uhr-Verlauf-Overlay</string>
+    <string id="settings_gradient_clock_and_aod" scope="settings">Verlauf für Uhr und AOD (Standard)</string>
+    <string id="settings_gradient_aod_only" scope="settings">Kein Verlauf für Uhr, Verlauf im AOD</string>
+    <string id="settings_gradient_clock_only" scope="settings">Verlauf für Uhr, kein Verlauf im AOD</string>
+    <string id="settings_gradient_clock_scanlines_aod" scope="settings">Verlauf für Uhr, Scanlines im AOD</string>
+    <string id="settings_gradient_no_clock_scanlines_aod" scope="settings">Kein Verlauf für Uhr, Scanlines im AOD</string>
+    <string id="settings_gradient_none" scope="settings">Keine Verläufe</string>
+    <string id="settings_clock_font" scope="settings">Uhren-Schriftart</string>
+    <string id="settings_font_34_segments" scope="settings">34 Segmente, Standard</string>
+    <string id="settings_font_17_segments" scope="settings">17 Segmente</string>
+    <string id="settings_font_17_segments_rounded" scope="settings">17 Segmente (abgerundet)</string>
+    <string id="settings_font_7_segments" scope="settings">7 Segmente</string>
+    <string id="settings_font_dots" scope="settings">Punkte</string>
+    <string id="settings_font_size" scope="settings">Schriftgröße</string>
+    <string id="settings_font_small" scope="settings">Klein (Standard)</string>
+    <string id="settings_font_large" scope="settings">Groß (andere Einstellungen anpassen um weniger beengt zu wirken)</string>
+    <string id="settings_every_30_seconds" scope="settings">Alle 30 Sekunden</string>
+    <string id="settings_histogram_size" scope="settings">Histogrammgröße</string>
+    <string id="settings_histogram_small" scope="settings">Klein (Standard)</string>
+    <string id="settings_histogram_large" scope="settings">Groß</string>
+    <string id="settings_bottom_font_variant" scope="settings">Untere Felder Schriftart-Variante:</string>
+    <string id="settings_bottom_5_digit_value_2" scope="settings">Unterer 5-stelliger Wert 2 (nur quadratische Uhren):</string>
+    <string id="settings_auto" scope="settings">Auto - AM/PM bei 12h-Zeit</string>
+    <string id="settings_ampm" scope="settings">Kein Trennzeichen, stattdessen AM/PM nachstellen</string>
+    <string id="settings_show_temp_unit" scope="settings">Temperatureinheit anzeigen</string>
+    <string id="settings_notification_field_shows" scope="settings">Zahl links der Sekunden zeigt</string>
+    <string id="settings_swim_distance_7_days" scope="settings">Schwimmdistanz der letzten 7 Tage (nur Geräteaktivitäten)</string>
+    <string id="settings_hrs_next_sun_event" scope="settings">Stunden bis zum nächsten Sonnenereignis (Sonnenauf/-untergang)</string>
+    <string id="settings_civil_dawn" scope="settings">Bürgerliche Morgendämmerung</string>
+    <string id="settings_civil_dusk" scope="settings">Bürgerliche Abenddämmerung</string>
+    <string id="settings_weather_feels_like" scope="settings">Wetter: Gefühlte Temperatur</string>
+    <string id="settings_weather_provider" scope="settings">Wetteranbieter</string>
+    <string id="settings_garmin" scope="settings">Garmin</string>
+    <string id="settings_openweathermap" scope="settings">OpenWeatherMap (siehe FAQ 5.0.0 auf ludw.github.io/faq für Einrichtung)</string>
+    <string id="settings_owm_api_key" scope="settings">OWM API-Schlüssel</string>
+    <string id="settings_owm_location_override" scope="settings">OWM Standort-Überschreibung (Breitengrad,Längengrad z.B. 51.5,-0.1 — leer lassen für Garmin-Standort)</string>
+    <string id="settings_cgm_glucose_trend" scope="settings">CGM Glukose + Trend</string>
+    <string id="settings_cgm_age" scope="settings">CGM Alter (Minuten)</string>
+    <string id="settings_seconds_shows" scope="settings">Sekundenfeld zeigt</string>
+    <string id="settings_seconds" scope="settings">Sekunden</string>
 </strings>

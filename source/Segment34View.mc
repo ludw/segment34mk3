@@ -157,6 +157,7 @@ class Segment34View extends WatchUi.WatchFace {
     hidden var propDateFormat as Number = 0;
     hidden var propDateCustomFormat as String = "DDD, DD MMMM";
     hidden var propNotificationCountShows as Number = 36;
+    hidden var propSecondsShows as Number = -3;
     hidden var propTzOffset1 as Number = 0;
     hidden var propTzOffset2 as Number = 0;
     hidden var propTzName1 as String = "";
@@ -680,13 +681,8 @@ class Segment34View extends WatchUi.WatchFace {
             infoMessage = ""; 
         }
         
-        // updateSeconds logic
-        if(isSleeping and (!propAlwaysShowSeconds or canBurnIn)) {
-            values[:dataSeconds] = "";
-        } else {
-            values[:dataSeconds] = now.sec.format("%02d");
-        }
-
+        values[:dataSeconds] = getValueForSeconds(now);
+        
         return values;
     }
 
@@ -727,11 +723,7 @@ class Segment34View extends WatchUi.WatchFace {
         } else {
             // Only update time-sensitive values
             cachedValues[:dataClock] = getClockData(now);
-            if(isSleeping and (!propAlwaysShowSeconds or canBurnIn)) {
-                cachedValues[:dataSeconds] = "";
-            } else {
-                cachedValues[:dataSeconds] = now.sec.format("%02d");
-            }
+            cachedValues[:dataSeconds] = getValueForSeconds(now);
         }
 
         if(isSleeping and canBurnIn) {
@@ -1467,6 +1459,7 @@ class Segment34View extends WatchUi.WatchFace {
         propDateFormat = p.getValue("dateFormat") as Number;
         propDateCustomFormat = p.getValue("dateCustomFormat") as String;
         propNotificationCountShows = p.getValue("notificationCountShows") as Number;
+        propSecondsShows = p.getValue("secondsShows") as Number;
         propTzOffset1 = p.getValue("tzOffset1") as Number;
         propTzOffset2 = p.getValue("tzOffset2") as Number;
         propTzName1 = p.getValue("tzName1") as String;
@@ -1500,6 +1493,18 @@ class Segment34View extends WatchUi.WatchFace {
             if (comp != null && comp.value != null) { return comp.value.toFloat(); }
         } catch(e) {}
         return null;
+    }
+
+    hidden function getValueForSeconds(now as Gregorian.Info) as String {
+        if(propSecondsShows == -3) {
+            // updateSeconds logic
+            if(isSleeping and (!propAlwaysShowSeconds or canBurnIn)) {
+                return "";
+            } else {
+                return now.sec.format("%02d");
+            }
+        }
+        return getValueByType(propSecondsShows, 5);
     }
 
     hidden function getClockData(now as Gregorian.Info) as String {
@@ -2459,6 +2464,7 @@ class Segment34View extends WatchUi.WatchFace {
             else if(ch.equals("l")) { result = result + getHighLow(); }
             else if(ch.equals("f")) { result = result + getFeelsLike(); }
             else if(ch.equals("c")) { result = result + getWeatherCondition(); }
+            else if(ch.equals("s")) { result = result + getWeatherConditionShort(); }
             else if(ch.equals("n")) { result = result + getCityName(); }
             else { result = result + ch; }
             i += 1;
@@ -2578,6 +2584,27 @@ class Segment34View extends WatchUi.WatchFace {
         var idx = weatherCondition.condition.toNumber();
         if (idx < 0 || idx >= weatherStrings.size()) { idx = 53; }
         return Application.loadResource(weatherStrings[idx]);
+    }
+
+    hidden function getWeatherConditionShort() as String {
+        if (owmError != null) { return owmError; }
+        if (weatherCondition == null || weatherCondition.condition == null) {
+            return "";
+        }
+        var short = [
+            "CLEAR", "CLOUDY", "CLOUDY", "RAIN", "SNOW", "WINDY", "THUNDER",
+            "WINTRY", "FOG", "HAZY", "HAIL", "SHOWERS", "THUNDER", "UNKNOWN",
+            "RAIN", "HVY RAIN", "SNOW", "HVY SNOW", "RAIN SNOW", "RAIN SNOW",
+            "CLOUDY", "RAIN SNOW", "CLEAR", "CLEAR", "SHOWERS", "SHOWERS",
+            "SHOWERS", "(SHOWERS)", "(THUNDER)", "MIST", "DUST", "DRIZZLE",
+            "TORNADO", "SMOKE", "ICE", "SAND", "SQUALL", "SANDSTORM",
+            "VOLC ASH", "HAZE", "FAIR", "HURRICANE", "TROP STORM", "(SNOW)",
+            "(RAIN SNOW)", "(RAIN)", "(SNOW)", "(RAIN SNOW)", "FLURRIES",
+            "FRZ RAIN", "SLEET", "ICE SNOW", "CLOUDY", "UNKNOWN"
+        ];
+        var idx = weatherCondition.condition.toNumber();
+        if (idx < 0 || idx >= short.size()) { idx = 53; }
+        return short[idx];
     }
 
     hidden function getTemperature() as String {
