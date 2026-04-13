@@ -801,16 +801,20 @@ class Segment34View extends WatchUi.WatchFace {
     hidden function calculateFieldXCoords(data_width as Float, left_edge as Number) as Void {
         var digits = getFieldWidths();
         var tot_digits = digits[0] + digits[1] + digits[2] + digits[3];
-        if (tot_digits == 0) { return; } 
-        var dw1 = Math.round(digits[0] * data_width / tot_digits);
-        var dw2 = Math.round(digits[1] * data_width / tot_digits);
-        var dw3 = Math.round(digits[2] * data_width / tot_digits);
-        var dw4 = Math.round(digits[3] * data_width / tot_digits);
+        if (tot_digits == 0) { return; }
 
-        fieldXCoords[0] = left_edge + Math.round(dw1 / 2);
-        fieldXCoords[1] = left_edge + Math.round(dw1 + (dw2 / 2));
-        fieldXCoords[2] = left_edge + Math.round(dw1 + dw2 + (dw3 / 2));
-        fieldXCoords[3] = left_edge + Math.round(dw1 + dw2 + dw3 + (dw4 / 2));
+        // Compute each field center in a single expression to avoid accumulated rounding errors.
+        // This keeps symmetric layouts (e.g. 3-5-3) perfectly centered relative to data_width.
+        var d0 = digits[0].toFloat();
+        var d1 = digits[1].toFloat();
+        var d2 = digits[2].toFloat();
+        var d3 = digits[3].toFloat();
+        var tot = tot_digits.toFloat();
+
+        fieldXCoords[0] = left_edge + Math.round((d0 / 2.0) * data_width / tot);
+        fieldXCoords[1] = left_edge + Math.round((d0 + d1 / 2.0) * data_width / tot);
+        fieldXCoords[2] = left_edge + Math.round((d0 + d1 + d2 / 2.0) * data_width / tot);
+        fieldXCoords[3] = left_edge + Math.round((d0 + d1 + d2 + d3 / 2.0) * data_width / tot);
     }
 
     hidden function drawWatchface(dc as Dc, now as Gregorian.Info, aod as Boolean, values as Dictionary) as Void {
@@ -1055,9 +1059,11 @@ class Segment34View extends WatchUi.WatchFace {
             return [5, 3, 3, 0];
         } else if(propFieldLayout == 14) {
             return [5, 0, 0, 0];
-        } else {
+        } else if(propFieldLayout == 15) {
             return [5, 5, 0, 0];
-        } 
+        } else {
+            return [3, 5, 3, 0];
+        }
     }
 
     hidden function drawDataField(dc as Dc, x as Number, y as Number, adjX as Number, label as String?, value as String, width as Number, font as FontResource, bgwidth as Number) as Number {
@@ -3143,11 +3149,11 @@ class Segment34View extends WatchUi.WatchFace {
             }
 
             // Draw both fields
-            drawDataField(dc, bottomFive1X, bottomFiveY, 0,
+            drawDataField(dc, bottomFive1X, bottomFiveY, 3,
                 null, values[:dataBottom], 5,
                 fontBottomData, field1Width);
 
-            drawDataField(dc, bottomFive2X, bottomFiveY, 0,
+            drawDataField(dc, bottomFive2X, bottomFiveY, 3,
                 null, values[:dataBottom2], 5,
                 fontBottomData, field2Width);
 
@@ -3163,7 +3169,7 @@ class Segment34View extends WatchUi.WatchFace {
                 Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER);
         } else {
             // Single field - original behavior
-            var step_width = drawDataField(dc, centerX, bottomFiveY, 0, null, values[:dataBottom], 5, fontBottomData, bottomDataWidth * 5);
+            var step_width = drawDataField(dc, centerX, bottomFiveY, 3, null, values[:dataBottom], 5, fontBottomData, bottomDataWidth * 5);
 
             // Draw icons
             dc.setColor(themeColors[dataVal], Graphics.COLOR_TRANSPARENT);
@@ -3187,7 +3193,7 @@ class Segment34View extends WatchUi.WatchFace {
 
     (:Round)
     hidden function drawBottomFieldsWithIcons(dc as Dc, values as Dictionary) as Void {
-        var step_width = drawDataField(dc, centerX, bottomFiveY, 0, null, values[:dataBottom], 5, fontBottomData, bottomDataWidth * 5);
+        var step_width = drawDataField(dc, centerX, bottomFiveY, 3, null, values[:dataBottom], 5, fontBottomData, bottomDataWidth * 5);
 
         // Draw icons
         dc.setColor(themeColors[dataVal], Graphics.COLOR_TRANSPARENT);

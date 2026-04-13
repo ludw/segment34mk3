@@ -51,7 +51,6 @@ For refactorings and optimizations keep in mind that:
 - Notifications as icon
 
 - separate 24h mode for alt tz
-- swim distance past 7 days
 
 ## Change log
 v0.6

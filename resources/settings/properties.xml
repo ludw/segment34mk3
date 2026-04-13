@@ -1,5 +1,5 @@
 <properties>
-    <property id="colorTheme" type="number">0</property>
+    <property id="colorTheme" type="number">8</property>
     <property id="nightColorTheme" type="number">-1</property>
     <property id="nightThemeActivation" type="number">0</property>
     <property id="colorOverride" type="string"></property>
@@ -53,7 +53,7 @@
     <property id="dateFormat" type="number">0</property>
     <property id="dateCustomFormat" type="string">o, d n</property>
     <property id="smallFontVariant" type="number">2</property>
-    <property id="bottomFontVariant" type="number">0</property>
+    <property id="bottomFontVariant" type="number">2</property>
     <property id="hemisphere" type="number">0</property>
     <property id="tzOffset1" type="number">0</property>
     <property id="tzOffset2" type="number">0</property>
