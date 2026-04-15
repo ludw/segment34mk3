@@ -53,6 +53,13 @@ For refactorings and optimizations keep in mind that:
 - separate 24h mode for alt tz
 
 ## Change log
+v0.8
+- More adjustments to 7 segment font
+- Separate 24h/12h setting for alt timezone
+
+v0.7
+- Fix for font errors
+
 v0.6
 - Steps in small fields behaves a bit better
 - Outline for 17 segment (rounded) fixed

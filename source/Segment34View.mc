@@ -162,6 +162,7 @@ class Segment34View extends WatchUi.WatchFace {
     hidden var propTzOffset2 as Number = 0;
     hidden var propTzName1 as String = "";
     hidden var propTzName2 as String = "";
+    hidden var propTzHourFormat as Number = 0;
     hidden var propWeekOffset as Number = 0;
     hidden var propLabelVisibility as Number = 0;
     hidden var propSmallFontVariant as Number = 0;
@@ -1470,6 +1471,7 @@ class Segment34View extends WatchUi.WatchFace {
         propTzOffset2 = p.getValue("tzOffset2") as Number;
         propTzName1 = p.getValue("tzName1") as String;
         propTzName2 = p.getValue("tzName2") as String;
+        propTzHourFormat = p.getValue("tzHourFormat") as Number;
         propWeekOffset = p.getValue("weekOffset") as Number;
         propSmallFontVariant = p.getValue("smallFontVariant") as Number;
         propBottomFontVariant = p.getValue("bottomFontVariant") as Number;
@@ -2997,11 +2999,17 @@ class Segment34View extends WatchUi.WatchFace {
         if(hour > 23) {
             hour -= 24;
         }
-        var f_hour = formatHour(hour);
+        var mainClockIs12h = (!propIs24H and propHourFormat == 0) or propHourFormat == 2;
+        var tzIs12h = (propTzHourFormat == 2) or (propTzHourFormat == 0 and mainClockIs12h);
+        var f_hour = hour;
+        if(tzIs12h) {
+            f_hour = hour % 12;
+            if(f_hour == 0) { f_hour = 12; }
+        }
         if(width < 5) {
             val = f_hour.format("%02d") + min.format("%02d");
         } else {
-            if(propTimeSeparator == 3) {
+            if(tzIs12h) {
                 var ampm = "A";
                 if(hour >= 12) { ampm = "P"; }
                 val = f_hour.format("%02d") + min.format("%02d") + ampm;

@@ -1197,6 +1197,14 @@
         </settingConfig>
     </setting>
 
+    <setting propertyKey="@Properties.tzHourFormat" title="@Strings.settings_alt_tz_time_format">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.settings_auto_use_system</listEntry>
+            <listEntry value="1">@Strings.settings_24h</listEntry>
+            <listEntry value="2">@Strings.settings_12h</listEntry>
+        </settingConfig>
+    </setting>
+
     <setting propertyKey="@Properties.tempUnit" title="@Strings.settings_temperature_unit">
         <settingConfig type="list">
             <listEntry value="0">@Strings.settings_auto_use_system</listEntry>

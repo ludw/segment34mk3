@@ -59,6 +59,7 @@
     <property id="tzOffset2" type="number">0</property>
     <property id="tzName1" type="string">UTC TIME</property>
     <property id="tzName2" type="string">TZ2</property>
+    <property id="tzHourFormat" type="number">0</property>
     <property id="icon1" type="number">1</property>
     <property id="icon2" type="number">2</property>
     <property id="weekOffset" type="number">0</property>

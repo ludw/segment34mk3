@@ -415,6 +415,7 @@
     <string id="settings_alternative_timezone_1_offset" scope="settings">Alternative Timezone 1 offset</string>
     <string id="settings_alternative_timezone_2_label" scope="settings">Alternative Timezone 2 label</string>
     <string id="settings_alternative_timezone_2_offset" scope="settings">Alternative Timezone 2 offset</string>
+    <string id="settings_alt_tz_time_format" scope="settings">Alt TZ time format</string>
     <string id="settings_temperature_unit" scope="settings">Temperature unit</string>
     <string id="settings_show_temp_unit" scope="settings">Show temperature unit</string>
     <string id="settings_c" scope="settings">C</string>
