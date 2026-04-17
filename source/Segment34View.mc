@@ -90,6 +90,8 @@ class Segment34View extends WatchUi.WatchFace {
     hidden var cachedRunDist7Days as Number = 0;
     hidden var cachedBikeDist7Days as Number = 0;
     hidden var cachedSwimDist7Days as Number = 0;
+    hidden var cachedRunDistMonth as Number = 0;
+    hidden var cachedRunDist28Days as Number = 0;
     hidden var lastActivityDistUpdate as Number = 0;
 
     hidden var histogramGoalLine as Number? = null;
@@ -2257,6 +2259,13 @@ class Segment34View extends WatchUi.WatchFace {
             }
             var distFactor = propIsMetricDistance ? 0.001 : 0.000621371;
             val = formatDistanceByWidth(cachedSwimDist7Days * distFactor, width);
+        } else if(complicationType == 66 || complicationType == 67) { // Run dist this month / past 28 days
+            if(Time.now().value() - lastActivityDistUpdate >= 60*5) {
+                lastActivityDistUpdate = Time.now().value();
+                updateActivityDistCache();
+            }
+            var distFactor = propIsMetricDistance ? 0.001 : 0.000621371;
+            val = formatDistanceByWidth((complicationType == 66 ? cachedRunDistMonth : cachedRunDist28Days) * distFactor, width);
         } else if(complicationType == 60) { // Weather data 1 format string
             val = getWeatherByFormat(propWeatherFormat1);
         } else if(complicationType == 61) { // Weather data 2 format string
@@ -2422,6 +2431,8 @@ class Segment34View extends WatchUi.WatchFace {
             case 16: return Application.loadResource(Rez.Strings.LABEL_STEPS);
             case 17: return formatLabel(Rez.Strings.LABEL_DIST_1, Rez.Strings.LABEL_DIST_2, labelSize);
             case 18: return Application.loadResource(Rez.Strings.LABEL_PUSHES);
+            case 66:
+            case 67:
             case 58:
             case 19:
                 if(propIsMetricDistance) { return formatLabel(Rez.Strings.LABEL_WKM_1, Rez.Strings.LABEL_WRUNM_2, labelSize); }
@@ -2936,22 +2947,37 @@ class Segment34View extends WatchUi.WatchFace {
 
     hidden function updateActivityDistCache() as Void {
         var sevenDaysAgoVal = Time.now().value() - (7 * 24 * 3600);
+        var twentyEightDaysAgoVal = Time.now().value() - (28 * 24 * 3600);
+        var nowInfo = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
+        var monthStartMoment = Gregorian.moment({:year => nowInfo.year, :month => nowInfo.month, :day => 1, :hour => 0, :minute => 0, :second => 0});
+        var monthStartVal = monthStartMoment.value();
         var runDist = 0;
         var bikeDist = 0;
         var swimDist = 0;
+        var runDist28Days = 0;
+        var runDistMonth = 0;
         var iter = UserProfile.getUserActivityHistory();
         var act = iter.next();
         while (act != null) {
-            if (act.startTime != null && act.startTime.value() >= sevenDaysAgoVal && act.distance != null) {
-                if (act.type == Activity.SPORT_RUNNING) { runDist += act.distance; }
-                else if (act.type == Activity.SPORT_CYCLING) { bikeDist += act.distance; }
-                else if (act.type == Activity.SPORT_SWIMMING) { swimDist += act.distance; }
+            if (act.startTime != null && act.distance != null) {
+                var t = act.startTime.value();
+                if (t >= sevenDaysAgoVal) {
+                    if (act.type == Activity.SPORT_RUNNING) { runDist += act.distance; }
+                    else if (act.type == Activity.SPORT_CYCLING) { bikeDist += act.distance; }
+                    else if (act.type == Activity.SPORT_SWIMMING) { swimDist += act.distance; }
+                }
+                if (act.type == Activity.SPORT_RUNNING) {
+                    if (t >= twentyEightDaysAgoVal) { runDist28Days += act.distance; }
+                    if (t >= monthStartVal) { runDistMonth += act.distance; }
+                }
             }
             act = iter.next();
         }
         cachedRunDist7Days = runDist;
         cachedBikeDist7Days = bikeDist;
         cachedSwimDist7Days = swimDist;
+        cachedRunDist28Days = runDist28Days;
+        cachedRunDistMonth = runDistMonth;
     }
 
     hidden function getWeeklyDistanceFromComplication(isRun as Boolean, conversionFactor as Float, width as Number) as String {

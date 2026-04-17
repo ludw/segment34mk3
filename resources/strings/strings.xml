@@ -256,6 +256,8 @@
     <string id="settings_distance_day" scope="settings">Distance / day</string>
     <string id="settings_run_distance_week" scope="settings">Run distance / week</string>
     <string id="settings_run_distance_7_days" scope="settings">Run distance past 7 days (on device activities only)</string>
+    <string id="settings_run_distance_month" scope="settings">Run distance this month (on device activities only)</string>
+    <string id="settings_run_distance_28_days" scope="settings">Run distance past 28 days (on device activities only)</string>
     <string id="settings_bike_distance_week" scope="settings">Bike distance / week</string>
     <string id="settings_bike_distance_7_days" scope="settings">Bike distance past 7 days (on device activities only)</string>
     <string id="settings_swim_distance_7_days" scope="settings">Swim distance past 7 days (on device activities only)</string>
