@@ -1242,7 +1242,6 @@ class Segment34View extends WatchUi.WatchFace {
             if(bw < 4) { bw = 4; }
         }
         var half_width = Math.round((data.size() * (bw + bs)) / 2);
-        var bar_height = 0;
 
         if(histogramGoalLine != null) {
             var goal_y = y + (h - Math.round(histogramGoalLine / scale));
@@ -1251,12 +1250,12 @@ class Segment34View extends WatchUi.WatchFace {
         }
 
         dc.setColor(themeColors[clock], Graphics.COLOR_TRANSPARENT);
-        for(var i=0; i<data.size(); i++) {
-            if(data[i] == null) { break; }
+        for(var i = 0; i < data.size(); i++) {
+            if(data[i] == -1) { continue; } // gap (e.g. stress not measurable)
             if(propHistogramData == 7) {
                 dc.setColor(getStressColor(data[i]), Graphics.COLOR_TRANSPARENT);
             }
-            bar_height = Math.round(data[i] / scale);
+            var bar_height = Math.round(data[i] / scale);
             dc.fillRectangle(x - half_width + i * (bw + bs), y + (h - bar_height), bw, bar_height);
         }
     }
@@ -2368,11 +2367,14 @@ class Segment34View extends WatchUi.WatchFace {
     }
 
     hidden function getDataArrayByType(dataSource as Number) as Array<Number> {
-        var ret = [];
+        if(dataSource == 8 or dataSource == 9 or dataSource == 10) {
+            return getDailyDataArray(dataSource);
+        }
+
+        var twoHours = new Time.Duration(7200);
         var iterator = null;
         var max = null;
-        var twoHours = new Time.Duration(7200);
-        
+
         if(dataSource == 0) {
             iterator = Toybox.SensorHistory.getBodyBatteryHistory({:period => twoHours, :order => Toybox.SensorHistory.ORDER_OLDEST_FIRST});
             max = 100;
@@ -2390,58 +2392,17 @@ class Segment34View extends WatchUi.WatchFace {
             max = 100;
         } else if(dataSource == 6) {
             iterator = Toybox.SensorHistory.getTemperatureHistory({:period => twoHours, :order => Toybox.SensorHistory.ORDER_OLDEST_FIRST});
-        } else if(dataSource == 8 or dataSource == 9 or dataSource == 10) {
-            // Daily data: past days (oldest first) + today (rightmost)
-            histogramGoalLine = null;
-            var history = ActivityMonitor.getHistory();
-            var todayInfo = ActivityMonitor.getInfo();
-            var rawData = [];
-            if(history != null) {
-                var daysAvail = history.size() < 6 ? history.size() : 6;
-                for(var i = daysAvail - 1; i >= 0; i--) {
-                    var dayVal = 0;
-                    if(dataSource == 8) {
-                        dayVal = (history[i].distance != null) ? history[i].distance : 0;
-                    } else if(dataSource == 9) {
-                        dayVal = (history[i].steps != null) ? history[i].steps : 0;
-                    } else if(dataSource == 10) {
-                        dayVal = (history[i].activeMinutes != null) ? history[i].activeMinutes.total : 0;
-                    }
-                    rawData.add(dayVal);
-                }
-            }
-            var todayVal = 0;
-            if(dataSource == 8 and todayInfo.distance != null) { todayVal = todayInfo.distance; }
-            else if(dataSource == 9 and todayInfo.steps != null) { todayVal = todayInfo.steps; }
-            else if(dataSource == 10 and todayInfo.activeMinutesDay != null) { todayVal = todayInfo.activeMinutesDay.total; }
-            rawData.add(todayVal);
-            var maxVal = 0;
-            for(var i = 0; i < rawData.size(); i++) {
-                if(rawData[i] > maxVal) { maxVal = rawData[i]; }
-            }
-            if(maxVal > 0) {
-                for(var i = 0; i < rawData.size(); i++) {
-                    ret.add(Math.round(rawData[i].toFloat() / maxVal * 100).toNumber());
-                }
-                if(dataSource == 9 and todayInfo.stepGoal != null and todayInfo.stepGoal > 0) {
-                    var goalNorm = Math.round(todayInfo.stepGoal.toFloat() / maxVal * 100).toNumber();
-                    if(goalNorm <= 100) { histogramGoalLine = goalNorm; }
-                }
-            }
-            return ret;
         }
 
-        if(iterator == null) { return ret; }
-        if(max == null) {
-            max = iterator.getMax();
-        }
+        if(iterator == null) { return []; }
+        if(max == null) { max = iterator.getMax(); }
         var min = iterator.getMin();
-        if(min == null or max == null) {
-            return ret;
-        }
+        if(min == null or max == null) { return []; }
+
+        var ret = [];
         var diff = max - (min * 0.9);
+        var isStress = (dataSource == 5 or dataSource == 7);
         var sample = iterator.next();
-        var count = 0;
         while(sample != null) {
             if(dataSource == 2) {
                 if(sample.data != null and sample.data != 0 and sample.data < 255) {
@@ -2458,28 +2419,74 @@ class Segment34View extends WatchUi.WatchFace {
             } else {
                 if(sample.data != null) {
                     ret.add(Math.round(sample.data.toFloat() / max * 100).toNumber());
+                } else if(isStress) {
+                    ret.add(-1); // gap: stress not measurable, preserve for display
                 }
             }
-            
             sample = iterator.next();
-            count++;
         }
 
-        if(ret.size() > histogramTargetWidth) {
-            var reduced_ret = [];
-            var step = (ret.size() as Float) / histogramTargetWidth.toFloat();
-            var closest_index = 0;
-            for(var i=0; i<histogramTargetWidth; i++) {
-                closest_index = Math.round(i * step).toNumber();
-                if (closest_index >= ret.size()) {
-                    closest_index = ret.size() - 1;
-                }
-                reduced_ret.add(ret[closest_index]);
+        return downsampleHistogram(ret);
+    }
+
+    // Daily activity histogram (distance / steps / active minutes), past 6 days + today.
+    hidden function getDailyDataArray(dataSource as Number) as Array<Number> {
+        histogramGoalLine = null;
+        var history = ActivityMonitor.getHistory();
+        var todayInfo = ActivityMonitor.getInfo();
+        var rawData = [];
+
+        if(history != null) {
+            var daysAvail = history.size() < 6 ? history.size() : 6;
+            for(var i = daysAvail - 1; i >= 0; i--) {
+                rawData.add(getHistoryDayValue(history[i], dataSource));
             }
-            return reduced_ret;
+        }
+        rawData.add(getTodayActivityValue(todayInfo, dataSource));
+
+        var maxVal = 0;
+        for(var i = 0; i < rawData.size(); i++) {
+            if(rawData[i] > maxVal) { maxVal = rawData[i]; }
+        }
+
+        var ret = [];
+        if(maxVal > 0) {
+            for(var i = 0; i < rawData.size(); i++) {
+                ret.add(Math.round(rawData[i].toFloat() / maxVal * 100).toNumber());
+            }
+            if(dataSource == 9 and todayInfo.stepGoal != null and todayInfo.stepGoal > 0) {
+                var goalNorm = Math.round(todayInfo.stepGoal.toFloat() / maxVal * 100).toNumber();
+                if(goalNorm <= 100) { histogramGoalLine = goalNorm; }
+            }
         }
         return ret;
-    } 
+    }
+
+    hidden function getHistoryDayValue(dayInfo, dataSource as Number) as Number {
+        if(dataSource == 8) { return dayInfo.distance != null ? dayInfo.distance : 0; }
+        if(dataSource == 9) { return dayInfo.steps != null ? dayInfo.steps : 0; }
+        if(dataSource == 10) { return dayInfo.activeMinutes != null ? dayInfo.activeMinutes.total : 0; }
+        return 0;
+    }
+
+    hidden function getTodayActivityValue(todayInfo, dataSource as Number) as Number {
+        if(dataSource == 8) { return todayInfo.distance != null ? todayInfo.distance : 0; }
+        if(dataSource == 9) { return todayInfo.steps != null ? todayInfo.steps : 0; }
+        if(dataSource == 10) { return todayInfo.activeMinutesDay != null ? todayInfo.activeMinutesDay.total : 0; }
+        return 0;
+    }
+
+    hidden function downsampleHistogram(data as Array<Number>) as Array<Number> {
+        if(data.size() <= histogramTargetWidth) { return data; }
+        var reduced = [];
+        var step = (data.size() as Float) / histogramTargetWidth.toFloat();
+        for(var i = 0; i < histogramTargetWidth; i++) {
+            var idx = Math.round(i * step).toNumber();
+            if(idx >= data.size()) { idx = data.size() - 1; }
+            reduced.add(data[idx]);
+        }
+        return reduced;
+    }
 
     hidden function getLabelByType(complicationType as Number, labelSize as Number) as String {
         // labelSize 1 = short, 2 = mid

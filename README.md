@@ -62,6 +62,7 @@ v0.8
 - Side bar width setting: Narrow (default) or Wide (double width)
 - Limit Bar Height setting: caps bars to fit within the round screen, with an indicator line at maximum height
 - Counter value that reset every midnight and can be increased/decreased with longpress actions
+- Stress in histogram should now show unmeasurable periods as gaps
 
 v0.7
 - Fix for font errors
