@@ -49,6 +49,7 @@ class Segment34View extends WatchUi.WatchFace {
     // Cached histogram data — sensor history only changes once per minute,
     // so we skip the expensive SensorHistory iteration on sub-minute updates.
     hidden var cachedHistogramData as Array<Number>? = null;
+    hidden var cachedHistogramData2 as Array<Number>? = null; // vigorous component for active minutes
     hidden var cachedHistogramDataSource as Number = -1;
     hidden var lastHistogramMinute as Number = -1;
 
@@ -668,6 +669,7 @@ class Segment34View extends WatchUi.WatchFace {
                 lastHistogramMinute = currentMinute;
             }
             values[:dataGraph1] = cachedHistogramData;
+            values[:dataGraph1b] = (propHistogramData == 10) ? cachedHistogramData2 : null;
         } else {
             values[:dataGraph1] = null;
         }
@@ -881,7 +883,7 @@ class Segment34View extends WatchUi.WatchFace {
         // Draw Top data fields or histogram
         if(propTopPartShows == 2) {
             yn3 = yn2 - marginY - histogramHeight;
-            drawHistogram(dc, values[:dataGraph1], centerX, yn3, histogramHeight);
+            drawHistogram(dc, values[:dataGraph1], values[:dataGraph1b], centerX, yn3, histogramHeight);
         } else {
             var top_data_height = marginY;
             var top_field_font = fontTinyData;
@@ -1229,7 +1231,7 @@ class Segment34View extends WatchUi.WatchFace {
         dc.setPenWidth(1);
     }
 
-    hidden function drawHistogram(dc as Dc, data as Array<Number>?, x as Number, y as Number, h as Number) as Void {
+    hidden function drawHistogram(dc as Dc, data as Array<Number>?, data2 as Array<Number>?, x as Number, y as Number, h as Number) as Void {
         if(data == null || data.size() == 0) { return; }
         var scale = 100.0 / h;
         var bw = histogramBarWidth;
@@ -1255,8 +1257,29 @@ class Segment34View extends WatchUi.WatchFace {
             if(propHistogramData == 7) {
                 dc.setColor(getStressColor(data[i]), Graphics.COLOR_TRANSPARENT);
             }
+            var bar_x = x - half_width + i * (bw + bs);
+            if(propHistogramData >= 8 && data[i] == 0) {
+                // Zero value: draw a 1px stub
+                dc.setColor(themeColors[dateDim], Graphics.COLOR_TRANSPARENT);
+                dc.fillRectangle(bar_x, y + h - 1, bw, 1);
+                dc.setColor(themeColors[clock], Graphics.COLOR_TRANSPARENT);
+                continue;
+            }
             var bar_height = Math.round(data[i] / scale);
-            dc.fillRectangle(x - half_width + i * (bw + bs), y + (h - bar_height), bw, bar_height);
+            if(data2 != null && i < data2.size() && data2[i] > 0) {
+                // Stacked bar: bottom = moderate (clock color), top = vigorous (bodybatt color)
+                var vigorous_height = Math.round(data2[i] / scale);
+                if(vigorous_height > bar_height) { vigorous_height = bar_height; }
+                var moderate_height = bar_height - vigorous_height;
+                if(moderate_height > 0) {
+                    dc.setColor(themeColors[date], Graphics.COLOR_TRANSPARENT);
+                    dc.fillRectangle(bar_x, y + h - bar_height, bw, moderate_height);
+                }
+                dc.setColor(themeColors[clock], Graphics.COLOR_TRANSPARENT);
+                dc.fillRectangle(bar_x, y + h - vigorous_height, bw, vigorous_height);
+            } else {
+                dc.fillRectangle(bar_x, y + (h - bar_height), bw, bar_height);
+            }
         }
     }
 
@@ -2432,17 +2455,25 @@ class Segment34View extends WatchUi.WatchFace {
     // Daily activity histogram (distance / steps / active minutes), past 6 days + today.
     hidden function getDailyDataArray(dataSource as Number) as Array<Number> {
         histogramGoalLine = null;
+        cachedHistogramData2 = null;
         var history = ActivityMonitor.getHistory();
         var todayInfo = ActivityMonitor.getInfo();
         var rawData = [];
+        var rawVigorous = [];
 
         if(history != null) {
             var daysAvail = history.size() < 6 ? history.size() : 6;
             for(var i = daysAvail - 1; i >= 0; i--) {
                 rawData.add(getHistoryDayValue(history[i], dataSource));
+                if(dataSource == 10) {
+                    rawVigorous.add(history[i].activeMinutes != null ? history[i].activeMinutes.vigorous * 2 : 0);
+                }
             }
         }
         rawData.add(getTodayActivityValue(todayInfo, dataSource));
+        if(dataSource == 10) {
+            rawVigorous.add(todayInfo.activeMinutesDay != null ? todayInfo.activeMinutesDay.vigorous * 2 : 0);
+        }
 
         var maxVal = 0;
         for(var i = 0; i < rawData.size(); i++) {
@@ -2457,6 +2488,13 @@ class Segment34View extends WatchUi.WatchFace {
             if(dataSource == 9 and todayInfo.stepGoal != null and todayInfo.stepGoal > 0) {
                 var goalNorm = Math.round(todayInfo.stepGoal.toFloat() / maxVal * 100).toNumber();
                 if(goalNorm <= 100) { histogramGoalLine = goalNorm; }
+            }
+            if(dataSource == 10) {
+                var vigRet = [];
+                for(var i = 0; i < rawVigorous.size(); i++) {
+                    vigRet.add(Math.round(rawVigorous[i].toFloat() / maxVal * 100).toNumber());
+                }
+                cachedHistogramData2 = vigRet;
             }
         }
         return ret;
@@ -2516,6 +2554,8 @@ class Segment34View extends WatchUi.WatchFace {
             case 18: return Application.loadResource(Rez.Strings.LABEL_PUSHES);
             case 66:
             case 67:
+                if(propIsMetricDistance) { return formatLabel(Rez.Strings.LABEL_MKM_1, Rez.Strings.LABEL_MRUNKM_2, labelSize); }
+                return formatLabel(Rez.Strings.LABEL_MMI_1, Rez.Strings.LABEL_MRUNMI_2, labelSize);
             case 58:
             case 19:
                 if(propIsMetricDistance) { return formatLabel(Rez.Strings.LABEL_WKM_1, Rez.Strings.LABEL_WRUNM_2, labelSize); }

@@ -45,15 +45,22 @@ For refactorings and optimizations keep in mind that:
 - Both optimizations and refactorings require significant testing across all supported devices
 
  ## Things people have asked for (may or may not be implemented)
-- Goal completion marker
-- Pressure trend
 - Notifications as icon
-
 - teal / orange inverse theme
-- stress graph, handle gaps better
 - histogram active minutes 2 colors
+- incorrect label for monthly run distance
+
+Weather stuff:
+- look into if we have wind gusts
+- tomorrows weather
+- precipitation next 6h
 
 ## Change log
+v0.9
+- Active minutes histogram show both vigorous and moderate minutes
+- Fixed issue with labels for monthly run distance
+
+
 v0.8
 - More adjustments to 7 segment font
 - Separate 24h/12h setting for alt timezone

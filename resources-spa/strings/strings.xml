@@ -127,6 +127,10 @@
     <string id="LABEL_WBIKEMI_2">MI BICI S</string>
     <string id="LABEL_WSWIMKM_2">KM NAT S</string>
     <string id="LABEL_WSWIMMI_2">MI NAT S</string>
+    <string id="LABEL_MKM_1">M KM</string>
+    <string id="LABEL_MRUNKM_2">KM CORRER M</string>
+    <string id="LABEL_MMI_1">M MI</string>
+    <string id="LABEL_MRUNMI_2">MI CORRER M</string>
     <string id="LABEL_TRAINING">ENTRENAMIENTO:</string>
     <string id="LABEL_PRESSURE">PRESIÓN:</string>
     <string id="LABEL_KG_1">KG</string>
