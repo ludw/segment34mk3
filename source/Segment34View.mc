@@ -159,6 +159,7 @@ class Segment34View extends WatchUi.WatchFace {
     hidden var propDistanceUnit as Number = 0;
     hidden var propIsMetricDistance as Boolean = true;
     hidden var propWindUnit as Number = 0;
+    hidden var propPrecipAmountUnit as Number = 0;
     hidden var propPressureUnit as Number = 0;
     hidden var propTopPartShows as Number = 0;
     hidden var propHistogramData as Number = 0;
@@ -1567,6 +1568,7 @@ class Segment34View extends WatchUi.WatchFace {
         propDistanceUnit = p.getValue("distanceUnit") as Number;
         propIsMetricDistance = (System.getDeviceSettings().distanceUnits == System.UNIT_METRIC and propDistanceUnit == 0) or propDistanceUnit == 1;
         propWindUnit = p.getValue("windUnit") as Number;
+        propPrecipAmountUnit = p.getValue("precipAmountUnit") as Number;
         propPressureUnit = p.getValue("pressureUnit") as Number;
         propLabelVisibility = p.getValue("labelVisibility") as Number;
         propDateFormat = p.getValue("dateFormat") as Number;
@@ -1878,7 +1880,10 @@ class Segment34View extends WatchUi.WatchFace {
                 if(cc.feelsLikeTemperature != null) { cc_data["feelsLikeTemperature"] = cc.feelsLikeTemperature; }
                 if(cc.windBearing != null) { cc_data["windBearing"] = cc.windBearing; }
                 if(cc.windSpeed != null) { cc_data["windSpeed"] = cc.windSpeed; }
+                if(cc has :windGust and cc.windGust != null) { cc_data["windGust"] = cc.windGust; }
+                if(cc has :precipitationIntensity and cc.precipitationIntensity != null) { cc_data["precipitationAmount"] = cc.precipitationIntensity; }
                 if(cc has :uvIndex and cc.uvIndex != null) { cc_data["uvIndex"] = cc.uvIndex; }
+                if(cc.observationTime != null) { cc_data["observationTime"] = cc.observationTime.value(); }
             }
 
             cc_data["timestamp"] = now;
@@ -1948,8 +1953,12 @@ class Segment34View extends WatchUi.WatchFace {
             ret.feelsLikeTemperature = cc_data.get("feelsLikeTemperature") as Float;
             ret.windBearing = cc_data.get("windBearing") as Number;
             ret.windSpeed = cc_data.get("windSpeed") as Float;
+            ret.windGust = cc_data.get("windGust") as Float;
+            ret.precipitationAmount = cc_data.get("precipitationAmount") as Float;
             ret.uvIndex = cc_data.get("uvIndex") as Float;
             ret.cityName = cc_data.get("cityName") as String?;
+            var obsTime = cc_data.get("observationTime");
+            ret.observationTimestamp = (obsTime != null ? obsTime : cc_data.get("timestamp")) as Number;
         } else {
             if(hf_data == null) { return ret; }
             // Find the most recently passed slot. When now >= firstForecastTime there is
@@ -1970,6 +1979,8 @@ class Segment34View extends WatchUi.WatchFace {
                 ret.windBearing = bestEntry.get("windBearing") as Number;
                 ret.windSpeed = bestEntry.get("windSpeed") as Float;
                 ret.uvIndex = cc_data.get("uvIndex") as Float;
+                var obsTime2 = cc_data.get("observationTime");
+                ret.observationTimestamp = (obsTime2 != null ? obsTime2 : cc_data.get("timestamp")) as Number;
             }
         }
         
@@ -2653,14 +2664,17 @@ class Segment34View extends WatchUi.WatchFace {
             var ch = format.substring(i, i + 1);
             if(ch.equals("t")) { result = result + getTemperature(); }
             else if(ch.equals("w")) { result = result + getWind(); }
+            else if(ch.equals("g")) { result = result + getWindGust(); }
             else if(ch.equals("h")) { result = result + getHumidity(); }
             else if(ch.equals("p")) { result = result + getPrecip(); }
+            else if(ch.equals("r")) { result = result + getPrecipAmount(); }
             else if(ch.equals("u")) { result = result + getUVIndex(); }
             else if(ch.equals("l")) { result = result + getHighLow(); }
             else if(ch.equals("f")) { result = result + getFeelsLike(); }
             else if(ch.equals("c")) { result = result + getWeatherCondition(); }
             else if(ch.equals("s")) { result = result + getWeatherConditionShort(); }
             else if(ch.equals("n")) { result = result + getCityName(); }
+            else if(ch.equals("o")) { result = result + getObservationTime(); }
             else { result = result + ch; }
             i += 1;
         }
@@ -2888,6 +2902,57 @@ class Segment34View extends WatchUi.WatchFace {
         }
 
         return bearing + windspeed;
+    }
+
+    hidden function getWindGust() as String {
+        if (weatherCondition == null) { return ""; }
+        var gust_mps = (weatherCondition has :windGust) ? weatherCondition.windGust : null;
+        if (gust_mps == null) { return ""; }
+        if (propWindUnit == 0) {
+            return Math.round(gust_mps).format("%d");
+        } else if (propWindUnit == 1) {
+            return Math.round(gust_mps * 3.6).format("%d");
+        } else if (propWindUnit == 2) {
+            return Math.round(gust_mps * 2.237).format("%d");
+        } else if (propWindUnit == 3) {
+            return Math.round(gust_mps * 1.944).format("%d");
+        } else { // beaufort
+            if (gust_mps < 0.5f) { return "0"; }
+            if (gust_mps < 1.5f) { return "1"; }
+            if (gust_mps < 3.3f) { return "2"; }
+            if (gust_mps < 5.5f) { return "3"; }
+            if (gust_mps < 7.9f) { return "4"; }
+            if (gust_mps < 10.7f) { return "5"; }
+            if (gust_mps < 13.8f) { return "6"; }
+            if (gust_mps < 17.1f) { return "7"; }
+            if (gust_mps < 20.7f) { return "8"; }
+            if (gust_mps < 24.4f) { return "9"; }
+            if (gust_mps < 28.4f) { return "10"; }
+            if (gust_mps < 32.6f) { return "11"; }
+            return "12";
+        }
+    }
+
+    hidden function getPrecipAmount() as String {
+        if (weatherCondition == null) { return ""; }
+        var mm_h = (weatherCondition has :precipitationAmount) ? weatherCondition.precipitationAmount : null;
+        if (mm_h == null) { return ""; }
+        var useMetric = (propPrecipAmountUnit == 1) ||
+            (propPrecipAmountUnit == 0 && System.getDeviceSettings().distanceUnits == System.UNIT_METRIC);
+        if (useMetric) {
+            return (mm_h as Float).format("%.1f");
+        } else {
+            return ((mm_h as Float) * 0.03937f).format("%.2f");
+        }
+    }
+
+    hidden function getObservationTime() as String {
+        if (weatherCondition == null) { return ""; }
+        var ts = (weatherCondition has :observationTimestamp) ? weatherCondition.observationTimestamp : null;
+        if (ts == null) { return ""; }
+        var info = Time.Gregorian.info(new Time.Moment(ts as Number), Time.FORMAT_SHORT);
+        var h = formatHour(info.hour);
+        return h.format("%02d") + ":" + info.min.format("%02d");
     }
 
     hidden function getFeelsLike() as String {
@@ -3503,9 +3568,11 @@ class Segment34Delegate extends WatchUi.WatchFaceDelegate {
 class StoredWeather {
     public var observationLocationPosition as Position.Location or Null;
     public var precipitationChance as Lang.Number or Null;
+    public var precipitationAmount as Lang.Float or Null;
     public var temperature as Lang.Numeric or Null;
     public var windBearing as Lang.Number or Null;
     public var windSpeed as Lang.Float or Null;
+    public var windGust as Lang.Float or Null;
     public var highTemperature as Lang.Numeric or Null;
     public var lowTemperature as Lang.Numeric or Null;
     public var feelsLikeTemperature as Lang.Float or Null;
@@ -3513,4 +3580,5 @@ class StoredWeather {
     public var condition as Lang.Number or Null;
     public var uvIndex as Lang.Float or Null;
     public var cityName as Lang.String or Null;
+    public var observationTimestamp as Lang.Number or Null;
 }

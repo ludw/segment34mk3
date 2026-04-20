@@ -426,6 +426,9 @@
     <string id="settings_mph" scope="settings">mph</string>
     <string id="settings_knots" scope="settings">knop</string>
     <string id="settings_beufort" scope="settings">beaufort</string>
+    <string id="settings_precip_amount_unit" scope="settings">Nederbördsmängd enhet (r= i väderformat)</string>
+    <string id="settings_mmh" scope="settings">mm/h</string>
+    <string id="settings_inh" scope="settings">in/h</string>
     <string id="settings_pressure_unit" scope="settings">Tryckenhet</string>
     <string id="settings_hpa" scope="settings">hPa</string>
     <string id="settings_mmhg" scope="settings">mmHg</string>
@@ -488,8 +491,8 @@
     <string id="settings_swim_distance_7_days" scope="settings">Simavstånd senaste 7 dagarna (endast aktiviteter på enheten)</string>
     <string id="settings_weather_data_1" scope="settings">Väderdata 1 (ange format nedan)</string>
     <string id="settings_weather_data_2" scope="settings">Väderdata 2 (ange format nedan)</string>
-    <string id="settings_weather_format_1" scope="settings">Format väderdata 1 (t=temp w=vind h=fuktighet p=nbd u=UV l=hög/låg f=känns c=förhållanden s=korta förhållanden n=stad(endast OWM))</string>
-    <string id="settings_weather_format_2" scope="settings">Format väderdata 2 (t=temp w=vind h=fuktighet p=nbd u=UV l=hög/låg f=känns c=förhållanden s=korta förhållanden n=stad(endast OWM))</string>
+    <string id="settings_weather_format_1" scope="settings">Format väderdata 1 (t=temp w=vind g=byvind h=fuktighet p=nbd% r=nbd_mängd u=UV l=hög/låg f=känns c=förhållanden s=korta förhållanden n=stad(endast OWM) o=obs_tid)</string>
+    <string id="settings_weather_format_2" scope="settings">Format väderdata 2 (t=temp w=vind g=byvind h=fuktighet p=nbd% r=nbd_mängd u=UV l=hög/låg f=känns c=förhållanden s=korta förhållanden n=stad(endast OWM) o=obs_tid)</string>
     <string id="settings_weather_feels_like" scope="settings">Väder: Känns som temperatur</string>
     <string id="settings_weather_provider" scope="settings">Väderleverantör</string>
     <string id="settings_garmin" scope="settings">Garmin</string>

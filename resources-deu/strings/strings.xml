@@ -55,10 +55,10 @@
     <string id="WEATHER_41">ORKAN</string>
     <string id="WEATHER_42">TROPENSTURM</string>
     <string id="WEATHER_43">SCHNEEWAHRSCH.</string>
-    <string id="WEATHER_44">REGEN/SCHNEE?</string>
-    <string id="WEATHER_45">BEWÖLKT, REGEN?</string>
-    <string id="WEATHER_46">BEWÖLKT, SCHNEE?</string>
-    <string id="WEATHER_47">BEWÖLKT, REGEN/SCHNEE?</string>
+    <string id="WEATHER_44">CH. REGEN/SCHNEE</string>
+    <string id="WEATHER_45">BEWÖLKT, CH. REGEN</string>
+    <string id="WEATHER_46">BEWÖLKT, CH. SCHNEE</string>
+    <string id="WEATHER_47">BEWÖLKT, CH. R/SCHNEE</string>
     <string id="WEATHER_48">GESTÖBER</string>
     <string id="WEATHER_49">GEFRIER. REGEN</string>
     <string id="WEATHER_50">REGEN/SCHNEE</string>
@@ -307,8 +307,8 @@
     <string id="settings_date" scope="settings">Datum</string>
     <string id="settings_weather_data_1" scope="settings">Wetterdaten 1 (Format unten angeben)</string>
     <string id="settings_weather_data_2" scope="settings">Wetterdaten 2 (Format unten angeben)</string>
-    <string id="settings_weather_format_1" scope="settings">Wetterdaten 1 Format (t=Temp w=Wind h=Feuchte p=Regen u=UV l=Hoch/Tief f=Gefühlt c=Lage s=Kurzlage)</string>
-    <string id="settings_weather_format_2" scope="settings">Wetterdaten 2 Format (t=Temp w=Wind h=Feuchte p=Regen u=UV l=Hoch/Tief f=Gefühlt c=Lage s=Kurzlage)</string>
+    <string id="settings_weather_format_1" scope="settings">Wetterdaten 1 Format (t=Temp w=Wind g=Böen h=Feuchte p=Regen% r=Regenmenge u=UV l=Hoch/Tief f=Gefühlt c=Lage s=Kurzlage o=Obs-Zeit)</string>
+    <string id="settings_weather_format_2" scope="settings">Wetterdaten 2 Format (t=Temp w=Wind g=Böen h=Feuchte p=Regen% r=Regenmenge u=UV l=Hoch/Tief f=Gefühlt c=Lage s=Kurzlage o=Obs-Zeit)</string>
     <string id="settings_steps_day" scope="settings">Schritte / Tag (Tausender wenn nicht genug Platz)</string>
     <string id="settings_wheelchair_pushes_day" scope="settings">Rollstuhl-Schübe / Tag</string>
     <string id="settings_calories_kcal_day_2" scope="settings">Kalorien (kcal) / Tag</string>
@@ -407,6 +407,9 @@
     <string id="settings_mph" scope="settings">mph</string>
     <string id="settings_knots" scope="settings">Knoten</string>
     <string id="settings_beufort" scope="settings">Beaufort</string>
+    <string id="settings_precip_amount_unit" scope="settings">Niederschlagsmenge Einheit (r= im Wetterformat)</string>
+    <string id="settings_mmh" scope="settings">mm/h</string>
+    <string id="settings_inh" scope="settings">in/h</string>
     <string id="settings_pressure_unit" scope="settings">Luftdruckeinheit</string>
     <string id="settings_hpa" scope="settings">hPA</string>
     <string id="settings_mmhg" scope="settings">mmHG</string>

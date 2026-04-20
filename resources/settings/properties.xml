@@ -11,6 +11,7 @@
     <property id="distanceUnit" type="number">0</property>
     <property id="showTempUnit" type="boolean">true</property>
     <property id="windUnit" type="number">0</property>
+    <property id="precipAmountUnit" type="number">0</property>
     <property id="pressureUnit" type="number">0</property>
     <property id="notificationCountShows" type="number">32</property>
     <property id="secondsShows" type="number">-3</property>

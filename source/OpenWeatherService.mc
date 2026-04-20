@@ -73,7 +73,22 @@ class OpenWeatherService {
             if (speed != null) { cc_data["windSpeed"] = (speed as Float).toFloat(); }
             var deg = wind.get("deg");
             if (deg != null) { cc_data["windBearing"] = deg as Number; }
+            var gust = wind.get("gust");
+            if (gust != null) { cc_data["windGust"] = (gust as Float).toFloat(); }
         }
+
+        var rain = data.get("rain") as Dictionary?;
+        var snow = data.get("snow") as Dictionary?;
+        var precipMmh = 0.0f;
+        if (rain != null) {
+            var r1h = rain.get("1h");
+            if (r1h != null) { precipMmh += (r1h as Float).toFloat(); }
+        }
+        if (snow != null) {
+            var s1h = snow.get("1h");
+            if (s1h != null) { precipMmh += (s1h as Float).toFloat(); }
+        }
+        if (precipMmh > 0.0f) { cc_data["precipitationAmount"] = precipMmh; }
 
         var weather = data.get("weather") as Array?;
         if (weather != null && weather.size() > 0) {
@@ -94,6 +109,8 @@ class OpenWeatherService {
         if (cityName != null) { cc_data["cityName"] = cityName as String; }
 
         cc_data["observationLocationPosition"] = [_lat, _lon];
+        var dt = data.get("dt");
+        if (dt != null) { cc_data["observationTime"] = dt as Number; }
         cc_data["timestamp"] = now;
         Application.Storage.setValue("current_conditions", cc_data);
         Application.Storage.setValue("owm_last_update", now);

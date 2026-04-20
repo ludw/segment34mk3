@@ -55,10 +55,10 @@
     <string id="WEATHER_41">HURAGAN</string>
     <string id="WEATHER_42">BURZA TROPIKALNA</string>
     <string id="WEATHER_43">MOŻLIWY ŚNIEG</string>
-    <string id="WEATHER_44">DESZCZ/ŚNIEG?</string>
-    <string id="WEATHER_45">POCHMURNO, DESZCZ?</string>
+    <string id="WEATHER_44">CH. DESZCZ/ŚNIEG</string>
+    <string id="WEATHER_45">POCHMURNO, CH. DESZCZ</string>
     <string id="WEATHER_46">POCHMURNO, MOŻLIWY ŚNIEG</string>
-    <string id="WEATHER_47">POCHMURNO, DESZCZ/ŚNIEG?</string>
+    <string id="WEATHER_47">POCHMURNO, CH. D/ŚNIEG</string>
     <string id="WEATHER_48">ZAMIECIE</string>
     <string id="WEATHER_49">MARZNĄCY DESZCZ</string>
     <string id="WEATHER_50">DESZCZ ZE ŚNIEGIEM</string>
@@ -422,6 +422,9 @@
     <string id="settings_mph" scope="settings">mph</string>
     <string id="settings_knots" scope="settings">węzły</string>
     <string id="settings_beufort" scope="settings">beaufort</string>
+    <string id="settings_precip_amount_unit" scope="settings">Jednostka ilości opadów (r= w formacie pogody)</string>
+    <string id="settings_mmh" scope="settings">mm/h</string>
+    <string id="settings_inh" scope="settings">in/h</string>
     <string id="settings_pressure_unit" scope="settings">Jednostka ciśnienia</string>
     <string id="settings_hpa" scope="settings">hPa</string>
     <string id="settings_mmhg" scope="settings">mmHg</string>
@@ -487,8 +490,8 @@
     <string id="settings_civil_dusk" scope="settings">Czas zmierzchu cywilnego</string>
     <string id="settings_weather_data_1" scope="settings">Dane pogodowe 1 (podaj format poniżej)</string>
     <string id="settings_weather_data_2" scope="settings">Dane pogodowe 2 (podaj format poniżej)</string>
-    <string id="settings_weather_format_1" scope="settings">Format danych pogodowych 1 (t=temp w=wiatr h=wilgotność p=opady u=UV l=maks/min f=odczuwalna c=warunki s=skrócone warunki n=miasto(tylko OWM))</string>
-    <string id="settings_weather_format_2" scope="settings">Format danych pogodowych 2 (t=temp w=wiatr h=wilgotność p=opady u=UV l=maks/min f=odczuwalna c=warunki s=skrócone warunki n=miasto(tylko OWM))</string>
+    <string id="settings_weather_format_1" scope="settings">Format danych pogodowych 1 (t=temp w=wiatr g=porywy h=wilgotność p=opady% r=ilosc_opadow u=UV l=maks/min f=odczuwalna c=warunki s=skrócone warunki n=miasto(tylko OWM) o=czas_obs)</string>
+    <string id="settings_weather_format_2" scope="settings">Format danych pogodowych 2 (t=temp w=wiatr g=porywy h=wilgotność p=opady% r=ilosc_opadow u=UV l=maks/min f=odczuwalna c=warunki s=skrócone warunki n=miasto(tylko OWM) o=czas_obs)</string>
     <string id="settings_weather_feels_like" scope="settings">Pogoda: Temperatura odczuwalna</string>
     <string id="settings_weather_provider" scope="settings">Dostawca pogody</string>
     <string id="settings_garmin" scope="settings">Garmin</string>
