@@ -1280,6 +1280,14 @@
         </settingConfig>
     </setting>
 
+    <setting propertyKey="@Properties.precipAmountUnit" title="@Strings.settings_precip_amount_unit">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.settings_auto_use_system</listEntry>
+            <listEntry value="1">@Strings.settings_mmh</listEntry>
+            <listEntry value="2">@Strings.settings_inh</listEntry>
+        </settingConfig>
+    </setting>
+
     <setting propertyKey="@Properties.pressureUnit" title="@Strings.settings_pressure_unit">
         <settingConfig type="list">
             <listEntry value="0">@Strings.settings_hpa</listEntry>

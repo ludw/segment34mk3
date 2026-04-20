@@ -428,6 +428,9 @@
     <string id="settings_mph" scope="settings">mph</string>
     <string id="settings_knots" scope="settings">nudos</string>
     <string id="settings_beufort" scope="settings">beaufort</string>
+    <string id="settings_precip_amount_unit" scope="settings">Unidad cantidad precipitación (r= en el formato meteo)</string>
+    <string id="settings_mmh" scope="settings">mm/h</string>
+    <string id="settings_inh" scope="settings">in/h</string>
     <string id="settings_pressure_unit" scope="settings">Unidad de presión</string>
     <string id="settings_hpa" scope="settings">hPA</string>
     <string id="settings_mmhg" scope="settings">mmHG</string>
@@ -496,8 +499,8 @@
     <string id="settings_date_custom_format" scope="settings">Formato personalizado (o=día semana d=día m=mes# n=mes y=año w=semana)</string>
     <string id="settings_weather_data_1" scope="settings">Datos meteo 1 (especifica formato abajo)</string>
     <string id="settings_weather_data_2" scope="settings">Datos meteo 2 (especifica formato abajo)</string>
-    <string id="settings_weather_format_1" scope="settings">Formato datos meteo 1 (t=temp w=viento h=humedad p=precip u=UV l=max/min f=sensación c=condiciones s=condiciones cortas n=ciudad(solo OWM))</string>
-    <string id="settings_weather_format_2" scope="settings">Formato datos meteo 2 (t=temp w=viento h=humedad p=precip u=UV l=max/min f=sensación c=condiciones s=condiciones cortas n=ciudad(solo OWM))</string>
+    <string id="settings_weather_format_1" scope="settings">Formato datos meteo 1 (t=temp w=viento g=racha h=humedad p=precip% r=cant_precip u=UV l=max/min f=sensación c=condiciones s=condiciones cortas n=ciudad(solo OWM) o=hora_obs)</string>
+    <string id="settings_weather_format_2" scope="settings">Formato datos meteo 2 (t=temp w=viento g=racha h=humedad p=precip% r=cant_precip u=UV l=max/min f=sensación c=condiciones s=condiciones cortas n=ciudad(solo OWM) o=hora_obs)</string>
     <string id="settings_weather_feels_like" scope="settings">Meteo: Temperatura sensación</string>
     <string id="settings_weather_provider" scope="settings">Proveedor meteo</string>
     <string id="settings_garmin" scope="settings">Garmin</string>

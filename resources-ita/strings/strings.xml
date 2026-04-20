@@ -423,6 +423,9 @@
     <string id="settings_mph" scope="settings">mph</string>
     <string id="settings_knots" scope="settings">nodi</string>
     <string id="settings_beufort" scope="settings">beaufort</string>
+    <string id="settings_precip_amount_unit" scope="settings">Unità quantità precipitazioni (r= nel formato meteo)</string>
+    <string id="settings_mmh" scope="settings">mm/h</string>
+    <string id="settings_inh" scope="settings">in/h</string>
     <string id="settings_pressure_unit" scope="settings">Unità pressione</string>
     <string id="settings_hpa" scope="settings">hPA</string>
     <string id="settings_mmhg" scope="settings">mmHG</string>
@@ -488,8 +491,8 @@
     <string id="settings_civil_dusk" scope="settings">Orario crepuscolo civile</string>
     <string id="settings_weather_data_1" scope="settings">Dati meteo 1 (specifica formato sotto)</string>
     <string id="settings_weather_data_2" scope="settings">Dati meteo 2 (specifica formato sotto)</string>
-    <string id="settings_weather_format_1" scope="settings">Formato dati meteo 1 (t=temp w=vento h=umidità p=precip u=UV l=max/min f=percepita c=condizioni s=condizioni brevi n=città(solo OWM))</string>
-    <string id="settings_weather_format_2" scope="settings">Formato dati meteo 2 (t=temp w=vento h=umidità p=precip u=UV l=max/min f=percepita c=condizioni s=condizioni brevi n=città(solo OWM))</string>
+    <string id="settings_weather_format_1" scope="settings">Formato dati meteo 1 (t=temp w=vento g=raffica h=umidità p=precip% r=qta_precip u=UV l=max/min f=percepita c=condizioni s=condizioni brevi n=città(solo OWM) o=ora_obs)</string>
+    <string id="settings_weather_format_2" scope="settings">Formato dati meteo 2 (t=temp w=vento g=raffica h=umidità p=precip% r=qta_precip u=UV l=max/min f=percepita c=condizioni s=condizioni brevi n=città(solo OWM) o=ora_obs)</string>
     <string id="settings_weather_feels_like" scope="settings">Meteo: Temperatura percepita</string>
     <string id="settings_weather_provider" scope="settings">Fornitore meteo</string>
     <string id="settings_garmin" scope="settings">Garmin</string>

@@ -337,8 +337,8 @@
     <string id="settings_date" scope="settings">Date</string>
     <string id="settings_weather_data_1" scope="settings">Weather data 1 (specify format below)</string>
     <string id="settings_weather_data_2" scope="settings">Weather data 2 (specify format below)</string>
-    <string id="settings_weather_format_1" scope="settings">Weather data 1 format (t=temp w=wind h=humidity p=precip u=UV l=high/low f=feels c=conditions s=shortened conditions n=city(OWM only))</string>
-    <string id="settings_weather_format_2" scope="settings">Weather data 2 format (t=temp w=wind h=humidity p=precip u=UV l=high/low f=feels c=conditions s=shortened conditions n=city(OWM only))</string>
+    <string id="settings_weather_format_1" scope="settings">Weather data 1 format (t=temp w=wind g=gust h=humidity p=precip% r=precip_amount u=UV l=high/low f=feels c=conditions s=shortened conditions n=city(OWM only) o=obs_time)</string>
+    <string id="settings_weather_format_2" scope="settings">Weather data 2 format (t=temp w=wind g=gust h=humidity p=precip% r=precip_amount u=UV l=high/low f=feels c=conditions s=shortened conditions n=city(OWM only) o=obs_time)</string>
     <string id="settings_steps_day" scope="settings">Steps / day (thousands if not enough room)</string>
     <string id="settings_wheelchair_pushes_day" scope="settings">Wheelchair pushes / day</string>
     <string id="settings_calories_kcal_day_2" scope="settings">Calories (kcal) / day</string>
@@ -440,6 +440,9 @@
     <string id="settings_mph" scope="settings">mph</string>
     <string id="settings_knots" scope="settings">knots</string>
     <string id="settings_beufort" scope="settings">beufort</string>
+    <string id="settings_precip_amount_unit" scope="settings">Precip amount unit (r= in weather format)</string>
+    <string id="settings_mmh" scope="settings">mm/h</string>
+    <string id="settings_inh" scope="settings">in/h</string>
     <string id="settings_pressure_unit" scope="settings">Pressure unit</string>
     <string id="settings_hpa" scope="settings">hPA</string>
     <string id="settings_mmhg" scope="settings">mmHG</string>
