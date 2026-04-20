@@ -698,6 +698,8 @@ class Segment34View extends WatchUi.WatchFace {
         computeBottomField2Values(values);
         values[:dataIcon1] = getIconState(propIcon1);
         values[:dataIcon2] = getIconState(propIcon2);
+        values[:dataIcon1Count] = getIconCountOverlay(propIcon1);
+        values[:dataIcon2Count] = getIconCountOverlay(propIcon2);
         values[:dataBattery] = getBattData();
         values[:dataAODLeft] = getValueByType(propAodFieldShows, 10);
         values[:dataAODRight] = getValueByType(propAodRightFieldShows, 5);
@@ -1680,6 +1682,21 @@ class Segment34View extends WatchUi.WatchFace {
             if(mov == 3) { return "P"; }
             if(mov == 4) { return "Q"; }
             if(mov == 5) { return "R"; }
+        } else if(setting == 6 || setting == 7) { // Notification icon (6) or notification icon with count (7)
+            var notif = System.getDeviceSettings().notificationCount;
+            if(notif != null && notif > 0) {
+                return "H";
+            }
+        }
+        return "";
+    }
+
+    hidden function getIconCountOverlay(setting as Number) as String {
+        if(setting == 7) {
+            var notif = System.getDeviceSettings().notificationCount;
+            if(notif != null && notif > 0) {
+                return notif > 9 ? "9+" : notif.format("%d");
+            }
         }
         return "";
     }
@@ -3385,6 +3402,22 @@ class Segment34View extends WatchUi.WatchFace {
         // No-op for non-square devices devices
     }
 
+    hidden function drawIconWithOverlay(dc as Dc, x as Number, y as Number, justify as Number, iconStr as String, countStr as String) as Void {
+        dc.drawText(x, y, fontIcons, iconStr, justify | Graphics.TEXT_JUSTIFY_VCENTER);
+        if(!countStr.equals("")) {
+            var labelX = 0;
+            if(justify == Graphics.TEXT_JUSTIFY_RIGHT) {
+                labelX = x - 8;
+            } else if (justify == Graphics.TEXT_JUSTIFY_LEFT) {
+                labelX = x + 10;
+            }
+            
+            dc.setColor(themeColors[bg], Graphics.COLOR_TRANSPARENT);
+            dc.drawText(labelX, y - 4, fontLabel, countStr, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+            dc.setColor(themeColors[dataVal], Graphics.COLOR_TRANSPARENT);
+        }
+    }
+
     (:Square)
     hidden function drawBottomFieldsWithIcons(dc as Dc, values as Dictionary) as Void {
         if (dualBottomFieldActive) {
@@ -3411,14 +3444,12 @@ class Segment34View extends WatchUi.WatchFace {
 
             // Icons on outer edges
             dc.setColor(themeColors[dataVal], Graphics.COLOR_TRANSPARENT);
-            dc.drawText(field1Left - (marginX / 2),
+            drawIconWithOverlay(dc, field1Left - (marginX / 2),
                 bottomFiveY + (largeDataHeight / 2) + iconYAdj,
-                fontIcons, values[:dataIcon1],
-                Graphics.TEXT_JUSTIFY_RIGHT | Graphics.TEXT_JUSTIFY_VCENTER);
-            dc.drawText(field2Left + field2Width + (marginX / 2) - 2,
+                Graphics.TEXT_JUSTIFY_RIGHT, values[:dataIcon1], values[:dataIcon1Count] as String);
+            drawIconWithOverlay(dc, field2Left + field2Width + (marginX / 2) - 2,
                 bottomFiveY + (largeDataHeight / 2) + iconYAdj,
-                fontIcons, values[:dataIcon2],
-                Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER);
+                Graphics.TEXT_JUSTIFY_LEFT, values[:dataIcon2], values[:dataIcon2Count] as String);
         } else {
             // Single field - original behavior
             var step_width = drawDataField(dc, centerX, bottomFiveY, 3, null, values[:dataBottom], 5, fontBottomData, bottomDataWidth * 5);
@@ -3434,11 +3465,11 @@ class Segment34View extends WatchUi.WatchFace {
                     step_width = 65;
                     y = screenHeight - 31;
                 }
-                dc.drawText(centerX - (step_width / 2) - (marginX / 2), y, fontIcons, values[:dataIcon1], Graphics.TEXT_JUSTIFY_RIGHT);
-                dc.drawText(centerX + (step_width / 2) + (marginX / 2) - 2, y, fontIcons, values[:dataIcon2], Graphics.TEXT_JUSTIFY_LEFT);
+                drawIconWithOverlay(dc, centerX - (step_width / 2) - (marginX / 2), y, Graphics.TEXT_JUSTIFY_RIGHT, values[:dataIcon1], values[:dataIcon1Count] as String);
+                drawIconWithOverlay(dc, centerX + (step_width / 2) + (marginX / 2) - 2, y, Graphics.TEXT_JUSTIFY_LEFT, values[:dataIcon2], values[:dataIcon2Count] as String);
             } else {
-                dc.drawText(centerX - (step_width / 2) - (marginX / 2), bottomFiveY + (largeDataHeight / 2) + iconYAdj, fontIcons, values[:dataIcon1], Graphics.TEXT_JUSTIFY_RIGHT | Graphics.TEXT_JUSTIFY_VCENTER);
-                dc.drawText(centerX + (step_width / 2) + (marginX / 2) - 2, bottomFiveY + (largeDataHeight / 2) + iconYAdj, fontIcons, values[:dataIcon2], Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER);
+                drawIconWithOverlay(dc, centerX - (step_width / 2) - (marginX / 2), bottomFiveY + (largeDataHeight / 2) + iconYAdj, Graphics.TEXT_JUSTIFY_RIGHT, values[:dataIcon1], values[:dataIcon1Count] as String);
+                drawIconWithOverlay(dc, centerX + (step_width / 2) + (marginX / 2) - 2, bottomFiveY + (largeDataHeight / 2) + iconYAdj, Graphics.TEXT_JUSTIFY_LEFT, values[:dataIcon2], values[:dataIcon2Count] as String);
             }
         }
     }
@@ -3458,11 +3489,11 @@ class Segment34View extends WatchUi.WatchFace {
                 step_width = 65;
                 y = screenHeight - 31;
             }
-            dc.drawText(centerX - (step_width / 2) - (marginX / 2), y, fontIcons, values[:dataIcon1], Graphics.TEXT_JUSTIFY_RIGHT);
-            dc.drawText(centerX + (step_width / 2) + (marginX / 2) - 2, y, fontIcons, values[:dataIcon2], Graphics.TEXT_JUSTIFY_LEFT);
+            drawIconWithOverlay(dc, centerX - (step_width / 2) - (marginX / 2), y, Graphics.TEXT_JUSTIFY_RIGHT, values[:dataIcon1], values[:dataIcon1Count] as String);
+            drawIconWithOverlay(dc, centerX + (step_width / 2) + (marginX / 2) - 2, y, Graphics.TEXT_JUSTIFY_LEFT, values[:dataIcon2], values[:dataIcon2Count] as String);
         } else {
-            dc.drawText(centerX - (step_width / 2) - (marginX / 2), bottomFiveY + (largeDataHeight / 2) + iconYAdj, fontIcons, values[:dataIcon1], Graphics.TEXT_JUSTIFY_RIGHT | Graphics.TEXT_JUSTIFY_VCENTER);
-            dc.drawText(centerX + (step_width / 2) + (marginX / 2) - 2, bottomFiveY + (largeDataHeight / 2) + iconYAdj, fontIcons, values[:dataIcon2], Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER);
+            drawIconWithOverlay(dc, centerX - (step_width / 2) - (marginX / 2), bottomFiveY + (largeDataHeight / 2) + iconYAdj, Graphics.TEXT_JUSTIFY_RIGHT, values[:dataIcon1], values[:dataIcon1Count] as String);
+            drawIconWithOverlay(dc, centerX + (step_width / 2) + (marginX / 2) - 2, bottomFiveY + (largeDataHeight / 2) + iconYAdj, Graphics.TEXT_JUSTIFY_LEFT, values[:dataIcon2], values[:dataIcon2Count] as String);
         }
     }
 

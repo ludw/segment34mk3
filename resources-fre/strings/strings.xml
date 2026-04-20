@@ -357,6 +357,8 @@
     <string id="settings_bluetooth_on_off" scope="settings">Bluetooth (activé/désactivé)</string>
     <string id="settings_bluetooth_just_when_off" scope="settings">Bluetooth (seulement quand désactivé)</string>
     <string id="settings_move_bar" scope="settings">Barre de mouvement</string>
+    <string id="settings_notification_icon" scope="settings">Icône de notification</string>
+    <string id="settings_notification_icon_with_count" scope="settings">Icône de notification avec compteur</string>
     <string id="settings_right_icon_indicates" scope="settings">L'icône droite indique :</string>
     <string id="settings_always_on_below" scope="settings">Toujours allumé (sous l'horloge) :</string>
     <string id="settings_second_always_on" scope="settings">Deuxième champ toujours allumé (à droite) :</string>

@@ -361,6 +361,8 @@
     <string id="settings_bluetooth_on_off" scope="settings">Bluetooth (på/av)</string>
     <string id="settings_bluetooth_just_when_off" scope="settings">Bluetooth (bara när av)</string>
     <string id="settings_move_bar" scope="settings">Rörelseindikator</string>
+    <string id="settings_notification_icon" scope="settings">Aviseringsikon</string>
+    <string id="settings_notification_icon_with_count" scope="settings">Aviseringsikon med antal</string>
     <string id="settings_right_icon_indicates" scope="settings">Höger ikon indikerar:</string>
     <string id="settings_always_on_below" scope="settings">Alltid-på (under klocka):</string>
     <string id="settings_second_always_on" scope="settings">Andra alltid-på-fält (till höger):</string>

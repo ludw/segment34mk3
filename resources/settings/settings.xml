@@ -810,6 +810,8 @@
                 <listEntry value="3">@Strings.settings_bluetooth_on_off</listEntry>
                 <listEntry value="4">@Strings.settings_bluetooth_just_when_off</listEntry>
                 <listEntry value="5">@Strings.settings_move_bar</listEntry>
+                <listEntry value="6">@Strings.settings_notification_icon</listEntry>
+                <listEntry value="7">@Strings.settings_notification_icon_with_count</listEntry>
             </settingConfig>
     </setting>
 
@@ -821,6 +823,8 @@
             <listEntry value="3">@Strings.settings_bluetooth_on_off</listEntry>
             <listEntry value="4">@Strings.settings_bluetooth_just_when_off</listEntry>
             <listEntry value="5">@Strings.settings_move_bar</listEntry>
+            <listEntry value="6">@Strings.settings_notification_icon</listEntry>
+            <listEntry value="7">@Strings.settings_notification_icon_with_count</listEntry>
         </settingConfig>
     </setting>
     

@@ -45,20 +45,15 @@ For refactorings and optimizations keep in mind that:
 - Both optimizations and refactorings require significant testing across all supported devices
 
  ## Things people have asked for (may or may not be implemented)
-- Notifications as icon
-- teal / orange inverse theme
 
-Weather stuff:
-- look into if we have wind gusts
-- tomorrows weather
-- precipitation next 1h, 3h
-- owm update time
+
 
 ## Change log
 v0.9
 - Active minutes histogram show both vigorous and moderate minutes
 - Fixed issue with labels for monthly run distance
-
+- Fixed issue with weather data cache causing some fields to be blank after an hour without connection
+- Notifications icon with or without notification count
 
 v0.8
 - More adjustments to 7 segment font

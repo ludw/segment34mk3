@@ -342,6 +342,8 @@
     <string id="settings_bluetooth_on_off" scope="settings">Bluetooth (an/aus)</string>
     <string id="settings_bluetooth_just_when_off" scope="settings">Bluetooth (nur wenn aus)</string>
     <string id="settings_move_bar" scope="settings">Inaktivitätsstatus</string>
+    <string id="settings_notification_icon" scope="settings">Benachrichtigungssymbol</string>
+    <string id="settings_notification_icon_with_count" scope="settings">Benachrichtigungssymbol mit Anzahl</string>
     <string id="settings_right_icon_indicates" scope="settings">Rechtes Icon zeigt:</string>
     <string id="settings_always_on_below" scope="settings">Always On (unter der Uhr):</string>
     <string id="settings_second_always_on" scope="settings">Zweites Always On Feld (rechts):</string>
