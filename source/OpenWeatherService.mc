@@ -101,7 +101,7 @@ class OpenWeatherService {
 
         // Grab UV index from Garmin's live data if available (OWM free tier lacks it).
         var garminCc = Weather.getCurrentConditions();
-        if (garminCc != null && (garminCc has :uvIndex) && garminCc.uvIndex != null) {
+        if (garminCc != null && garminCc.uvIndex != null) {
             cc_data["uvIndex"] = garminCc.uvIndex;
         }
 

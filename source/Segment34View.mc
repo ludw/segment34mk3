@@ -84,7 +84,7 @@ class Segment34View extends WatchUi.WatchFace {
     public var nightModeOverride as Number = -1;
     hidden var themeColors as Array<Graphics.ColorType> = [];
     hidden var nightMode as Boolean?;
-    hidden var weatherCondition as CurrentConditions or StoredWeather or Null;
+    hidden var weatherCondition as StoredWeather or Null;
     hidden var propWeatherProvider as Number = 0;
     hidden var owmError as String or Null = null;
     hidden var hrHistoryData as Array<Number>?;
@@ -1843,11 +1843,9 @@ class Segment34View extends WatchUi.WatchFace {
             // Garmin provider: original behavior unchanged.
             owmError = null;
             if (Weather.getCurrentConditions() != null) {
-                weatherCondition = Weather.getCurrentConditions();
                 try { storeWeatherData(); } catch(e) {}
-            } else {
-                try { weatherCondition = readWeatherData(); } catch(e) {}
             }
+            try { weatherCondition = readWeatherData(); } catch(e) {}
         }
         cachedTempUnit = getTempUnit();
     }
@@ -1897,9 +1895,7 @@ class Segment34View extends WatchUi.WatchFace {
                 if(cc.feelsLikeTemperature != null) { cc_data["feelsLikeTemperature"] = cc.feelsLikeTemperature; }
                 if(cc.windBearing != null) { cc_data["windBearing"] = cc.windBearing; }
                 if(cc.windSpeed != null) { cc_data["windSpeed"] = cc.windSpeed; }
-                if(cc has :windGust and cc.windGust != null) { cc_data["windGust"] = cc.windGust as Float; }
-                if(cc has :precipitationIntensity and cc.precipitationIntensity != null) { cc_data["precipitationAmount"] = cc.precipitationIntensity as Float; }
-                if(cc has :uvIndex and cc.uvIndex != null) { cc_data["uvIndex"] = cc.uvIndex; }
+                if(cc.uvIndex != null) { cc_data["uvIndex"] = cc.uvIndex; }
                 if(cc.observationTime != null) { cc_data["observationTime"] = cc.observationTime.value(); }
             }
 
@@ -1929,7 +1925,7 @@ class Segment34View extends WatchUi.WatchFace {
                     "windBearing" => hf[i].windBearing,
                     "windSpeed" => hf[i].windSpeed
                 };
-                if(hf[i] has :uvIndex) { tmp["uvIndex"] = hf[i].uvIndex; }
+                if(hf[i].uvIndex != null) { tmp["uvIndex"] = hf[i].uvIndex; }
                 
                 hf_data.add(tmp);
             }
@@ -2787,7 +2783,7 @@ class Segment34View extends WatchUi.WatchFace {
     }
 
     hidden function getCityName() as String {
-        if (weatherCondition == null || !(weatherCondition has :cityName) || weatherCondition.cityName == null) { return ""; }
+        if (weatherCondition == null || weatherCondition.cityName == null) { return ""; }
         return weatherCondition.cityName.toUpper();
     }
 
@@ -2887,7 +2883,7 @@ class Segment34View extends WatchUi.WatchFace {
 
     hidden function getWindGust() as String {
         if (weatherCondition == null) { return ""; }
-        var gust_mps = (weatherCondition has :windGust) ? weatherCondition.windGust : null;
+        var gust_mps = weatherCondition.windGust;
         if (gust_mps == null) { return ""; }
         return formatWindSpeed(gust_mps as Float);
     }
@@ -2920,7 +2916,7 @@ class Segment34View extends WatchUi.WatchFace {
 
     hidden function getPrecipAmount() as String {
         if (weatherCondition == null) { return ""; }
-        var mm_h = (weatherCondition has :precipitationAmount) ? weatherCondition.precipitationAmount : null;
+        var mm_h = weatherCondition != null ? weatherCondition.precipitationAmount : null;
         if (mm_h == null) { return ""; }
         var useMetric = (propPrecipAmountUnit == 1) ||
             (propPrecipAmountUnit == 0 && System.getDeviceSettings().distanceUnits == System.UNIT_METRIC);
@@ -2933,13 +2929,7 @@ class Segment34View extends WatchUi.WatchFace {
 
     hidden function getObservationTime() as String {
         if (weatherCondition == null) { return ""; }
-        var ts = null;
-        if (weatherCondition has :observationTimestamp) {
-            ts = weatherCondition.observationTimestamp;
-        } else if (weatherCondition has :observationTime) {
-            var moment = weatherCondition.observationTime;
-            if (moment != null) { ts = (moment as Time.Moment).value(); }
-        }
+        var ts = weatherCondition.observationTimestamp;
         if (ts == null) { return ""; }
         var info = Time.Gregorian.info(new Time.Moment(ts as Number), Time.FORMAT_SHORT);
         var h = formatHour(info.hour);
@@ -2963,7 +2953,7 @@ class Segment34View extends WatchUi.WatchFace {
 
     hidden function getUVIndex() as String {
         var ret = "";
-        if(weatherCondition != null and weatherCondition has :uvIndex and weatherCondition.uvIndex != null) {
+        if(weatherCondition != null and weatherCondition.uvIndex != null) {
             ret = weatherCondition.uvIndex.format("%d");
         }
         return ret;
