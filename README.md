@@ -53,6 +53,7 @@ v1.0
 - Training status as icon
 - Wind gusts, last weather update and precipitation amount
 - Option for update frequency for OWM
+- VO2 MAX trend arrow (takes a few weeks before it shows up)
 
 v0.9
 - Active minutes histogram show both vigorous and moderate minutes
