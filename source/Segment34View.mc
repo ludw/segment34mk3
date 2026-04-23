@@ -700,10 +700,8 @@ class Segment34View extends WatchUi.WatchFace {
         values[:dataIcon2] = getIconState(propIcon2);
         values[:dataIcon1Count] = getIconCountOverlay(propIcon1);
         values[:dataIcon2Count] = getIconCountOverlay(propIcon2);
-        var tsIconColor = null;
-        if(propIcon1 == 8 || propIcon2 == 8) { tsIconColor = getTrainingStatusColor(); }
-        values[:dataIcon1BgColor] = (propIcon1 == 8) ? tsIconColor : null;
-        values[:dataIcon2BgColor] = (propIcon2 == 8) ? tsIconColor : null;
+        values[:dataIcon1Color] = getIconColor(propIcon1);
+        values[:dataIcon2Color] = getIconColor(propIcon2);
         values[:dataBattery] = getBattData();
         values[:dataAODLeft] = getValueByType(propAodFieldShows, 10);
         values[:dataAODRight] = getValueByType(propAodRightFieldShows, 5);
@@ -1700,23 +1698,49 @@ class Segment34View extends WatchUi.WatchFace {
         return "";
     }
 
-    hidden function getTrainingStatusColor() as Number? {
-        try {
-            var complication = Complications.getComplication(new Id(Complications.COMPLICATION_TYPE_TRAINING_STATUS));
-            if(complication != null && complication.value != null) {
-                var status = complication.value.toUpper();
-                if(status.find("OVERREACHING") != null) { return 0xFF3333; }
-                if(status.find("PEAKING") != null) { return 0x7B60FF; }
-                if(status.find("UNPRODUCTIVE") != null) { return 0xFF7700; }
-                if(status.find("PRODUCTIVE") != null) { return 0x30A050; }
-                if(status.find("MAINTAINING") != null) { return 0xFFCC00; }
-                if(status.find("RECOVERY") != null) { return 0x4488EE; }
-                if(status.find("STRAINED") != null) { return 0xFF44AA; }
-                if(status.find("DETRAINING") != null) { return 0x808080; }
-                if(status.find("PAUSED") != null) { return 0x444444; }
-                return 0x808080; // No Status / unknown
-            }
-        } catch(e) {}
+    (:AMOLED)
+    hidden function getIconColor(setting as Number) as Number? {
+        if(setting == 8) { // Training status icon
+            try {
+                var complication = Complications.getComplication(new Id(Complications.COMPLICATION_TYPE_TRAINING_STATUS));
+                if(complication != null && complication.value != null) {
+                    var status = complication.value.toUpper();
+                    if(status.find("OVERREACHING") != null) { return 0xFF3333; }
+                    if(status.find("PEAKING") != null) { return 0x7B60FF; }
+                    if(status.find("UNPRODUCTIVE") != null) { return 0xFF7700; }
+                    if(status.find("PRODUCTIVE") != null) { return 0x30A050; }
+                    if(status.find("MAINTAINING") != null) { return 0xFFCC00; }
+                    if(status.find("RECOVERY") != null) { return 0x4488EE; }
+                    if(status.find("STRAINED") != null) { return 0xFF44AA; }
+                    if(status.find("DETRAINING") != null) { return 0x808080; }
+                    if(status.find("PAUSED") != null) { return 0x444444; }
+                    return 0x808080; // No Status / unknown
+                }
+            } catch(e) {}
+        }
+        return null;
+    }
+
+    (:MIP)
+    hidden function getIconColor(setting as Number) as Number? {
+        if(setting == 8) { // Training status icon
+            try {
+                var complication = Complications.getComplication(new Id(Complications.COMPLICATION_TYPE_TRAINING_STATUS));
+                if(complication != null && complication.value != null) {
+                    var status = complication.value.toUpper();
+                    if(status.find("OVERREACHING") != null) { return 0xFF5555; }
+                    if(status.find("PEAKING") != null) { return 0x5555FF; }
+                    if(status.find("UNPRODUCTIVE") != null) { return 0xFF5500; }
+                    if(status.find("PRODUCTIVE") != null) { return 0x55AA55; }
+                    if(status.find("MAINTAINING") != null) { return 0xFFAA00; }
+                    if(status.find("RECOVERY") != null) { return 0x55AAFF; }
+                    if(status.find("STRAINED") != null) { return 0xFF55AA; }
+                    if(status.find("DETRAINING") != null) { return 0xAAAAAA; }
+                    if(status.find("PAUSED") != null) { return 0x555555; }
+                    return 0xAAAAAA; // No Status / unknown
+                }
+            } catch(e) {}
+        }
         return null;
     }
 
@@ -3421,19 +3445,11 @@ class Segment34View extends WatchUi.WatchFace {
         // No-op for non-square devices devices
     }
 
-    hidden function drawIconWithOverlay(dc as Dc, x as Number, y as Number, justify as Number, iconStr as String, countStr as String, bgColor as Number?) as Void {
-        if(bgColor != null) {
-            dc.setColor(bgColor, Graphics.COLOR_TRANSPARENT);
-        }
+    hidden function drawIconWithOverlay(dc as Dc, x as Number, y as Number, justify as Number, iconStr as String, countStr as String, iconColor as Number?) as Void {
+        dc.setColor(iconColor != null ? iconColor : themeColors[dataVal], Graphics.COLOR_TRANSPARENT);
         dc.drawText(x, y, fontIcons, iconStr, justify | Graphics.TEXT_JUSTIFY_VCENTER);
         if(!countStr.equals("")) {
-            var labelX = 0;
-            if(justify == Graphics.TEXT_JUSTIFY_RIGHT) {
-                labelX = x - 8;
-            } else if (justify == Graphics.TEXT_JUSTIFY_LEFT) {
-                labelX = x + 10;
-            }
-            
+            var labelX = justify == Graphics.TEXT_JUSTIFY_RIGHT ? x - 8 : x + 10;
             dc.setColor(themeColors[bg], Graphics.COLOR_TRANSPARENT);
             dc.drawText(labelX, y - 4, fontLabel, countStr, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
             dc.setColor(themeColors[dataVal], Graphics.COLOR_TRANSPARENT);
@@ -3465,19 +3481,17 @@ class Segment34View extends WatchUi.WatchFace {
                 fontBottomData, field2Width);
 
             // Icons on outer edges
-            dc.setColor(themeColors[dataVal], Graphics.COLOR_TRANSPARENT);
             drawIconWithOverlay(dc, field1Left - (marginX / 2),
                 bottomFiveY + (largeDataHeight / 2) + iconYAdj,
-                Graphics.TEXT_JUSTIFY_RIGHT, values[:dataIcon1], values[:dataIcon1Count] as String, values[:dataIcon1BgColor] as Number?);
+                Graphics.TEXT_JUSTIFY_RIGHT, values[:dataIcon1], values[:dataIcon1Count] as String, values[:dataIcon1Color] as Number?);
             drawIconWithOverlay(dc, field2Left + field2Width + (marginX / 2) - 2,
                 bottomFiveY + (largeDataHeight / 2) + iconYAdj,
-                Graphics.TEXT_JUSTIFY_LEFT, values[:dataIcon2], values[:dataIcon2Count] as String, values[:dataIcon2BgColor] as Number?);
+                Graphics.TEXT_JUSTIFY_LEFT, values[:dataIcon2], values[:dataIcon2Count] as String, values[:dataIcon2Color] as Number?);
         } else {
             // Single field - original behavior
             var step_width = drawDataField(dc, centerX, bottomFiveY, 3, null, values[:dataBottom], 5, fontBottomData, bottomDataWidth * 5);
 
             // Draw icons
-            dc.setColor(themeColors[dataVal], Graphics.COLOR_TRANSPARENT);
             if(propFontSize == 1 and step_width == 0) {
                 var y = 0;
                 if(screenWidth <= 280) {
@@ -3487,11 +3501,11 @@ class Segment34View extends WatchUi.WatchFace {
                     step_width = 65;
                     y = screenHeight - 31;
                 }
-                drawIconWithOverlay(dc, centerX - (step_width / 2) - (marginX / 2), y, Graphics.TEXT_JUSTIFY_RIGHT, values[:dataIcon1], values[:dataIcon1Count] as String, values[:dataIcon1BgColor] as Number?);
-                drawIconWithOverlay(dc, centerX + (step_width / 2) + (marginX / 2) - 2, y, Graphics.TEXT_JUSTIFY_LEFT, values[:dataIcon2], values[:dataIcon2Count] as String, values[:dataIcon2BgColor] as Number?);
+                drawIconWithOverlay(dc, centerX - (step_width / 2) - (marginX / 2), y, Graphics.TEXT_JUSTIFY_RIGHT, values[:dataIcon1], values[:dataIcon1Count] as String, values[:dataIcon1Color] as Number?);
+                drawIconWithOverlay(dc, centerX + (step_width / 2) + (marginX / 2) - 2, y, Graphics.TEXT_JUSTIFY_LEFT, values[:dataIcon2], values[:dataIcon2Count] as String, values[:dataIcon2Color] as Number?);
             } else {
-                drawIconWithOverlay(dc, centerX - (step_width / 2) - (marginX / 2), bottomFiveY + (largeDataHeight / 2) + iconYAdj, Graphics.TEXT_JUSTIFY_RIGHT, values[:dataIcon1], values[:dataIcon1Count] as String, values[:dataIcon1BgColor] as Number?);
-                drawIconWithOverlay(dc, centerX + (step_width / 2) + (marginX / 2) - 2, bottomFiveY + (largeDataHeight / 2) + iconYAdj, Graphics.TEXT_JUSTIFY_LEFT, values[:dataIcon2], values[:dataIcon2Count] as String, values[:dataIcon2BgColor] as Number?);
+                drawIconWithOverlay(dc, centerX - (step_width / 2) - (marginX / 2), bottomFiveY + (largeDataHeight / 2) + iconYAdj, Graphics.TEXT_JUSTIFY_RIGHT, values[:dataIcon1], values[:dataIcon1Count] as String, values[:dataIcon1Color] as Number?);
+                drawIconWithOverlay(dc, centerX + (step_width / 2) + (marginX / 2) - 2, bottomFiveY + (largeDataHeight / 2) + iconYAdj, Graphics.TEXT_JUSTIFY_LEFT, values[:dataIcon2], values[:dataIcon2Count] as String, values[:dataIcon2Color] as Number?);
             }
         }
     }
@@ -3501,7 +3515,6 @@ class Segment34View extends WatchUi.WatchFace {
         var step_width = drawDataField(dc, centerX, bottomFiveY, 3, null, values[:dataBottom], 5, fontBottomData, bottomDataWidth * 5);
 
         // Draw icons
-        dc.setColor(themeColors[dataVal], Graphics.COLOR_TRANSPARENT);
         if(propFontSize == 1 and step_width == 0) {
             var y = 0;
             if(screenWidth <= 280) {
@@ -3511,11 +3524,11 @@ class Segment34View extends WatchUi.WatchFace {
                 step_width = 65;
                 y = screenHeight - 31;
             }
-            drawIconWithOverlay(dc, centerX - (step_width / 2) - (marginX / 2), y, Graphics.TEXT_JUSTIFY_RIGHT, values[:dataIcon1], values[:dataIcon1Count] as String, values[:dataIcon1BgColor] as Number?);
-            drawIconWithOverlay(dc, centerX + (step_width / 2) + (marginX / 2) - 2, y, Graphics.TEXT_JUSTIFY_LEFT, values[:dataIcon2], values[:dataIcon2Count] as String, values[:dataIcon2BgColor] as Number?);
+            drawIconWithOverlay(dc, centerX - (step_width / 2) - (marginX / 2), y, Graphics.TEXT_JUSTIFY_RIGHT, values[:dataIcon1], values[:dataIcon1Count] as String, values[:dataIcon1Color] as Number?);
+            drawIconWithOverlay(dc, centerX + (step_width / 2) + (marginX / 2) - 2, y, Graphics.TEXT_JUSTIFY_LEFT, values[:dataIcon2], values[:dataIcon2Count] as String, values[:dataIcon2Color] as Number?);
         } else {
-            drawIconWithOverlay(dc, centerX - (step_width / 2) - (marginX / 2), bottomFiveY + (largeDataHeight / 2) + iconYAdj, Graphics.TEXT_JUSTIFY_RIGHT, values[:dataIcon1], values[:dataIcon1Count] as String, values[:dataIcon1BgColor] as Number?);
-            drawIconWithOverlay(dc, centerX + (step_width / 2) + (marginX / 2) - 2, bottomFiveY + (largeDataHeight / 2) + iconYAdj, Graphics.TEXT_JUSTIFY_LEFT, values[:dataIcon2], values[:dataIcon2Count] as String, values[:dataIcon2BgColor] as Number?);
+            drawIconWithOverlay(dc, centerX - (step_width / 2) - (marginX / 2), bottomFiveY + (largeDataHeight / 2) + iconYAdj, Graphics.TEXT_JUSTIFY_RIGHT, values[:dataIcon1], values[:dataIcon1Count] as String, values[:dataIcon1Color] as Number?);
+            drawIconWithOverlay(dc, centerX + (step_width / 2) + (marginX / 2) - 2, bottomFiveY + (largeDataHeight / 2) + iconYAdj, Graphics.TEXT_JUSTIFY_LEFT, values[:dataIcon2], values[:dataIcon2Count] as String, values[:dataIcon2Color] as Number?);
         }
     }
 
