@@ -110,6 +110,8 @@ class Segment34View extends WatchUi.WatchFace {
     // CGM Connect Widget complication IDs
     hidden var cgmComplicationId as Complications.Id? = null;
     hidden var cgmAgeComplicationId as Complications.Id? = null;
+    hidden var vo2RunTrend as String = "";
+    hidden var vo2BikeTrend as String = "";
     
     hidden var propIs24H as Boolean = false;
     hidden var propTheme as Integer = 0;
@@ -747,6 +749,7 @@ class Segment34View extends WatchUi.WatchFace {
             lastSlowUpdate = unix_timestamp;
             updateColorTheme();
             updateWeather();
+            updateVo2History();
         }
 
         if(lastUpdate == null or unix_timestamp - lastUpdate >= propUpdateFreq) {
@@ -1903,6 +1906,16 @@ class Segment34View extends WatchUi.WatchFace {
         cachedTempUnit = getTempUnit();
     }
 
+    hidden function updateVo2History() as Void {
+        var profile = UserProfile.getProfile();
+        if (profile.vo2maxRunning != null) {
+            vo2RunTrend = getVo2Trend("vo2run_hist", profile.vo2maxRunning as Number);
+        }
+        if (profile.vo2maxCycling != null) {
+            vo2BikeTrend = getVo2Trend("vo2bike_hist", profile.vo2maxCycling as Number);
+        }
+    }
+
     hidden function computeCcHash(cc) as Number {
         if (cc == null) { return 0; }
         var h = 17;
@@ -2172,12 +2185,12 @@ class Segment34View extends WatchUi.WatchFace {
         } else if(complicationType == 6) { // VO2 Max Running
             var profile = UserProfile.getProfile();
             if(profile.vo2maxRunning != null) {
-                val = profile.vo2maxRunning.format(numberFormat);
+                val = vo2RunTrend + (profile.vo2maxRunning as Number).format(numberFormat);
             }
         } else if(complicationType == 7) { // VO2 Max Cycling
             var profile = UserProfile.getProfile();
             if(profile.vo2maxCycling != null) {
-                val = profile.vo2maxCycling.format(numberFormat);
+                val = vo2BikeTrend + (profile.vo2maxCycling as Number).format(numberFormat);
             }
         } else if(complicationType == 8) { // Respiration rate
             if(activityInfo == null) { activityInfo = ActivityMonitor.getInfo(); }
@@ -3239,6 +3252,45 @@ class Segment34View extends WatchUi.WatchFace {
         if (trend.equals("d")) { return "d"; }  // Falling ↘
         if (trend.equals("D")) { return "e"; }  // Rapidly falling ↓
         return "";
+    }
+
+    // Returns a trend arrow char (b=↗ c=→ d=↘) based on stored VO2 history.
+    // Stores a new reading every 5 days; drops entries older than 30 days.
+    // Returns "" if fewer than 2 stored entries exist.
+    hidden function getVo2Trend(key as String, currentVal as Number) as String {
+        var nowDays = (Time.now().value() / 86400).toNumber();
+        var FIVE_DAYS  = 5;
+        var THIRTY_DAYS = 30;
+
+        var history = Application.Storage.getValue(key) as Array?;
+        if (history == null) { history = [] as Array; }
+
+        // Prune entries older than 30 days
+        var pruned = [] as Array;
+        for (var i = 0; i < history.size(); i++) {
+            var entry = history[i] as Array;
+            if (nowDays - (entry[0] as Number) <= THIRTY_DAYS) {
+                pruned.add(entry);
+            }
+        }
+
+        // Add new entry if history empty or >= 5 days since last stored
+        var shouldAdd = pruned.size() == 0 ||
+            (nowDays - ((pruned[pruned.size() - 1] as Array)[0] as Number) >= FIVE_DAYS);
+        if (shouldAdd) {
+            pruned.add([nowDays, currentVal]);
+        }
+
+        if (shouldAdd || pruned.size() != history.size()) {
+            Application.Storage.setValue(key, pruned);
+        }
+
+        if (pruned.size() < 2) { return ""; }
+
+        var oldest = (pruned[0] as Array)[1] as Number;
+        if (currentVal > oldest) { return "b"; }  // ↗
+        if (currentVal < oldest) { return "d"; }  // ↘
+        return "c";  // →
     }
 
     hidden function getCgmReading() as String {
