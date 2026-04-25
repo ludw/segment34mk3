@@ -43,6 +43,7 @@ class Segment34View extends WatchUi.WatchFace {
     hidden var graphBarSpacing as Number = 2;
     hidden var graphHeight as Number = 20;
     hidden var graphTargetWidth as Number = 40;
+    hidden var graphHalfWidth as Number = 0;  // max half-width of graph area; set per device in loadResources()
     hidden var propGraphSize as Number = 0;
     hidden var propGraphStyle as Number = 0;
     hidden var propGraphAxisLabels as Boolean = false;
@@ -367,6 +368,7 @@ class Segment34View extends WatchUi.WatchFace {
         graphBarSpacing = (propGraphSize == 1) ? 2 : 1;
         graphHeight = (propGraphSize == 1) ? 25 : 18;
         graphTargetWidth = (propGraphSize == 1) ? 25 : 40;
+        graphHalfWidth = screenWidth / 6;
     }
 
     (:Round280)
@@ -424,6 +426,7 @@ class Segment34View extends WatchUi.WatchFace {
         graphBarSpacing = (propGraphSize == 1) ? 2 : 1;
         graphHeight = (propGraphSize == 1) ? 28 : 20;
         graphTargetWidth = (propGraphSize == 1) ? 25 : 40;
+        graphHalfWidth = screenWidth / 6;
     }
 
     (:Round390)
@@ -481,6 +484,7 @@ class Segment34View extends WatchUi.WatchFace {
         baseX = centerX;
         barBottomAdj = 2;
         graphHeight = (propGraphSize == 1) ? 35 : 25;
+        graphHalfWidth = screenWidth / 6;
     }
 
     (:Round416)
@@ -538,6 +542,7 @@ class Segment34View extends WatchUi.WatchFace {
         barBottomAdj = 2;
         bottomFiveAdj = 8;
         graphHeight = (propGraphSize == 1) ? 35 : 25;
+        graphHalfWidth = screenWidth / 6;
     }
 
     (:Round454)
@@ -597,6 +602,7 @@ class Segment34View extends WatchUi.WatchFace {
         barBottomAdj = 2;
         graphHeight = (propGraphSize == 1) ? 40 : 30;
         graphTargetWidth = 45;
+        graphHalfWidth = screenWidth / 6;
     }
 
     (:Square)
@@ -656,6 +662,7 @@ class Segment34View extends WatchUi.WatchFace {
         barBottomAdj = 2;
         graphHeight = (propGraphSize == 1) ? 40 : 30;
         graphTargetWidth = 45;
+        graphHalfWidth = screenWidth / 4;
     }
 
     hidden function computeDisplayValues(now as Gregorian.Info) as Dictionary {
@@ -1253,17 +1260,17 @@ class Segment34View extends WatchUi.WatchFace {
         if(propGraphAxisLabels) { y = y + halfMarginY; }
 
         if(propGraphData >= 8) {
-            // Daily data mode: wider bars to fill ~75% of screen width
+            // Daily data mode: bar widths fill the device's graph area
             var n = data.size();
             bs = 6;
-            bw = Math.round((x.toFloat() * 0.75 - bs.toFloat() * (n - 1)) / n).toNumber();
+            bw = Math.round((graphHalfWidth.toFloat() * 2 - bs.toFloat() * (n - 1)) / n).toNumber();
             if(bw < 4) { bw = 4; }
         }
         var half_width = Math.round((data.size() * (bw + bs)) / 2);
 
         if(propGraphStyle > 0) {
             // Line graph: fixed total width regardless of data point count
-            half_width = screenWidth / 6;
+            half_width = graphHalfWidth;
 
             // Shift right when axis labels are shown, to create space for Y-axis labels
             var xShift = propGraphAxisLabels ? 10 : 0;
@@ -1351,7 +1358,11 @@ class Segment34View extends WatchUi.WatchFace {
                 dc.drawLine(prevX, prevY, ptX, ptY);
             }
             if(propGraphStyle == 2) {
-                dc.setColor(themeColors[dataVal], Graphics.COLOR_TRANSPARENT);
+                if(propGraphData == 7) {
+                    dc.setColor(getStressColor(data[i]), Graphics.COLOR_TRANSPARENT);
+                } else {
+                    dc.setColor(themeColors[dataVal], Graphics.COLOR_TRANSPARENT);
+                }
                 dc.fillRectangle(ptX - 1, ptY - 1, 3, 3);
                 dc.setColor(themeColors[clock], Graphics.COLOR_TRANSPARENT);
             }
