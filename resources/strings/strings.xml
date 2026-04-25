@@ -253,7 +253,7 @@
     <string id="settings_top_part_shows" scope="settings">Top Part shows</string>
     <string id="settings_two_small_data" scope="settings">Two small data fields and Moon phase</string>
     <string id="settings_two_small_data_fields" scope="settings">Two small data fields</string>
-    <string id="settings_histogram_graph" scope="settings">A histogram graph (last 2 hours of data)</string>
+    <string id="settings_graph_mode" scope="settings">A data graph (last 2 hours of data)</string>
     <string id="settings_top_left_small" scope="settings">Top left small data field:</string>
     <string id="settings_hidden" scope="settings">Hidden</string>
     <string id="settings_active_min_week" scope="settings">Active min / week</string>
@@ -313,10 +313,15 @@
     <string id="settings_next_calendar_event" scope="settings">Next calendar event time</string>
     <string id="settings_next_calendar_event_time" scope="settings">Next calendar event time</string>
     <string id="settings_top_right_small" scope="settings">Top right small data field:</string>
-    <string id="settings_histogram_shows" scope="settings">Histogram shows (must be enabled in Top Part shows)</string>
-    <string id="settings_histogram_size" scope="settings">Histogram size</string>
-    <string id="settings_histogram_small" scope="settings">Small (default)</string>
-    <string id="settings_histogram_large" scope="settings">Large</string>
+    <string id="settings_graph_shows" scope="settings">Graph shows (must be enabled in Top Part shows)</string>
+    <string id="settings_graph_size" scope="settings">Graph size</string>
+    <string id="settings_graph_small" scope="settings">Small (default)</string>
+    <string id="settings_graph_large" scope="settings">Large</string>
+    <string id="settings_graph_style" scope="settings">Graph style</string>
+    <string id="settings_graph_style_bars" scope="settings">Bars</string>
+    <string id="settings_graph_style_line" scope="settings">Line</string>
+    <string id="settings_graph_style_dots" scope="settings">Line + dots</string>
+    <string id="settings_graph_axis_labels" scope="settings">Show axis labels</string>
     <string id="settings_body_battery_history" scope="settings">Body battery history</string>
     <string id="settings_elevation_history" scope="settings">Elevation history</string>
     <string id="settings_heart_rate_history" scope="settings">Heart rate history</string>

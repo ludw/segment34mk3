@@ -237,7 +237,7 @@
     <string id="settings_top_part_shows" scope="settings">Górna część pokazuje</string>
     <string id="settings_two_small_data" scope="settings">Dwa małe pola danych i faza księżyca</string>
     <string id="settings_two_small_data_fields" scope="settings">Dwa małe pola danych</string>
-    <string id="settings_histogram_graph" scope="settings">Wykres histogramu (ostatnie 2 godziny danych)</string>
+    <string id="settings_graph_mode" scope="settings">Wykres danych (ostatnie 2 godziny danych)</string>
     <string id="settings_top_left_small" scope="settings">Małe pole danych górny lewy:</string>
     <string id="settings_hidden" scope="settings">Ukryte</string>
     <string id="settings_active_min_week" scope="settings">Aktywne min / tydzień</string>
@@ -290,7 +290,6 @@
     <string id="settings_next_calendar_event" scope="settings">Czas następnego wydarzenia kalendarza</string>
     <string id="settings_next_calendar_event_time" scope="settings">Czas następnego wydarzenia kalendarza</string>
     <string id="settings_top_right_small" scope="settings">Małe pole danych górny prawy:</string>
-    <string id="settings_histogram_shows" scope="settings">Histogram pokazuje (musi być włączone w Górna część pokazuje)</string>
     <string id="settings_body_battery_history" scope="settings">Historia baterii ciała</string>
     <string id="settings_elevation_history" scope="settings">Historia wysokości</string>
     <string id="settings_heart_rate_history" scope="settings">Historia tętna</string>
@@ -480,9 +479,15 @@
     <string id="settings_font_small" scope="settings">Małe (domyślne)</string>
     <string id="settings_font_large" scope="settings">Duże (dostosuj inne ustawienia, aby zmieścić)</string>
     <string id="settings_every_30_seconds" scope="settings">Co 30 sekund</string>
-    <string id="settings_histogram_size" scope="settings">Rozmiar histogramu</string>
-    <string id="settings_histogram_small" scope="settings">Małe (domyślne)</string>
-    <string id="settings_histogram_large" scope="settings">Duże</string>
+    <string id="settings_graph_shows" scope="settings">Graph pokazuje (musi być włączone w Górna część pokazuje)</string>
+    <string id="settings_graph_size" scope="settings">Rozmiar wykresu</string>
+    <string id="settings_graph_small" scope="settings">Małe (domyślne)</string>
+    <string id="settings_graph_large" scope="settings">Duże</string>
+    <string id="settings_graph_style" scope="settings">Styl wykresu</string>
+    <string id="settings_graph_style_bars" scope="settings">Słupki</string>
+    <string id="settings_graph_style_line" scope="settings">Linia</string>
+    <string id="settings_graph_style_dots" scope="settings">Linia + kropki</string>
+    <string id="settings_graph_axis_labels" scope="settings">Pokaż etykiety osi</string>
     <string id="settings_bottom_font_variant" scope="settings">Wariant czcionki dolnych pól:</string>
     <string id="settings_auto" scope="settings">Auto - AM/PM dla czasu 12h</string>
     <string id="settings_ampm" scope="settings">Brak separatora, pokaż AM/PM po</string>

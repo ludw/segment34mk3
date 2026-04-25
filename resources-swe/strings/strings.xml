@@ -238,7 +238,7 @@
     <string id="settings_top_part_shows" scope="settings">Övre delen visar</string>
     <string id="settings_two_small_data" scope="settings">Två små datafält och månfas</string>
     <string id="settings_two_small_data_fields" scope="settings">Två små datafält</string>
-    <string id="settings_histogram_graph" scope="settings">Ett histogramgraf (senaste 2 timmars data)</string>
+    <string id="settings_graph_mode" scope="settings">En datagraf (senaste 2 timmars data)</string>
     <string id="settings_top_left_small" scope="settings">Övre vänstra lilla datafält:</string>
     <string id="settings_hidden" scope="settings">Dolt</string>
     <string id="settings_active_min_week" scope="settings">Aktiva min / vecka</string>
@@ -293,7 +293,6 @@
     <string id="settings_next_calendar_event" scope="settings">Nästa kalenderhändelse tid</string>
     <string id="settings_next_calendar_event_time" scope="settings">Nästa kalenderhändelse tid</string>
     <string id="settings_top_right_small" scope="settings">Övre högra lilla datafält:</string>
-    <string id="settings_histogram_shows" scope="settings">Histogram visar (måste aktiveras i Övre delen visar)</string>
     <string id="settings_body_battery_history" scope="settings">Kroppsbatteri historik</string>
     <string id="settings_elevation_history" scope="settings">Höjdhistorik</string>
     <string id="settings_heart_rate_history" scope="settings">Hjärtfrekvenshistorik</string>
@@ -484,9 +483,15 @@
     <string id="settings_font_small" scope="settings">Liten (standard)</string>
     <string id="settings_font_large" scope="settings">Stor (justera andra inställningar för att minska trånghet)</string>
     <string id="settings_every_30_seconds" scope="settings">Var 30:e sekund</string>
-    <string id="settings_histogram_size" scope="settings">Histogramstorlek</string>
-    <string id="settings_histogram_small" scope="settings">Liten (standard)</string>
-    <string id="settings_histogram_large" scope="settings">Stor</string>
+    <string id="settings_graph_shows" scope="settings">Graf visar (måste aktiveras i Övre delen visar)</string>
+    <string id="settings_graph_size" scope="settings">Grafstorlek</string>
+    <string id="settings_graph_small" scope="settings">Liten (standard)</string>
+    <string id="settings_graph_large" scope="settings">Stor</string>
+    <string id="settings_graph_style" scope="settings">Grafstil</string>
+    <string id="settings_graph_style_bars" scope="settings">Staplar</string>
+    <string id="settings_graph_style_line" scope="settings">Linje</string>
+    <string id="settings_graph_style_dots" scope="settings">Linje + punkter</string>
+    <string id="settings_graph_axis_labels" scope="settings">Visa axeletiketter</string>
     <string id="settings_auto" scope="settings">Auto - AM/PM för 12h-tid</string>
     <string id="settings_ampm" scope="settings">Ingen separator, visa AM/PM efter istället</string>
     <string id="settings_show_temp_unit" scope="settings">Visa temperaturenhet</string>

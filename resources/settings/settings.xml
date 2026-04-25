@@ -147,7 +147,7 @@
             <settingConfig type="list">
                 <listEntry value="0">@Strings.settings_two_small_data</listEntry>
                 <listEntry value="1">@Strings.settings_two_small_data_fields</listEntry>
-                <listEntry value="2">@Strings.settings_histogram_graph</listEntry>
+                <listEntry value="2">@Strings.settings_graph_mode</listEntry>
             </settingConfig>
     </setting>
 
@@ -281,7 +281,7 @@
         </settingConfig>
     </setting>
 
-    <setting propertyKey="@Properties.histogramData" title="@Strings.settings_histogram_shows">
+    <setting propertyKey="@Properties.histogramData" title="@Strings.settings_graph_shows">
             <settingConfig type="list">
                 <listEntry value="0">@Strings.settings_body_battery_history</listEntry>
                 <listEntry value="1">@Strings.settings_elevation_history</listEntry>
@@ -297,11 +297,23 @@
             </settingConfig>
     </setting>
 
-    <setting propertyKey="@Properties.histogramSize" title="@Strings.settings_histogram_size">
+    <setting propertyKey="@Properties.histogramSize" title="@Strings.settings_graph_size">
         <settingConfig type="list">
-            <listEntry value="0">@Strings.settings_histogram_small</listEntry>
-            <listEntry value="1">@Strings.settings_histogram_large</listEntry>
+            <listEntry value="0">@Strings.settings_graph_small</listEntry>
+            <listEntry value="1">@Strings.settings_graph_large</listEntry>
         </settingConfig>
+    </setting>
+
+    <setting propertyKey="@Properties.graphStyle" title="@Strings.settings_graph_style">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.settings_graph_style_bars</listEntry>
+            <listEntry value="1">@Strings.settings_graph_style_line</listEntry>
+            <listEntry value="2">@Strings.settings_graph_style_dots</listEntry>
+        </settingConfig>
+    </setting>
+
+    <setting propertyKey="@Properties.graphAxisLabels" title="@Strings.settings_graph_axis_labels">
+        <settingConfig type="boolean" />
     </setting>
 
     <setting propertyKey="@Properties.weatherProvider" title="@Strings.settings_weather_provider">

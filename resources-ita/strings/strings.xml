@@ -238,7 +238,7 @@
     <string id="settings_top_part_shows" scope="settings">La parte superiore mostra</string>
     <string id="settings_two_small_data" scope="settings">Due piccoli campi dati e fase lunare</string>
     <string id="settings_two_small_data_fields" scope="settings">Due piccoli campi dati</string>
-    <string id="settings_histogram_graph" scope="settings">Un grafico a istogramma (ultime 2 ore di dati)</string>
+    <string id="settings_graph_mode" scope="settings">Un grafico dati (ultime 2 ore di dati)</string>
     <string id="settings_top_left_small" scope="settings">Campo dati piccolo in alto a sinistra:</string>
     <string id="settings_hidden" scope="settings">Nascosto</string>
     <string id="settings_active_min_week" scope="settings">Minuti attivi / settimana</string>
@@ -291,7 +291,6 @@
     <string id="settings_next_calendar_event" scope="settings">Prossimo evento calendario</string>
     <string id="settings_next_calendar_event_time" scope="settings">Orario prossimo evento calendario</string>
     <string id="settings_top_right_small" scope="settings">Campo dati piccolo in alto a destra:</string>
-    <string id="settings_histogram_shows" scope="settings">L'istogramma mostra (deve essere abilitato in La parte superiore mostra)</string>
     <string id="settings_body_battery_history" scope="settings">Cronologia batteria corpo</string>
     <string id="settings_elevation_history" scope="settings">Cronologia elevazione</string>
     <string id="settings_heart_rate_history" scope="settings">Cronologia frequenza cardiaca</string>
@@ -481,9 +480,15 @@
     <string id="settings_font_small" scope="settings">Piccolo (predefinito)</string>
     <string id="settings_font_large" scope="settings">Grande (regola le altre impostazioni per meno spazio)</string>
     <string id="settings_every_30_seconds" scope="settings">Ogni 30 secondi</string>
-    <string id="settings_histogram_size" scope="settings">Dimensione istogramma</string>
-    <string id="settings_histogram_small" scope="settings">Piccolo (predefinito)</string>
-    <string id="settings_histogram_large" scope="settings">Grande</string>
+    <string id="settings_graph_shows" scope="settings">Il grafico mostra (deve essere abilitato in La parte superiore mostra)</string>
+    <string id="settings_graph_size" scope="settings">Dimensione grafico</string>
+    <string id="settings_graph_small" scope="settings">Piccolo (predefinito)</string>
+    <string id="settings_graph_large" scope="settings">Grande</string>
+    <string id="settings_graph_style" scope="settings">Stile grafico</string>
+    <string id="settings_graph_style_bars" scope="settings">Barre</string>
+    <string id="settings_graph_style_line" scope="settings">Linea</string>
+    <string id="settings_graph_style_dots" scope="settings">Linea + punti</string>
+    <string id="settings_graph_axis_labels" scope="settings">Mostra etichette assi</string>
     <string id="settings_bottom_font_variant" scope="settings">Variante font campi inferiori:</string>
     <string id="settings_auto" scope="settings">Auto - AM/PM per l'orario 12h</string>
     <string id="settings_ampm" scope="settings">Nessun separatore, mostra AM/PM dopo</string>

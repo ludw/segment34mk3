@@ -39,19 +39,21 @@ class Segment34View extends WatchUi.WatchFace {
     hidden var textSideAdj as Number = 0;
     hidden var secondsClipWidth as Number = 24;
     hidden var iconYAdj as Number = 3;
-    hidden var histogramBarWidth as Number = 2;
-    hidden var histogramBarSpacing as Number = 2;
-    hidden var histogramHeight as Number = 20;
-    hidden var histogramTargetWidth as Number = 40;
-    hidden var propHistogramSize as Number = 0;
+    hidden var graphBarWidth as Number = 2;
+    hidden var graphBarSpacing as Number = 2;
+    hidden var graphHeight as Number = 20;
+    hidden var graphTargetWidth as Number = 40;
+    hidden var propGraphSize as Number = 0;
+    hidden var propGraphStyle as Number = 0;
+    hidden var propGraphAxisLabels as Boolean = false;
     hidden var bottomFieldWidths as Array<Number> = [3, 3, 3, 0];
 
-    // Cached histogram data — sensor history only changes once per minute,
+    // Cached graph data — sensor history only changes once per minute,
     // so we skip the expensive SensorHistory iteration on sub-minute updates.
-    hidden var cachedHistogramData as Array<Number>? = null;
-    hidden var cachedHistogramData2 as Array<Number>? = null; // vigorous component for active minutes
-    hidden var cachedHistogramDataSource as Number = -1;
-    hidden var lastHistogramMinute as Number = -1;
+    hidden var cachedGraphData as Array<Number>? = null;
+    hidden var cachedGraphData2 as Array<Number>? = null; // vigorous component for active minutes
+    hidden var cachedGraphDataSource as Number = -1;
+    hidden var lastGraphMinute as Number = -1;
 
     hidden var fontMoon as WatchUi.FontResource?;
     hidden var fontIcons as WatchUi.FontResource;
@@ -101,7 +103,9 @@ class Segment34View extends WatchUi.WatchFace {
     hidden var cachedRunDist28Days as Number = 0;
     hidden var lastActivityDistUpdate as Number = 0;
 
-    hidden var histogramGoalLine as Number? = null;
+    hidden var graphGoalLine as Number? = null;
+    hidden var cachedGraphYMin as Float = 0.0;
+    hidden var cachedGraphYMax as Float = 100.0;
     hidden var lastHfTime as Number? = null;
     hidden var lastCcHash as Number? = null;
     hidden var isLowMem as Boolean = false;
@@ -164,7 +168,7 @@ class Segment34View extends WatchUi.WatchFace {
     hidden var propPrecipAmountUnit as Number = 0;
     hidden var propPressureUnit as Number = 0;
     hidden var propTopPartShows as Number = 0;
-    hidden var propHistogramData as Number = 0;
+    hidden var propGraphData as Number = 0;
     hidden var propSunriseFieldShows as Number = 39;
     hidden var propSunsetFieldShows as Number = 40;
     hidden var propWeatherLine1Shows as Number = 79;
@@ -359,10 +363,10 @@ class Segment34View extends WatchUi.WatchFace {
         baseX = centerX + 1;
         fieldSpaceingAdj = 5;
         barBottomAdj = 1;
-        histogramBarWidth = (propHistogramSize == 1) ? 2 : 1;
-        histogramBarSpacing = (propHistogramSize == 1) ? 2 : 1;
-        histogramHeight = (propHistogramSize == 1) ? 25 : 18;
-        histogramTargetWidth = (propHistogramSize == 1) ? 25 : 40;
+        graphBarWidth = (propGraphSize == 1) ? 2 : 1;
+        graphBarSpacing = (propGraphSize == 1) ? 2 : 1;
+        graphHeight = (propGraphSize == 1) ? 25 : 18;
+        graphTargetWidth = (propGraphSize == 1) ? 25 : 40;
     }
 
     (:Round280)
@@ -416,10 +420,10 @@ class Segment34View extends WatchUi.WatchFace {
         bottomDataWidth = 18;
         baseX = centerX;
         barBottomAdj = 1;
-        histogramBarWidth = (propHistogramSize == 1) ? 2 : 1;
-        histogramBarSpacing = (propHistogramSize == 1) ? 2 : 1;
-        histogramHeight = (propHistogramSize == 1) ? 28 : 20;
-        histogramTargetWidth = (propHistogramSize == 1) ? 25 : 40;
+        graphBarWidth = (propGraphSize == 1) ? 2 : 1;
+        graphBarSpacing = (propGraphSize == 1) ? 2 : 1;
+        graphHeight = (propGraphSize == 1) ? 28 : 20;
+        graphTargetWidth = (propGraphSize == 1) ? 25 : 40;
     }
 
     (:Round390)
@@ -476,7 +480,7 @@ class Segment34View extends WatchUi.WatchFace {
         bottomDataWidth = 24;
         baseX = centerX;
         barBottomAdj = 2;
-        histogramHeight = (propHistogramSize == 1) ? 35 : 25;
+        graphHeight = (propGraphSize == 1) ? 35 : 25;
     }
 
     (:Round416)
@@ -533,7 +537,7 @@ class Segment34View extends WatchUi.WatchFace {
         baseX = centerX;
         barBottomAdj = 2;
         bottomFiveAdj = 8;
-        histogramHeight = (propHistogramSize == 1) ? 35 : 25;
+        graphHeight = (propGraphSize == 1) ? 35 : 25;
     }
 
     (:Round454)
@@ -591,8 +595,8 @@ class Segment34View extends WatchUi.WatchFace {
         largeDataWidth = 24;
         bottomDataWidth = 24;
         barBottomAdj = 2;
-        histogramHeight = (propHistogramSize == 1) ? 40 : 30;
-        histogramTargetWidth = 45;
+        graphHeight = (propGraphSize == 1) ? 40 : 30;
+        graphTargetWidth = 45;
     }
 
     (:Square)
@@ -650,8 +654,8 @@ class Segment34View extends WatchUi.WatchFace {
         largeDataWidth = 24;
         bottomDataWidth = 24;
         barBottomAdj = 2;
-        histogramHeight = (propHistogramSize == 1) ? 40 : 30;
-        histogramTargetWidth = 45;
+        graphHeight = (propGraphSize == 1) ? 40 : 30;
+        graphTargetWidth = 45;
     }
 
     hidden function computeDisplayValues(now as Gregorian.Info) as Dictionary {
@@ -664,15 +668,15 @@ class Segment34View extends WatchUi.WatchFace {
             var currentMinute = now.hour * 60 + now.min;
             // Only re-fetch sensor history when the minute changes or the data source changed.
             // SensorHistory updates at most once per minute, so more frequent reads are wasted.
-            if(cachedHistogramData == null
-                    or currentMinute != lastHistogramMinute
-                    or propHistogramData != cachedHistogramDataSource) {
-                cachedHistogramData = getDataArrayByType(propHistogramData);
-                cachedHistogramDataSource = propHistogramData;
-                lastHistogramMinute = currentMinute;
+            if(cachedGraphData == null
+                    or currentMinute != lastGraphMinute
+                    or propGraphData != cachedGraphDataSource) {
+                cachedGraphData = getDataArrayByType(propGraphData);
+                cachedGraphDataSource = propGraphData;
+                lastGraphMinute = currentMinute;
             }
-            values[:dataGraph1] = cachedHistogramData;
-            values[:dataGraph1b] = (propHistogramData == 10) ? cachedHistogramData2 : null;
+            values[:dataGraph1] = cachedGraphData;
+            values[:dataGraph1b] = (propGraphData == 10) ? cachedGraphData2 : null;
         } else {
             values[:dataGraph1] = null;
         }
@@ -888,10 +892,11 @@ class Segment34View extends WatchUi.WatchFace {
         var yn2 = yn1 - marginY - smallDataHeight;
         var yn3 = yn2 - marginY - labelHeight - tinyDataHeight - halfMarginY - aboveLine2Adjustment;
 
-        // Draw Top data fields or histogram
+        // Draw Top data fields or graph
         if(propTopPartShows == 2) {
-            yn3 = yn2 - marginY - histogramHeight;
-            drawHistogram(dc, values[:dataGraph1], values[:dataGraph1b], centerX, yn3, histogramHeight);
+            var xLabelSpace = (propGraphStyle > 0 && propGraphAxisLabels) ? labelHeight + 2 : 0;
+            yn3 = yn2 - marginY - graphHeight - xLabelSpace;
+            drawGraph(dc, values[:dataGraph1], values[:dataGraph1b], centerX, yn3, graphHeight);
         } else {
             var top_data_height = marginY;
             var top_field_font = fontTinyData;
@@ -1239,12 +1244,15 @@ class Segment34View extends WatchUi.WatchFace {
         dc.setPenWidth(1);
     }
 
-    hidden function drawHistogram(dc as Dc, data as Array<Number>?, data2 as Array<Number>?, x as Number, y as Number, h as Number) as Void {
+    hidden function drawGraph(dc as Dc, data as Array<Number>?, data2 as Array<Number>?, x as Number, y as Number, h as Number) as Void {
         if(data == null || data.size() == 0) { return; }
         var scale = 100.0 / h;
-        var bw = histogramBarWidth;
-        var bs = histogramBarSpacing;
-        if(propHistogramData >= 8) {
+        var bw = graphBarWidth;
+        var bs = graphBarSpacing;
+
+        if(propGraphAxisLabels) { y = y + halfMarginY; }
+
+        if(propGraphData >= 8) {
             // Daily data mode: wider bars to fill ~75% of screen width
             var n = data.size();
             bs = 6;
@@ -1253,8 +1261,21 @@ class Segment34View extends WatchUi.WatchFace {
         }
         var half_width = Math.round((data.size() * (bw + bs)) / 2);
 
-        if(histogramGoalLine != null) {
-            var goal_y = y + (h - Math.round(histogramGoalLine / scale));
+        if(propGraphStyle > 0) {
+            // Line graph: fixed total width regardless of data point count
+            half_width = screenWidth / 6;
+
+            // Shift right when axis labels are shown, to create space for Y-axis labels
+            var xShift = propGraphAxisLabels ? 10 : 0;
+            drawLineGraph(dc, data, x + xShift, y, h, half_width, scale);
+        } else {
+            drawBarGraph(dc, data, data2, x, y, h, half_width, bw, bs, scale);
+        }
+    }
+
+    hidden function drawBarGraph(dc as Dc, data as Array<Number>, data2 as Array<Number>?, x as Number, y as Number, h as Number, half_width as Number, bw as Number, bs as Number, scale as Float) as Void {
+        if(graphGoalLine != null) {
+            var goal_y = y + (h - Math.round(graphGoalLine / scale));
             dc.setColor(themeColors[fieldLbl], Graphics.COLOR_TRANSPARENT);
             dc.drawLine(x - half_width, goal_y, x + half_width, goal_y);
         }
@@ -1262,11 +1283,11 @@ class Segment34View extends WatchUi.WatchFace {
         dc.setColor(themeColors[clock], Graphics.COLOR_TRANSPARENT);
         for(var i = 0; i < data.size(); i++) {
             if(data[i] == -1) { continue; } // gap (e.g. stress not measurable)
-            if(propHistogramData == 7) {
+            if(propGraphData == 7) {
                 dc.setColor(getStressColor(data[i]), Graphics.COLOR_TRANSPARENT);
             }
             var bar_x = x - half_width + i * (bw + bs);
-            if(propHistogramData >= 8 && data[i] == 0) {
+            if(propGraphData >= 8 && data[i] == 0) {
                 // Zero value: draw a 1px stub
                 dc.setColor(themeColors[dateDim], Graphics.COLOR_TRANSPARENT);
                 dc.fillRectangle(bar_x, y + h - 1, bw, 1);
@@ -1275,7 +1296,7 @@ class Segment34View extends WatchUi.WatchFace {
             }
             var bar_height = Math.round(data[i] / scale);
             if(data2 != null && i < data2.size() && data2[i] > 0) {
-                // Stacked bar: bottom = moderate (clock color), top = vigorous (bodybatt color)
+                // Stacked bar: bottom = moderate (date color), top = vigorous (clock color)
                 var vigorous_height = Math.round(data2[i] / scale);
                 if(vigorous_height > bar_height) { vigorous_height = bar_height; }
                 var moderate_height = bar_height - vigorous_height;
@@ -1288,6 +1309,90 @@ class Segment34View extends WatchUi.WatchFace {
             } else {
                 dc.fillRectangle(bar_x, y + (h - bar_height), bw, bar_height);
             }
+        }
+    }
+
+    hidden function drawLineGraph(dc as Dc, data as Array<Number>, x as Number, y as Number, h as Number, half_width as Number, scale as Float) as Void {
+        var n = data.size();
+        var graphLeft = x - half_width;
+        var graphRight = x + half_width;
+        var totalW = graphRight - graphLeft;
+
+        // Draw axes
+        dc.setColor(themeColors[fieldLbl], Graphics.COLOR_TRANSPARENT);
+        dc.setPenWidth(1);
+        dc.drawLine(graphLeft, y + h, graphRight, y + h);   // X axis
+        dc.drawLine(graphLeft, y, graphLeft, y + h);         // Y axis
+
+        // Draw axis labels if enabled
+        if(propGraphAxisLabels) {
+            var maxStr = formatGraphAxisValue(cachedGraphYMax);
+            var minStr = formatGraphAxisValue(cachedGraphYMin);
+            dc.drawText(graphLeft - 2, y, fontLabel, maxStr, Graphics.TEXT_JUSTIFY_RIGHT);
+            dc.drawText(graphLeft - 2, y + h - labelHeight, fontLabel, minStr, Graphics.TEXT_JUSTIFY_RIGHT);
+
+            var leftLabel = getGraphXLabel(true);
+            var rightLabel = getGraphXLabel(false);
+            dc.drawText(graphLeft, y + h, fontLabel, leftLabel, Graphics.TEXT_JUSTIFY_LEFT);
+            dc.drawText(graphRight, y + h, fontLabel, rightLabel, Graphics.TEXT_JUSTIFY_RIGHT);
+        }
+
+        // Draw line and optional dots
+        dc.setColor(themeColors[clock], Graphics.COLOR_TRANSPARENT);
+        var prevX = -1;
+        var prevY = -1;
+        for(var i = 0; i < n; i++) {
+            if(data[i] < 0) { prevX = -1; prevY = -1; continue; } // gap
+            var ptX = n > 1 ? graphLeft + Math.round(i.toFloat() * totalW / (n - 1)) : x;
+            var ptY = y + h - 1 - Math.round(data[i] / scale);
+            if(ptY < y) { ptY = y; }
+
+            if(prevX >= 0) {
+                dc.drawLine(prevX, prevY, ptX, ptY);
+            }
+            if(propGraphStyle == 2) {
+                dc.setColor(themeColors[dataVal], Graphics.COLOR_TRANSPARENT);
+                dc.fillRectangle(ptX - 1, ptY - 1, 3, 3);
+                dc.setColor(themeColors[clock], Graphics.COLOR_TRANSPARENT);
+            }
+            prevX = ptX;
+            prevY = ptY;
+        }
+    }
+
+    // Format a Y-axis value for display; uses "k" suffix for values >= 1000.
+    hidden function formatGraphAxisValue(val as Float) as String {
+        var n = val.toNumber();
+        if(n < 0) {
+            var abs = (-val).toNumber();
+            if(abs >= 1000) { return "-" + (abs / 1000).toString() + "K"; }
+            return "-" + abs.toString();
+        }
+        if(n >= 1000) { return (n / 1000).toString() + "K"; }
+        return n.toString();
+    }
+
+    // Returns the X-axis label for the leftmost (isLeft=true) or rightmost point.
+    // For 2-hour data: formatted time; for 7-day data: abbreviated weekday.
+    hidden function getGraphXLabel(isLeft as Boolean) as String {
+        if(propGraphData >= 8) {
+            var daysBack = isLeft ? 6 : 0;
+            var target = Time.now().subtract(new Time.Duration(daysBack * 86400));
+            var info = Time.Gregorian.info(target, Time.FORMAT_SHORT);
+            return dayName(info.day_of_week);
+        } else {
+            var minutesBack = isLeft ? 120 : 0;
+            var target = Time.now().subtract(new Time.Duration(minutesBack * 60));
+            var info = Time.Gregorian.info(target, Time.FORMAT_SHORT);
+            var h = info.hour;
+            var m = info.min;
+            if(!propIs24H) {
+                var ampm = h >= 12 ? "P" : "A";
+                h = h % 12;
+                if(h == 0) { h = 12; }
+                return h.toString() + ":" + m.format("%02d") + ampm;
+            }
+            return h.format("%02d") + ":" + m.format("%02d");
         }
     }
 
@@ -1525,8 +1630,11 @@ class Segment34View extends WatchUi.WatchFace {
         propClockFont = p.getValue("clockFont") as Number;
         propFontSize = p.getValue("fontSize") as Number;
         propTopPartShows = p.getValue("topPartShows") as Number;
-        propHistogramData = p.getValue("histogramData") as Number;
-        propHistogramSize = p.getValue("histogramSize") as Number;
+        propGraphData = p.getValue("histogramData") as Number;
+        propGraphSize = p.getValue("histogramSize") as Number;
+        propGraphStyle = p.getValue("graphStyle") as Number;
+        propGraphAxisLabels = p.getValue("graphAxisLabels") as Boolean;
+        cachedGraphData = null; // force graph data refresh when properties change
         propSunriseFieldShows = p.getValue("sunriseFieldShows") as Number;
         propSunsetFieldShows = p.getValue("sunsetFieldShows") as Number;
         propWeatherLine1Shows = p.getValue("weatherLine1Shows") as Number;
@@ -2543,6 +2651,31 @@ class Segment34View extends WatchUi.WatchFace {
         var min = iterator.getMin();
         if(min == null or max == null) { return []; }
 
+        var hrMin = 0;
+        if(dataSource == 2) {
+            var hrProfile = UserProfile.getProfile();
+            if(hrProfile != null && hrProfile.restingHeartRate != null && hrProfile.restingHeartRate > 30) {
+                hrMin = hrProfile.restingHeartRate;
+            }
+        }
+
+        // Set Y axis bounds for axis labels
+        if(dataSource == 0) {
+            cachedGraphYMin = 0.0; cachedGraphYMax = 100.0;
+        } else if(dataSource == 1 or dataSource == 4) {
+            var rawMin = min * 0.9;
+            cachedGraphYMin = dataSource == 4 ? (rawMin / 100.0).toFloat() : rawMin.toFloat();
+            cachedGraphYMax = dataSource == 4 ? (max.toFloat() / 100.0) : max.toFloat();
+        } else if(dataSource == 2) {
+            cachedGraphYMin = hrMin.toFloat(); cachedGraphYMax = max.toFloat();
+        } else if(dataSource == 3) {
+            cachedGraphYMin = 50.0; cachedGraphYMax = 100.0;
+        } else if(dataSource == 5 or dataSource == 7) {
+            cachedGraphYMin = 0.0; cachedGraphYMax = 100.0;
+        } else if(dataSource == 6) {
+            cachedGraphYMin = min.toFloat(); cachedGraphYMax = max.toFloat();
+        }
+
         var ret = [];
         var diff = max - (min * 0.9);
         var isStress = (dataSource == 5 or dataSource == 7);
@@ -2550,7 +2683,10 @@ class Segment34View extends WatchUi.WatchFace {
         while(sample != null) {
             if(dataSource == 2) {
                 if(sample.data != null and sample.data != 0 and sample.data < 255) {
-                    ret.add(Math.round(sample.data.toFloat() / max * 100).toNumber());
+                    var hrRange = max - hrMin;
+                    var normalized = hrRange > 0 ? Math.round((sample.data.toFloat() - hrMin) / hrRange * 100).toNumber() : 0;
+                    if(normalized < 0) { normalized = 0; }
+                    ret.add(normalized);
                 }
             } else if(dataSource == 1 or dataSource == 4) {
                 if(sample.data != null) {
@@ -2570,13 +2706,13 @@ class Segment34View extends WatchUi.WatchFace {
             sample = iterator.next();
         }
 
-        return downsampleHistogram(ret);
+        return downsampleGraph(ret);
     }
 
-    // Daily activity histogram (distance / steps / active minutes), past 6 days + today.
+    // Daily activity graph (distance / steps / active minutes), past 6 days + today.
     hidden function getDailyDataArray(dataSource as Number) as Array<Number> {
-        histogramGoalLine = null;
-        cachedHistogramData2 = null;
+        graphGoalLine = null;
+        cachedGraphData2 = null;
         var history = ActivityMonitor.getHistory();
         var todayInfo = ActivityMonitor.getInfo();
         var rawData = [];
@@ -2601,6 +2737,14 @@ class Segment34View extends WatchUi.WatchFace {
             if(rawData[i] > maxVal) { maxVal = rawData[i]; }
         }
 
+        cachedGraphYMin = 0.0;
+        if(dataSource == 8) {
+            // Distance is in cm; convert to user's distance unit for the axis label
+            cachedGraphYMax = maxVal.toFloat() / (propIsMetricDistance ? 100000.0 : 160934.4);
+        } else {
+            cachedGraphYMax = maxVal.toFloat();
+        }
+
         var ret = [];
         if(maxVal > 0) {
             for(var i = 0; i < rawData.size(); i++) {
@@ -2608,14 +2752,14 @@ class Segment34View extends WatchUi.WatchFace {
             }
             if(dataSource == 9 and todayInfo.stepGoal != null and todayInfo.stepGoal > 0) {
                 var goalNorm = Math.round(todayInfo.stepGoal.toFloat() / maxVal * 100).toNumber();
-                if(goalNorm <= 100) { histogramGoalLine = goalNorm; }
+                if(goalNorm <= 100) { graphGoalLine = goalNorm; }
             }
             if(dataSource == 10) {
                 var vigRet = [];
                 for(var i = 0; i < rawVigorous.size(); i++) {
                     vigRet.add(Math.round(rawVigorous[i].toFloat() / maxVal * 100).toNumber());
                 }
-                cachedHistogramData2 = vigRet;
+                cachedGraphData2 = vigRet;
             }
         }
         return ret;
@@ -2635,11 +2779,11 @@ class Segment34View extends WatchUi.WatchFace {
         return 0;
     }
 
-    hidden function downsampleHistogram(data as Array<Number>) as Array<Number> {
-        if(data.size() <= histogramTargetWidth) { return data; }
+    hidden function downsampleGraph(data as Array<Number>) as Array<Number> {
+        if(data.size() <= graphTargetWidth) { return data; }
         var reduced = [];
-        var step = (data.size() as Float) / histogramTargetWidth.toFloat();
-        for(var i = 0; i < histogramTargetWidth; i++) {
+        var step = (data.size() as Float) / graphTargetWidth.toFloat();
+        for(var i = 0; i < graphTargetWidth; i++) {
             var idx = Math.round(i * step).toNumber();
             if(idx >= data.size()) { idx = data.size() - 1; }
             reduced.add(data[idx]);

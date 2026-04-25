@@ -238,7 +238,7 @@
     <string id="settings_top_part_shows" scope="settings">Oberer Teil zeigt</string>
     <string id="settings_two_small_data" scope="settings">Zwei kleine Datenfelder und Mondphase</string>
     <string id="settings_two_small_data_fields" scope="settings">Zwei kleine Datenfelder</string>
-    <string id="settings_histogram_graph" scope="settings">Ein Histogramm (letzte 2 Stunden)</string>
+    <string id="settings_graph_mode" scope="settings">Ein Datengraph (letzte 2 Stunden)</string>
     <string id="settings_top_left_small" scope="settings">Datenfeld oben links:</string>
     <string id="settings_hidden" scope="settings">Versteckt</string>
     <string id="settings_active_min_week" scope="settings">Aktiv-Min / Woche</string>
@@ -290,7 +290,6 @@
     <string id="settings_next_calendar_event" scope="settings">Nächster Kalendereintrag</string>
     <string id="settings_next_calendar_event_time" scope="settings">Nächste Kalendereintragszeit</string>
     <string id="settings_top_right_small" scope="settings">Datenfeld oben rechts:</string>
-    <string id="settings_histogram_shows" scope="settings">Histogramm zeigt (muss oben aktiviert sein)</string>
     <string id="settings_body_battery_history" scope="settings">Body Battery Verlauf</string>
     <string id="settings_elevation_history" scope="settings">Höhenverlauf</string>
     <string id="settings_heart_rate_history" scope="settings">Herzfrequenzverlauf</string>
@@ -463,9 +462,15 @@
     <string id="settings_font_small" scope="settings">Klein (Standard)</string>
     <string id="settings_font_large" scope="settings">Groß (andere Einstellungen anpassen um weniger beengt zu wirken)</string>
     <string id="settings_every_30_seconds" scope="settings">Alle 30 Sekunden</string>
-    <string id="settings_histogram_size" scope="settings">Histogrammgröße</string>
-    <string id="settings_histogram_small" scope="settings">Klein (Standard)</string>
-    <string id="settings_histogram_large" scope="settings">Groß</string>
+    <string id="settings_graph_shows" scope="settings">Graph zeigt (muss oben aktiviert sein)</string>
+    <string id="settings_graph_size" scope="settings">Graphgröße</string>
+    <string id="settings_graph_small" scope="settings">Klein (Standard)</string>
+    <string id="settings_graph_large" scope="settings">Groß</string>
+    <string id="settings_graph_style" scope="settings">Graph-Stil</string>
+    <string id="settings_graph_style_bars" scope="settings">Balken</string>
+    <string id="settings_graph_style_line" scope="settings">Linie</string>
+    <string id="settings_graph_style_dots" scope="settings">Linie + Punkte</string>
+    <string id="settings_graph_axis_labels" scope="settings">Achsenbeschriftung anzeigen</string>
     <string id="settings_bottom_font_variant" scope="settings">Untere Felder Schriftart-Variante:</string>
     <string id="settings_bottom_5_digit_value_2" scope="settings">Unterer 5-stelliger Wert 2 (nur quadratische Uhren):</string>
     <string id="settings_auto" scope="settings">Auto - AM/PM bei 12h-Zeit</string>

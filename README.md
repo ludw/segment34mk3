@@ -49,6 +49,10 @@ For refactorings and optimizations keep in mind that:
 
 
 ## Change log
+v0.11
+- Fix for gusts and percipitation amount
+- New options to show line graph instead of histogram
+
 v0.10
 - Training status as icon
 - Wind gusts, last weather update and precipitation amount
