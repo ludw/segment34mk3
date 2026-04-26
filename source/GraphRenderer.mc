@@ -80,23 +80,44 @@ class GraphRenderer {
         }
         var half_width = Math.round((data.size() * (bw + bs)) / 2);
 
+        // Shift right when axis labels are shown, to create space for Y-axis labels on the left
+        var xShift = _propGraphAxisLabels ? 10 : 0;
+
         if(_propGraphStyle > 0) {
             // Line graph: fixed total width regardless of data point count
             half_width = _halfWidth;
-
-            // Shift right when axis labels are shown, to create space for Y-axis labels
-            var xShift = _propGraphAxisLabels ? 10 : 0;
             drawLineGraph(dc, data, x + xShift, y, h, half_width, scale, themeColors);
         } else {
-            drawBarGraph(dc, data, data2, x, y, h, half_width, bw, bs, scale, themeColors);
+            drawBarGraph(dc, data, data2, x + xShift, y, h, half_width, bw, bs, scale, themeColors);
         }
     }
 
     hidden function drawBarGraph(dc as Graphics.Dc, data as Array<Number>, data2 as Array<Number>?, x as Number, y as Number, h as Number, half_width as Number, bw as Number, bs as Number, scale as Float, themeColors as Array<Graphics.ColorType>) as Void {
+        var graphLeft = x - half_width;
+        var graphRight = x + half_width;
+
+        if(_propGraphAxisLabels) {
+            dc.setColor(themeColors[fieldLbl], Graphics.COLOR_TRANSPARENT);
+            dc.setPenWidth(1);
+            dc.drawLine(graphLeft, y + h, graphRight, y + h);   // X axis
+            dc.drawLine(graphLeft, y, graphLeft, y + h);         // Y axis
+
+            var maxStr = formatGraphAxisValue(cachedGraphYMax);
+            dc.drawText(graphLeft - 2, y, _fontLabel, maxStr, Graphics.TEXT_JUSTIFY_RIGHT);
+            if(cachedGraphYMin != 0.0) {
+                var minStr = formatGraphAxisValue(cachedGraphYMin);
+                dc.drawText(graphLeft - 2, y + h - _labelHeight, _fontLabel, minStr, Graphics.TEXT_JUSTIFY_RIGHT);
+            }
+            var leftLabel = getGraphXLabel(true);
+            var rightLabel = getGraphXLabel(false);
+            dc.drawText(graphLeft, y + h, _fontLabel, leftLabel, Graphics.TEXT_JUSTIFY_LEFT);
+            dc.drawText(graphRight, y + h, _fontLabel, rightLabel, Graphics.TEXT_JUSTIFY_RIGHT);
+        }
+
         if(graphGoalLine != null) {
             var goal_y = y + (h - Math.round(graphGoalLine / scale));
             dc.setColor(themeColors[fieldLbl], Graphics.COLOR_TRANSPARENT);
-            dc.drawLine(x - half_width, goal_y, x + half_width, goal_y);
+            dc.drawLine(graphLeft, goal_y, graphRight, goal_y);
         }
 
         dc.setColor(themeColors[clock], Graphics.COLOR_TRANSPARENT);
@@ -105,7 +126,7 @@ class GraphRenderer {
             if(_propGraphData == 7) {
                 dc.setColor(getStressColor(data[i]), Graphics.COLOR_TRANSPARENT);
             }
-            var bar_x = x - half_width + i * (bw + bs);
+            var bar_x = graphLeft + i * (bw + bs);
             if(_propGraphData >= 8 && data[i] == 0) {
                 // Zero value: draw a 1px stub
                 dc.setColor(themeColors[dateDim], Graphics.COLOR_TRANSPARENT);
@@ -208,6 +229,9 @@ class GraphRenderer {
     }
 
     function getDataArrayByType(dataSource as Number) as Array<Number> {
+        graphGoalLine = null;
+        cachedGraphData2 = null;
+
         if(dataSource == 8 or dataSource == 9 or dataSource == 10) {
             return getDailyDataArray(dataSource);
         }

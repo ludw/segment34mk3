@@ -145,6 +145,14 @@ class ValueResolver {
         return getValueByType(complicationType, width) + unit;
     }
 
+    function getValueByType(complicationType as Number, width as Number) as String {
+        var val = getClockValue(complicationType, width);
+        if (val == null) { val = getActivityValue(complicationType, width); }
+        if (val == null) { val = getWeatherValue(complicationType, width); }
+        if (val == null) { val = getComplicationValue(complicationType, width); }
+        return val != null ? val : "";
+    }
+
     hidden function getUnitByType(complicationType as Number) as String {
         var unit = "";
         if(complicationType == 10) { // Calories / day
@@ -558,14 +566,6 @@ class ValueResolver {
             return _dataHelper.getCgmAge();
         }
         return null;
-    }
-
-    function getValueByType(complicationType as Number, width as Number) as String {
-        var val = getClockValue(complicationType, width);
-        if (val == null) { val = getActivityValue(complicationType, width); }
-        if (val == null) { val = getWeatherValue(complicationType, width); }
-        if (val == null) { val = getComplicationValue(complicationType, width); }
-        return val != null ? val : "";
     }
 
     function getLabelByType(complicationType as Number, labelSize as Number) as String {
