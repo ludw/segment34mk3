@@ -103,6 +103,7 @@ class Segment34View extends WatchUi.WatchFace {
 
     hidden var doesPartialUpdate as Boolean = false;
     hidden var complications as ComplicationHelper = new ComplicationHelper();
+    hidden var weatherHelper as WeatherDisplayHelper = new WeatherDisplayHelper();
     
     hidden var propIs24H as Boolean = false;
     hidden var propTheme as Integer = 0;
@@ -1605,7 +1606,8 @@ class Segment34View extends WatchUi.WatchFace {
             }
             try { weatherCondition = readWeatherData(); } catch(e) {}
         }
-        cachedTempUnit = getTempUnit();
+        cachedTempUnit = weatherHelper.getTempUnit(propTempUnit);
+        weatherHelper.update(weatherCondition, owmError, cachedTempUnit, propShowTempUnit, propWindUnit, propPrecipAmountUnit, propIs24H, propHourFormat);
     }
 
     hidden function computeCcHash(cc) as Number {
@@ -2039,9 +2041,9 @@ class Segment34View extends WatchUi.WatchFace {
                 val = formatTemperature(convertTemperature(tempVal, cachedTempUnit), propShowTempUnit, cachedTempUnit);
             }
         } else if(complicationType == 41) { // Temperature
-            val = getTemperature();
+            val = weatherHelper.getTemperature();
         } else if(complicationType == 42) { // Precipitation chance
-            val = getPrecip();
+            val = weatherHelper.getPrecip();
             if(width == 3 and val.equals("100%")) { val = "100"; }
         } else if(complicationType == 43) { // Next Sun Event
             var nextSunEventArray = getNextSunEvent(weatherCondition);
@@ -2091,15 +2093,15 @@ class Segment34View extends WatchUi.WatchFace {
                 }
             }
         } else if(complicationType == 51) { // UV Index
-            val = getUVIndex();
+            val = weatherHelper.getUVIndex();
         } else if(complicationType == 52) { // Humidity
-            val = getHumidity();
+            val = weatherHelper.getHumidity();
         } else if(complicationType == 53) { // CGM Glucose + Trend
             val = complications.getCgmReading();
         } else if(complicationType == 54) { // CGM Age (minutes)
             val = complications.getCgmAge();
         } else if(complicationType == 55) { // Feels like
-            val = getFeelsLike();
+            val = weatherHelper.getFeelsLike();
         } else if(complicationType == 56) { // Hours to next sun event
             val = hoursToNextSunEvent(weatherCondition);
         } else if(complicationType == 57) { // Resting Heart Rate
@@ -2129,9 +2131,9 @@ class Segment34View extends WatchUi.WatchFace {
             var distFactor = propIsMetricDistance ? 0.001 : 0.000621371;
             val = formatDistanceByWidth((complicationType == 66 ? _cachedRunDistMonth : _cachedRunDist28Days) * distFactor, width);
         } else if(complicationType == 60) { // Weather data 1 format string
-            val = getWeatherByFormat(propWeatherFormat1);
+            val = weatherHelper.getWeatherByFormat(propWeatherFormat1);
         } else if(complicationType == 61) { // Weather data 2 format string
-            val = getWeatherByFormat(propWeatherFormat2);
+            val = weatherHelper.getWeatherByFormat(propWeatherFormat2);
         } else if(complicationType == 63 || complicationType == 64) { // Civil dawn / Civil dusk
             if(weatherCondition != null) {
                 var loc = weatherCondition.observationLocationPosition;
@@ -2417,188 +2419,6 @@ class Segment34View extends WatchUi.WatchFace {
         }
         return "";
     }
-
-    hidden function getWeatherByFormat(format as String) as String {
-        var result = "";
-        var i = 0;
-        while(i < format.length()) {
-            var ch = format.substring(i, i + 1);
-            if(ch.equals("t")) { result = result + getTemperature(); }
-            else if(ch.equals("w")) { result = result + getWind(); }
-            else if(ch.equals("g")) { result = result + getWindGust(); }
-            else if(ch.equals("h")) { result = result + getHumidity(); }
-            else if(ch.equals("p")) { result = result + getPrecip(); }
-            else if(ch.equals("r")) { result = result + getPrecipAmount(); }
-            else if(ch.equals("u")) { result = result + getUVIndex(); }
-            else if(ch.equals("l")) { result = result + getHighLow(); }
-            else if(ch.equals("f")) { result = result + getFeelsLike(); }
-            else if(ch.equals("c")) { result = result + getWeatherCondition(); }
-            else if(ch.equals("s")) { result = result + getWeatherConditionShort(); }
-            else if(ch.equals("n")) { result = result + getCityName(); }
-            else if(ch.equals("o")) { result = result + getObservationTime(); }
-            else { result = result + ch; }
-            i += 1;
-        }
-        return result;
-    }
-
-    hidden function getCityName() as String {
-        if (weatherCondition == null || weatherCondition.cityName == null) { return ""; }
-        return weatherCondition.cityName.toUpper();
-    }
-
-    hidden function getWeatherCondition() as String {
-        if (owmError != null) { return owmError; }
-        // Early return if no weather data
-        if (weatherCondition == null || weatherCondition.condition == null) {
-            return "";
-        }
-
-        var weatherStrings = [
-            Rez.Strings.WEATHER_0, Rez.Strings.WEATHER_1, Rez.Strings.WEATHER_2, Rez.Strings.WEATHER_3,
-            Rez.Strings.WEATHER_4, Rez.Strings.WEATHER_5, Rez.Strings.WEATHER_6, Rez.Strings.WEATHER_7,
-            Rez.Strings.WEATHER_8, Rez.Strings.WEATHER_9, Rez.Strings.WEATHER_10, Rez.Strings.WEATHER_11,
-            Rez.Strings.WEATHER_12, Rez.Strings.WEATHER_13, Rez.Strings.WEATHER_14, Rez.Strings.WEATHER_15,
-            Rez.Strings.WEATHER_16, Rez.Strings.WEATHER_17, Rez.Strings.WEATHER_18, Rez.Strings.WEATHER_19,
-            Rez.Strings.WEATHER_20, Rez.Strings.WEATHER_21, Rez.Strings.WEATHER_22, Rez.Strings.WEATHER_23,
-            Rez.Strings.WEATHER_24, Rez.Strings.WEATHER_25, Rez.Strings.WEATHER_26, Rez.Strings.WEATHER_27,
-            Rez.Strings.WEATHER_28, Rez.Strings.WEATHER_29, Rez.Strings.WEATHER_30, Rez.Strings.WEATHER_31,
-            Rez.Strings.WEATHER_32, Rez.Strings.WEATHER_33, Rez.Strings.WEATHER_34, Rez.Strings.WEATHER_35,
-            Rez.Strings.WEATHER_36, Rez.Strings.WEATHER_37, Rez.Strings.WEATHER_38, Rez.Strings.WEATHER_39,
-            Rez.Strings.WEATHER_40, Rez.Strings.WEATHER_41, Rez.Strings.WEATHER_42, Rez.Strings.WEATHER_43,
-            Rez.Strings.WEATHER_44, Rez.Strings.WEATHER_45, Rez.Strings.WEATHER_46, Rez.Strings.WEATHER_47,
-            Rez.Strings.WEATHER_48, Rez.Strings.WEATHER_49, Rez.Strings.WEATHER_50, Rez.Strings.WEATHER_51,
-            Rez.Strings.WEATHER_52, Rez.Strings.WEATHER_53
-        ];
-        var idx = weatherCondition.condition.toNumber();
-        if (idx < 0 || idx >= weatherStrings.size()) { idx = 53; }
-        return Application.loadResource(weatherStrings[idx]);
-    }
-
-    hidden function getWeatherConditionShort() as String {
-        if (owmError != null) { return owmError; }
-        if (weatherCondition == null || weatherCondition.condition == null) {
-            return "";
-        }
-        var short = [
-            "CLEAR", "CLOUDY", "CLOUDY", "RAIN", "SNOW", "WINDY", "THUNDER",
-            "WINTRY", "FOG", "HAZY", "HAIL", "SHOWERS", "THUNDER", "UNKNOWN",
-            "RAIN", "HVY RAIN", "SNOW", "HVY SNOW", "RAIN SNOW", "RAIN SNOW",
-            "CLOUDY", "RAIN SNOW", "CLEAR", "CLEAR", "SHOWERS", "SHOWERS",
-            "SHOWERS", "(SHOWERS)", "(THUNDER)", "MIST", "DUST", "DRIZZLE",
-            "TORNADO", "SMOKE", "ICE", "SAND", "SQUALL", "SANDSTORM",
-            "VOLC ASH", "HAZE", "FAIR", "HURRICANE", "TROP STORM", "(SNOW)",
-            "(RAIN SNOW)", "(RAIN)", "(SNOW)", "(RAIN SNOW)", "FLURRIES",
-            "FRZ RAIN", "SLEET", "ICE SNOW", "CLOUDY", "UNKNOWN"
-        ];
-        var idx = weatherCondition.condition.toNumber();
-        if (idx < 0 || idx >= short.size()) { idx = 53; }
-        return short[idx];
-    }
-
-    hidden function getTemperature() as String {
-        if(weatherCondition != null and weatherCondition.temperature != null) {
-            var temp_val = weatherCondition.temperature;
-            return formatTemperature(convertTemperature(temp_val, cachedTempUnit), propShowTempUnit, cachedTempUnit);
-        }
-        return "";
-    }
-
-    hidden function getTempUnit() as String {
-        var temp_unit_setting = System.getDeviceSettings().temperatureUnits;
-        if((temp_unit_setting == System.UNIT_METRIC and propTempUnit == 0) or propTempUnit == 1) {
-            return "C";
-        } else {
-            return "F";
-        }
-    }
-
-
-
-    hidden function getWind() as String {
-        var bearing = "";
-        var windspeed = "";
-        if(weatherCondition != null and weatherCondition.windSpeed != null) {
-            windspeed = formatWindSpeed(weatherCondition.windSpeed as Float, propWindUnit);
-        }
-        if(weatherCondition != null and weatherCondition.windBearing != null) {
-            bearing = ((Math.round((weatherCondition.windBearing.toFloat() + 180) / 45.0).toNumber() % 8) + 97).toChar().toString();
-        }
-        return bearing + windspeed;
-    }
-
-    hidden function getWindGust() as String {
-        if (weatherCondition == null) { return ""; }
-        var gust_mps = weatherCondition.windGust;
-        if (gust_mps == null) { return ""; }
-        return formatWindSpeed(gust_mps as Float, propWindUnit);
-    }
-
-    hidden function getPrecipAmount() as String {
-        if (weatherCondition == null) { return ""; }
-        var mm_h = weatherCondition != null ? weatherCondition.precipitationAmount : null;
-        if (mm_h == null) { return ""; }
-        var useMetric = (propPrecipAmountUnit == 1) ||
-            (propPrecipAmountUnit == 0 && System.getDeviceSettings().distanceUnits == System.UNIT_METRIC);
-        if (useMetric) {
-            return (mm_h as Float).format("%.1f");
-        } else {
-            return ((mm_h as Float) * 0.03937f).format("%.2f");
-        }
-    }
-
-    hidden function getObservationTime() as String {
-        if (weatherCondition == null) { return ""; }
-        var ts = weatherCondition.observationTimestamp;
-        if (ts == null) { return ""; }
-        var info = Time.Gregorian.info(new Time.Moment(ts as Number), Time.FORMAT_SHORT);
-        var h = formatHour(info.hour, propIs24H, propHourFormat);
-        return h.format("%02d") + ":" + info.min.format("%02d");
-    }
-
-    hidden function getFeelsLike() as String {
-        if(weatherCondition != null and weatherCondition.feelsLikeTemperature != null) {
-            return formatTemperature(convertTemperature(weatherCondition.feelsLikeTemperature, cachedTempUnit), propShowTempUnit, cachedTempUnit);
-        }
-        return "";
-    }
-
-    hidden function getHumidity() as String {
-        var ret = "";
-        if(weatherCondition != null and weatherCondition.relativeHumidity != null) {
-            ret = weatherCondition.relativeHumidity.format("%d") + "%";
-        }
-        return ret;
-    }
-
-    hidden function getUVIndex() as String {
-        var ret = "";
-        if(weatherCondition != null and weatherCondition.uvIndex != null) {
-            ret = weatherCondition.uvIndex.format("%d");
-        }
-        return ret;
-    }
-
-    hidden function getHighLow() as String {
-        var ret = "";
-        if(weatherCondition != null) {
-            if(weatherCondition.highTemperature != null and weatherCondition.lowTemperature != null) {
-                var high = convertTemperature(weatherCondition.highTemperature, cachedTempUnit);
-                var low = convertTemperature(weatherCondition.lowTemperature, cachedTempUnit);
-                ret = formatTemperature(high, propShowTempUnit, cachedTempUnit) + "/" + formatTemperature(low, propShowTempUnit, cachedTempUnit);
-            }
-        }
-        return ret;
-    }
-
-    hidden function getPrecip() as String {
-        var ret = "";
-        if(weatherCondition != null and weatherCondition.precipitationChance != null) {
-            ret = weatherCondition.precipitationChance.format("%d") + "%";
-        }
-        return ret;
-    }
-
     // Square helper functions - only compiled for square devices
     (:Square)
     hidden function loadBottomField2Property() as Void {
