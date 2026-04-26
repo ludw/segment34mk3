@@ -70,7 +70,6 @@ class Segment34View extends WatchUi.WatchFace {
     // Cached graph data — sensor history only changes once per minute,
     // so we skip the expensive SensorHistory iteration on sub-minute updates.
     hidden var cachedGraphData as Array<Number>? = null;
-    // cachedGraphData2 lives in graphRenderer
     hidden var cachedGraphDataSource as Number = -1;
     hidden var lastGraphMinute as Number = -1;
 
@@ -111,7 +110,6 @@ class Segment34View extends WatchUi.WatchFace {
     hidden var cachedValues as Dictionary = {};
     hidden var cachedTempUnit as String = "C";
 
-    // graphGoalLine, cachedGraphYMin, cachedGraphYMax live in graphRenderer
     hidden var weatherStorage as WeatherStorage = new WeatherStorage();
 
     hidden var doesPartialUpdate as Boolean = false;
@@ -636,7 +634,6 @@ class Segment34View extends WatchUi.WatchFace {
     hidden function computeDisplayValues(now as Gregorian.Info) as Dictionary {
         var values = {};
         
-        // From updateSlowData logic
         values[:dataClock] = getClockData(now);
         values[:dataMoon] = (propTopPartShows == 0) ? moonPhase(now, propHemisphere) : "";
         if(propTopPartShows == 2) {
@@ -663,7 +660,6 @@ class Segment34View extends WatchUi.WatchFace {
         values[:dataLabelBottomRight] = resolver.strLabelBottomRight;
         values[:dataLabelBottomFourth] = resolver.strLabelBottomFourth;
 
-        // From updateData logic
         var fieldWidths = getFieldWidths();
         resolver.setWeatherData(weatherCondition, cachedTempUnit);
         values[:dataTopLeft] = resolver.getValueByType(propSunriseFieldShows, 5);
@@ -834,30 +830,26 @@ class Segment34View extends WatchUi.WatchFace {
         var data_width = Math.sqrt(centerY*centerY - (y3 - centerY)*(y3 - centerY)) * 2 + fieldSpaceingAdj;
         var left_edge = Math.round((screenWidth - data_width) / 2);
         
-        calculateFieldXCoords(data_width, left_edge);
+        // Compute each field center in a single expression to avoid accumulated rounding errors.
+        // This keeps symmetric layouts (e.g. 3-5-3) perfectly centered relative to data_width.
+        var digits = getFieldWidths();
+        var tot_digits = digits[0] + digits[1] + digits[2] + digits[3];
+        if (tot_digits != 0) {
+            var d0 = digits[0].toFloat();
+            var d1 = digits[1].toFloat();
+            var d2 = digits[2].toFloat();
+            var d3 = digits[3].toFloat();
+            var tot = tot_digits.toFloat();
+
+            fieldXCoords[0] = left_edge + Math.round((d0 / 2.0) * data_width / tot);
+            fieldXCoords[1] = left_edge + Math.round((d0 + d1 / 2.0) * data_width / tot);
+            fieldXCoords[2] = left_edge + Math.round((d0 + d1 + d2 / 2.0) * data_width / tot);
+            fieldXCoords[3] = left_edge + Math.round((d0 + d1 + d2 + d3 / 2.0) * data_width / tot);
+        }
 
         bottomFiveY = y3 + halfMarginY + bottomFiveAdj;
         if((propLabelVisibility == 1 or propLabelVisibility == 3)) { bottomFiveY = bottomFiveY - labelHeight; }
         calculateSquareLayout();
-    }
-
-    hidden function calculateFieldXCoords(data_width as Float, left_edge as Number) as Void {
-        var digits = getFieldWidths();
-        var tot_digits = digits[0] + digits[1] + digits[2] + digits[3];
-        if (tot_digits == 0) { return; }
-
-        // Compute each field center in a single expression to avoid accumulated rounding errors.
-        // This keeps symmetric layouts (e.g. 3-5-3) perfectly centered relative to data_width.
-        var d0 = digits[0].toFloat();
-        var d1 = digits[1].toFloat();
-        var d2 = digits[2].toFloat();
-        var d3 = digits[3].toFloat();
-        var tot = tot_digits.toFloat();
-
-        fieldXCoords[0] = left_edge + Math.round((d0 / 2.0) * data_width / tot);
-        fieldXCoords[1] = left_edge + Math.round((d0 + d1 / 2.0) * data_width / tot);
-        fieldXCoords[2] = left_edge + Math.round((d0 + d1 + d2 / 2.0) * data_width / tot);
-        fieldXCoords[3] = left_edge + Math.round((d0 + d1 + d2 + d3 / 2.0) * data_width / tot);
     }
 
     hidden function drawWatchface(dc as Dc, now as Gregorian.Info, aod as Boolean, values as Dictionary) as Void {
