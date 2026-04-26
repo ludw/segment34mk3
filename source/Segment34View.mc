@@ -986,7 +986,7 @@ class Segment34View extends WatchUi.WatchFace {
         values[:dataLeftBar] = dataHelper.getBarData(propLeftBarShows);
         values[:dataRightBar] = dataHelper.getBarData(propRightBarShows);
 
-        if(!resolver.infoMessage.length() == 0) {
+        if(resolver.infoMessage.length() != 0) {
             values[:dataBelow] = resolver.infoMessage;
             resolver.infoMessage = ""; 
         }
@@ -1075,6 +1075,32 @@ class Segment34View extends WatchUi.WatchFace {
         } else {
             return [3, 5, 3, 0];
         }
+    }
+
+    hidden function updateColorTheme() {
+        theme.update(nightModeOverride, propTheme, propNightTheme, propNightThemeActivation, propColorOverride, propColorOverride2, weatherCondition);
+        if(theme.infoMessage.length() > 0) {
+            resolver.infoMessage = theme.infoMessage;
+            theme.infoMessage = "";
+        }
+    }
+
+    hidden function updateWeather() as Void {
+        if (propWeatherProvider == 1) {
+            // OWM provider: background service delegate handles fetching.
+            // The view only reads the results from Application.Storage.
+            owmError = Application.Storage.getValue("owm_error") as String?;
+            try { weatherCondition = weatherStorage.read(); } catch(e) {}
+        } else {
+            // Garmin provider: original behavior unchanged.
+            owmError = null;
+            if (Weather.getCurrentConditions() != null) {
+                try { weatherStorage.store(); } catch(e) {}
+            }
+            try { weatherCondition = weatherStorage.read(); } catch(e) {}
+        }
+        cachedTempUnit = weatherHelper.getTempUnit(propTempUnit);
+        weatherHelper.update(weatherCondition, owmError, cachedTempUnit, propShowTempUnit, propWindUnit, propPrecipAmountUnit, propIs24H, propHourFormat);
     }
 
     // === DRAW CHAIN ===
@@ -1560,34 +1586,6 @@ class Segment34View extends WatchUi.WatchFace {
         }
         
         
-    }
-
-    // === DATA UPDATES ===
-
-    hidden function updateColorTheme() {
-        theme.update(nightModeOverride, propTheme, propNightTheme, propNightThemeActivation, propColorOverride, propColorOverride2, weatherCondition);
-        if(theme.infoMessage.length() > 0) {
-            resolver.infoMessage = theme.infoMessage;
-            theme.infoMessage = "";
-        }
-    }
-
-    hidden function updateWeather() as Void {
-        if (propWeatherProvider == 1) {
-            // OWM provider: background service delegate handles fetching.
-            // The view only reads the results from Application.Storage.
-            owmError = Application.Storage.getValue("owm_error") as String?;
-            try { weatherCondition = weatherStorage.read(); } catch(e) {}
-        } else {
-            // Garmin provider: original behavior unchanged.
-            owmError = null;
-            if (Weather.getCurrentConditions() != null) {
-                try { weatherStorage.store(); } catch(e) {}
-            }
-            try { weatherCondition = weatherStorage.read(); } catch(e) {}
-        }
-        cachedTempUnit = weatherHelper.getTempUnit(propTempUnit);
-        weatherHelper.update(weatherCondition, owmError, cachedTempUnit, propShowTempUnit, propWindUnit, propPrecipAmountUnit, propIs24H, propHourFormat);
     }
 
     // === SQUARE DEVICE SETUP ===
