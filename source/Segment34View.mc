@@ -98,7 +98,6 @@ class Segment34View extends WatchUi.WatchFace {
     hidden var drawGradient as BitmapResource?;
     hidden var drawAODPattern as BitmapResource?;
     
-    public var infoMessage as String = "";
     public var nightModeOverride as Number = -1;
     hidden var theme as ThemeManager = new ThemeManager();
     hidden var weatherCondition as StoredWeather or Null;
@@ -121,6 +120,7 @@ class Segment34View extends WatchUi.WatchFace {
     hidden var complications as ComplicationHelper = new ComplicationHelper();
     hidden var weatherHelper as WeatherDisplayHelper = new WeatherDisplayHelper();
     hidden var graphRenderer as GraphRenderer = new GraphRenderer();
+    public var resolver as ValueResolver = new ValueResolver(weatherHelper, complications);
     
     hidden var propIs24H as Boolean = false;
     hidden var propTheme as Integer = 0;
@@ -195,14 +195,6 @@ class Segment34View extends WatchUi.WatchFace {
     hidden var propBottomFontVariant as Number = 2;
     hidden var propStressDynamicColor as Boolean = false;
 
-    // Cached Labels
-    hidden var strLabelTopLeft as String = "";
-    hidden var strLabelTopRight as String = "";
-    hidden var strLabelBottomLeft as String = "";
-    hidden var strLabelBottomMiddle as String = "";
-    hidden var strLabelBottomRight as String = "";
-    hidden var strLabelBottomFourth as String = "";
-
 
     var clockBgText = "";
 
@@ -258,20 +250,7 @@ class Segment34View extends WatchUi.WatchFace {
     }
 
     hidden function updateActiveLabels() as Void {
-        var fieldWidths = getFieldWidths();
-        strLabelTopLeft = getLabelByType(propSunriseFieldShows, 1);
-        strLabelTopRight = getLabelByType(propSunsetFieldShows, 1);
-        if(propFontSize == 0) {
-            strLabelBottomLeft = getLabelByType(propLeftValueShows, fieldWidths[0] - 1);
-            strLabelBottomMiddle = getLabelByType(propMiddleValueShows, fieldWidths[1] - 1);
-            strLabelBottomRight = getLabelByType(propRightValueShows, fieldWidths[2] - 1);
-            strLabelBottomFourth = getLabelByType(propFourthValueShows, fieldWidths[3] - 1);
-        } else { // Large text
-            strLabelBottomLeft = getLabelByType(propLeftValueShows, 1);
-            strLabelBottomMiddle = getLabelByType(propMiddleValueShows, 1);
-            strLabelBottomRight = getLabelByType(propRightValueShows, 1);
-            strLabelBottomFourth = getLabelByType(propFourthValueShows, 1);
-        }
+        resolver.updateActiveLabels(getFieldWidths());
     }
 
     hidden function loadFontVariant(resDefault, resReadable, resLines, variant as Number) as FontResource {
@@ -679,26 +658,27 @@ class Segment34View extends WatchUi.WatchFace {
             values[:dataGraph1] = null;
         }
 
-        values[:dataLabelTopLeft] = strLabelTopLeft;
-        values[:dataLabelTopRight] = strLabelTopRight;
-        values[:dataLabelBottomLeft] = strLabelBottomLeft;
-        values[:dataLabelBottomMiddle] = strLabelBottomMiddle;
-        values[:dataLabelBottomRight] = strLabelBottomRight;
-        values[:dataLabelBottomFourth] = strLabelBottomFourth;
+        values[:dataLabelTopLeft] = resolver.strLabelTopLeft;
+        values[:dataLabelTopRight] = resolver.strLabelTopRight;
+        values[:dataLabelBottomLeft] = resolver.strLabelBottomLeft;
+        values[:dataLabelBottomMiddle] = resolver.strLabelBottomMiddle;
+        values[:dataLabelBottomRight] = resolver.strLabelBottomRight;
+        values[:dataLabelBottomFourth] = resolver.strLabelBottomFourth;
 
         // From updateData logic
         var fieldWidths = getFieldWidths();
-        values[:dataTopLeft] = getValueByType(propSunriseFieldShows, 5);
-        values[:dataTopRight] = getValueByType(propSunsetFieldShows, 5);
-        values[:dataAboveLine1] = getValueByTypeWithUnit(propWeatherLine1Shows, 10);
-        values[:dataAboveLine2] = getValueByTypeWithUnit(propWeatherLine2Shows, 10);
-        values[:dataBelow] = getValueByTypeWithUnit(propDateFieldShows, 10);
-        values[:dataNotifications] = getValueByType(propNotificationCountShows, 2);
-        values[:dataBottomLeft] = getValueByType(propLeftValueShows, fieldWidths[0]);
-        values[:dataBottomMiddle] = getValueByType(propMiddleValueShows, fieldWidths[1]);
-        values[:dataBottomRight] = getValueByType(propRightValueShows, fieldWidths[2]);
-        values[:dataBottomFourth] = getValueByType(propFourthValueShows, fieldWidths[3]);
-        values[:dataBottom] = getValueByType(propBottomFieldShows, 5);
+        resolver.setWeatherData(weatherCondition, cachedTempUnit);
+        values[:dataTopLeft] = resolver.getValueByType(propSunriseFieldShows, 5);
+        values[:dataTopRight] = resolver.getValueByType(propSunsetFieldShows, 5);
+        values[:dataAboveLine1] = resolver.getValueByTypeWithUnit(propWeatherLine1Shows, 10);
+        values[:dataAboveLine2] = resolver.getValueByTypeWithUnit(propWeatherLine2Shows, 10);
+        values[:dataBelow] = resolver.getValueByTypeWithUnit(propDateFieldShows, 10);
+        values[:dataNotifications] = resolver.getValueByType(propNotificationCountShows, 2);
+        values[:dataBottomLeft] = resolver.getValueByType(propLeftValueShows, fieldWidths[0]);
+        values[:dataBottomMiddle] = resolver.getValueByType(propMiddleValueShows, fieldWidths[1]);
+        values[:dataBottomRight] = resolver.getValueByType(propRightValueShows, fieldWidths[2]);
+        values[:dataBottomFourth] = resolver.getValueByType(propFourthValueShows, fieldWidths[3]);
+        values[:dataBottom] = resolver.getValueByType(propBottomFieldShows, 5);
         computeBottomField2Values(values);
         values[:dataIcon1] = complications.getIconState(propIcon1);
         values[:dataIcon2] = complications.getIconState(propIcon2);
@@ -707,14 +687,14 @@ class Segment34View extends WatchUi.WatchFace {
         values[:dataIcon1Color] = complications.getIconColor(propIcon1);
         values[:dataIcon2Color] = complications.getIconColor(propIcon2);
         values[:dataBattery] = getBattData(propBatteryVariant, screenHeight, propFontSize);
-        values[:dataAODLeft] = getValueByType(propAodFieldShows, 10);
-        values[:dataAODRight] = getValueByType(propAodRightFieldShows, 5);
+        values[:dataAODLeft] = resolver.getValueByType(propAodFieldShows, 10);
+        values[:dataAODRight] = resolver.getValueByType(propAodRightFieldShows, 5);
         values[:dataLeftBar] = getBarData(propLeftBarShows);
         values[:dataRightBar] = getBarData(propRightBarShows);
 
-        if(!infoMessage.length() == 0) {
-            values[:dataBelow] = infoMessage;
-            infoMessage = ""; 
+        if(!resolver.infoMessage.length() == 0) {
+            values[:dataBelow] = resolver.infoMessage;
+            resolver.infoMessage = ""; 
         }
         
         values[:dataSeconds] = getValueForSeconds(now);
@@ -1319,7 +1299,7 @@ class Segment34View extends WatchUi.WatchFace {
     hidden function updateColorTheme() {
         theme.update(nightModeOverride, propTheme, propNightTheme, propNightThemeActivation, propColorOverride, propColorOverride2, weatherCondition);
         if(theme.infoMessage.length() > 0) {
-            infoMessage = theme.infoMessage;
+            resolver.infoMessage = theme.infoMessage;
             theme.infoMessage = "";
         }
     }
@@ -1409,6 +1389,15 @@ class Segment34View extends WatchUi.WatchFace {
 
         theme.resetNightMode(); // force update color theme
         updateColorTheme();
+        resolver.configure(
+            propIs24H, propHourFormat, propTzHourFormat,
+            propTzOffset1, propTzOffset2, propTzName1, propTzName2,
+            propDateFormat, propDateCustomFormat, propWeekOffset,
+            propFontSize, propIsMetricDistance, propPressureUnit, propShowTempUnit,
+            propWeatherFormat1, propWeatherFormat2,
+            propSunriseFieldShows, propSunsetFieldShows,
+            propLeftValueShows, propMiddleValueShows, propRightValueShows, propFourthValueShows
+        );
         updateActiveLabels();
 
         if(propTimeSeparator == 2) {
@@ -1433,7 +1422,7 @@ class Segment34View extends WatchUi.WatchFace {
                 return now.sec.format("%02d");
             }
         }
-        return getValueByType(propSecondsShows, 5);
+        return resolver.getValueByType(propSecondsShows, 5);
     }
 
     hidden function getClockData(now as Gregorian.Info) as String {
@@ -1652,518 +1641,6 @@ class Segment34View extends WatchUi.WatchFace {
         return ret;
     }
 
-    hidden function getValueByTypeWithUnit(complicationType as Number, width as Number) as String {
-        var unit = getUnitByType(complicationType);
-        if (unit.length() > 0) {
-            unit = " " + unit;
-        }
-        return getValueByType(complicationType, width) + unit;
-    }
-
-    hidden function getUnitByType(complicationType) as String {
-        var unit = "";
-        if(complicationType == 10) { // Calories / day
-            unit = Application.loadResource(Rez.Strings.UNIT_KCAL);
-        } else if(complicationType == 11) { // Altitude (m)
-            unit = Application.loadResource(Rez.Strings.UNIT_M);
-        } else if(complicationType == 14) { // Altitude (ft)
-            unit = Application.loadResource(Rez.Strings.UNIT_FT);
-        } else if(complicationType == 16) { // Steps / day
-            unit = Application.loadResource(Rez.Strings.UNIT_STEPS);
-        } else if(complicationType == 18) { // Wheelchair pushes
-            unit = Application.loadResource(Rez.Strings.UNIT_PUSHES);
-        } else if(complicationType == 25) { // Active calories / day
-            unit = Application.loadResource(Rez.Strings.UNIT_KCAL);
-        } else if(complicationType == 46) { // Active/Total calories / day
-            unit = Application.loadResource(Rez.Strings.UNIT_KCAL);
-        }
-        return unit;
-    }
-
-    // Types: -2 (hidden), -1 (date), 15/37 (alt TZ), 27 (week#), 44 (DTG), 48/49/50 (location)
-    hidden function getClockValue(complicationType as Number, width as Number) as String? {
-        var numberFormat = "%d";
-        if (complicationType == -2) { // Hidden
-            return "";
-        } else if (complicationType == -1) { // Date
-            return formatDate(propDateFormat, propDateCustomFormat, propFontSize, propWeekOffset);
-        } else if (complicationType == 15) { // Alt TZ 1
-            return secondaryTimezone(propTzOffset1, width, propIs24H, propHourFormat, propTzHourFormat);
-        } else if (complicationType == 27) { // Week number
-            var today = Time.Gregorian.info(Time.now(), Time.FORMAT_SHORT);
-            var week_number = isoWeekNumber(today.year, today.month, today.day, propWeekOffset);
-            return week_number.format(numberFormat);
-        } else if (complicationType == 37) { // Alt TZ 2
-            return secondaryTimezone(propTzOffset2, width, propIs24H, propHourFormat, propTzHourFormat);
-        } else if (complicationType == 44) { // Military Date Time Group
-            return getDateTimeGroup();
-        } else if (complicationType == 48) { // Location Long Lat dec deg
-            var pos = Activity.getActivityInfo().currentLocation;
-            if (pos != null) {
-                return pos.toDegrees()[0] + " " + pos.toDegrees()[1];
-            } else {
-                return Application.loadResource(Rez.Strings.LABEL_POS_NA);
-            }
-        } else if (complicationType == 49) { // Location Military format
-            var pos = Activity.getActivityInfo().currentLocation;
-            if (pos != null) {
-                return pos.toGeoString(Position.GEO_MGRS);
-            } else {
-                return Application.loadResource(Rez.Strings.LABEL_POS_NA);
-            }
-        } else if (complicationType == 50) { // Location Accuracy
-            var acc = Activity.getActivityInfo().currentLocationAccuracy;
-            if (acc != null) {
-                if (width < 4) {
-                    return (acc as Number).format("%d");
-                } else {
-                    return ["N/A", "LAST", "POOR", "USBL", "GOOD"][acc];
-                }
-            }
-            return "";
-        }
-        return null;
-    }
-
-    // Types: 0-4, 8-10, 12-13, 16-20, 23-25, 28-29, 46, 57-59, 62, 65-68 (activity/fitness metrics)
-    hidden function getActivityValue(complicationType as Number, width as Number) as String? {
-        var numberFormat = "%d";
-        var activityInfo = null;
-        if (complicationType == 0) { // Active min / week
-            activityInfo = ActivityMonitor.getInfo();
-            if (activityInfo.activeMinutesWeek != null) {
-                return activityInfo.activeMinutesWeek.total.format(numberFormat);
-            }
-            return "";
-        } else if (complicationType == 62) { // Active hours / week
-            activityInfo = ActivityMonitor.getInfo();
-            if (activityInfo.activeMinutesWeek != null) {
-                return (activityInfo.activeMinutesWeek.total / 60.0).format("%.1f");
-            }
-            return "";
-        } else if (complicationType == 1) { // Active min / day
-            activityInfo = ActivityMonitor.getInfo();
-            if (activityInfo.activeMinutesDay != null) {
-                return activityInfo.activeMinutesDay.total.format(numberFormat);
-            }
-            return "";
-        } else if (complicationType == 2) { // distance / day
-            activityInfo = ActivityMonitor.getInfo();
-            if (activityInfo.distance != null) {
-                return formatDistanceByWidth(activityInfo.distance / (propIsMetricDistance ? 100000.0 : 160900.0), width);
-            }
-            return "";
-        } else if (complicationType == 3) { // floors climbed / day
-            activityInfo = ActivityMonitor.getInfo();
-            if (activityInfo.floorsClimbed != null) {
-                return activityInfo.floorsClimbed.format(numberFormat);
-            }
-            return "";
-        } else if (complicationType == 4) { // meters climbed / day
-            activityInfo = ActivityMonitor.getInfo();
-            if (activityInfo.metersClimbed != null) {
-                return activityInfo.metersClimbed.format(numberFormat);
-            }
-            return "";
-        } else if (complicationType == 8) { // Respiration rate
-            activityInfo = ActivityMonitor.getInfo();
-            if (activityInfo.respirationRate != null) {
-                return activityInfo.respirationRate.format(numberFormat);
-            }
-            return "";
-        } else if (complicationType == 9) { // Heart Rate (live)
-            // Try to retrieve live HR from Activity::Info
-            var activity_info = Activity.getActivityInfo();
-            var sample = activity_info.currentHeartRate;
-            if (sample != null) {
-                return sample.format("%01d");
-            } else {
-                var history = ActivityMonitor.getHeartRateHistory(1, /* newestFirst */ true);
-                if (history != null) {
-                    var hist = history.next();
-                    if ((hist != null) && (hist.heartRate != ActivityMonitor.INVALID_HR_SAMPLE)) {
-                        return hist.heartRate.format("%01d");
-                    }
-                }
-            }
-            return "";
-        } else if (complicationType == 10) { // Calories
-            activityInfo = ActivityMonitor.getInfo();
-            if (activityInfo.calories != null) {
-                return activityInfo.calories.format(numberFormat);
-            }
-            return "";
-        } else if (complicationType == 12) { // Stress
-            var st = getStressData();
-            if (st != null) {
-                return st.format(numberFormat);
-            }
-            return "";
-        } else if (complicationType == 13) { // Body battery
-            var bb = getBBData();
-            if (bb != null) {
-                return bb.format(numberFormat);
-            }
-            return "";
-        } else if (complicationType == 16) { // Steps / day
-            activityInfo = ActivityMonitor.getInfo();
-            if (activityInfo.steps != null) {
-                var steps = activityInfo.steps;
-                if (width >= 5) {
-                    return steps.format("%d");
-                } else if (width == 4 and steps < 10000) {
-                    return steps.format("%d");
-                } else {
-                    return (steps / 1000).format("%d") + "K";
-                }
-            }
-            return "";
-        } else if (complicationType == 17) { // Distance (m) / day
-            activityInfo = ActivityMonitor.getInfo();
-            if (activityInfo.distance != null) {
-                return (activityInfo.distance / 100).format(numberFormat);
-            }
-            return "";
-        } else if (complicationType == 18) { // Wheelchair pushes
-            activityInfo = ActivityMonitor.getInfo();
-            if (activityInfo.pushes != null) {
-                return activityInfo.pushes.format(numberFormat);
-            }
-            return "";
-        } else if (complicationType == 19) { // Weekly run distance
-            return getWeeklyDistanceFromComplication(true, propIsMetricDistance ? 0.001 : 0.000621371, width);
-        } else if (complicationType == 20) { // Weekly bike distance
-            return getWeeklyDistanceFromComplication(false, propIsMetricDistance ? 0.001 : 0.000621371, width);
-        } else if (complicationType == 23) { // Weight kg
-            var profile = UserProfile.getProfile();
-            if (profile.weight != null) {
-                var weight_kg = profile.weight / 1000.0;
-                if (width == 3) {
-                    return weight_kg.format(numberFormat);
-                } else {
-                    return weight_kg.format("%.1f");
-                }
-            }
-            return "";
-        } else if (complicationType == 24) { // Weight lbs
-            var profile = UserProfile.getProfile();
-            if (profile.weight != null) {
-                return (profile.weight * 0.00220462).format(numberFormat);
-            }
-            return "";
-        } else if (complicationType == 25) { // Act Calories
-            activityInfo = ActivityMonitor.getInfo();
-            var rest_calories = getRestCalories();
-            // Get total calories and subtract rest calories
-            if (activityInfo.calories != null && rest_calories > 0) {
-                var active_calories = activityInfo.calories - rest_calories;
-                if (active_calories > 0) {
-                    return active_calories.format(numberFormat);
-                } else { return "0"; }
-            }
-            return "";
-        } else if (complicationType == 28 || complicationType == 29) { // Total distance past 7 days
-            return formatDistanceByWidth(getWeeklyDistance() * (propIsMetricDistance ? 0.00001 : 0.00000621371), width);
-        } else if (complicationType == 46) { // Active / Total calories
-            activityInfo = ActivityMonitor.getInfo();
-            var rest_calories = getRestCalories();
-            var total_calories = 0;
-            // Get total calories and subtract rest calories
-            if (activityInfo.calories != null) {
-                total_calories = activityInfo.calories;
-            }
-            var active_calories = total_calories - rest_calories;
-            active_calories = (active_calories > 0) ? active_calories : 0; // Ensure active calories is not negative
-            return active_calories.format(numberFormat) + "/" + total_calories.format(numberFormat);
-        } else if (complicationType == 57) { // Resting Heart Rate
-            var profile = UserProfile.getProfile();
-            if (profile.restingHeartRate != null) {
-                return profile.restingHeartRate.format(numberFormat);
-            }
-            return "";
-        } else if (complicationType == 58 || complicationType == 59) { // Run/bike distance past 7 days
-            if (Time.now().value() - _lastActivityDistUpdate >= 60*5) {
-                _lastActivityDistUpdate = Time.now().value();
-                updateActivityDistCache();
-            }
-            var distFactor = propIsMetricDistance ? 0.001 : 0.000621371;
-            return formatDistanceByWidth((complicationType == 58 ? _cachedRunDist7Days : _cachedBikeDist7Days) * distFactor, width);
-        } else if (complicationType == 65) { // Swim distance past 7 days
-            if (Time.now().value() - _lastActivityDistUpdate >= 60*5) {
-                _lastActivityDistUpdate = Time.now().value();
-                updateActivityDistCache();
-            }
-            var distFactor = propIsMetricDistance ? 0.001 : 0.000621371;
-            return formatDistanceByWidth(_cachedSwimDist7Days * distFactor, width);
-        } else if (complicationType == 66 || complicationType == 67) { // Run dist this month / past 28 days
-            if (Time.now().value() - _lastActivityDistUpdate >= 60*5) {
-                _lastActivityDistUpdate = Time.now().value();
-                updateActivityDistCache();
-            }
-            var distFactor = propIsMetricDistance ? 0.001 : 0.000621371;
-            return formatDistanceByWidth((complicationType == 66 ? _cachedRunDistMonth : _cachedRunDist28Days) * distFactor, width);
-        } else if (complicationType == 68) { // Daily counter (resets at midnight)
-            var today = Time.Gregorian.info(Time.now(), Time.FORMAT_SHORT);
-            var todayKey = today.year * 10000 + today.month * 100 + today.day;
-            var storedKey = Application.Storage.getValue("dailyCounterDay") as Number?;
-            if (storedKey == null || storedKey != todayKey) {
-                Application.Storage.setValue("dailyCounterDay", todayKey);
-                Application.Storage.setValue("dailyCounter", 0);
-            }
-            var count = Application.Storage.getValue("dailyCounter") as Number?;
-            return (count != null ? count : 0).format(numberFormat);
-        }
-        return null;
-    }
-
-    // Types: 22/26 (pressure), 34 (sensor temp), 35/36 (sun), 39-43 (weather), 51/52/55/56 (weather detail), 60/61 (format), 63/64 (twilight)
-    hidden function getWeatherValue(complicationType as Number, width as Number) as String? {
-        if (complicationType == 22) { // Raw Barometric pressure (hPA)
-            var info = Activity.getActivityInfo();
-            if (info.rawAmbientPressure != null) {
-                return formatPressure(info.rawAmbientPressure / 100.0, width, propPressureUnit);
-            }
-            return "";
-        } else if (complicationType == 26) { // Sea level pressure (hPA)
-            var info = Activity.getActivityInfo();
-            if (info.meanSeaLevelPressure != null) {
-                return formatPressure(info.meanSeaLevelPressure / 100.0, width, propPressureUnit);
-            }
-            return "";
-        } else if (complicationType == 34) { // Sensor temperature
-            var tempIterator = Toybox.SensorHistory.getTemperatureHistory({:period => 1});
-            if (tempIterator != null) {
-                var temp = tempIterator.next();
-                if (temp != null and temp.data != null) {
-                    return formatTemperature(convertTemperature(temp.data, cachedTempUnit), propShowTempUnit, cachedTempUnit);
-                }
-            }
-            return "";
-        } else if (complicationType == 35 || complicationType == 36) { // Sunrise / Sunset
-            if (weatherCondition != null) {
-                var loc = weatherCondition.observationLocationPosition;
-                if (loc != null) {
-                    var now = Time.now();
-                    var s = (complicationType == 35) ? Weather.getSunrise(loc, now) : Weather.getSunset(loc, now);
-                    return formatSunTime(s, width, propIs24H, propHourFormat);
-                }
-            }
-            return "";
-        } else if (complicationType == 39) { // High temp
-            if (weatherCondition != null and weatherCondition.highTemperature != null) {
-                var tempVal = weatherCondition.highTemperature;
-                return formatTemperature(convertTemperature(tempVal, cachedTempUnit), propShowTempUnit, cachedTempUnit);
-            }
-            return "";
-        } else if (complicationType == 40) { // Low temp
-            if (weatherCondition != null and weatherCondition.lowTemperature != null) {
-                var tempVal = weatherCondition.lowTemperature;
-                return formatTemperature(convertTemperature(tempVal, cachedTempUnit), propShowTempUnit, cachedTempUnit);
-            }
-            return "";
-        } else if (complicationType == 41) { // Temperature
-            return weatherHelper.getTemperature();
-        } else if (complicationType == 42) { // Precipitation chance
-            var val = weatherHelper.getPrecip();
-            if (width == 3 and val.equals("100%")) { val = "100"; }
-            return val;
-        } else if (complicationType == 43) { // Next Sun Event
-            var nextSunEventArray = getNextSunEvent(weatherCondition);
-            if (nextSunEventArray != null && nextSunEventArray.size() == 2) {
-                return formatSunTime(nextSunEventArray[0], width, propIs24H, propHourFormat);
-            }
-            return "";
-        } else if (complicationType == 51) { // UV Index
-            return weatherHelper.getUVIndex();
-        } else if (complicationType == 52) { // Humidity
-            return weatherHelper.getHumidity();
-        } else if (complicationType == 55) { // Feels like
-            return weatherHelper.getFeelsLike();
-        } else if (complicationType == 56) { // Hours to next sun event
-            return hoursToNextSunEvent(weatherCondition);
-        } else if (complicationType == 60) { // Weather data 1 format string
-            return weatherHelper.getWeatherByFormat(propWeatherFormat1);
-        } else if (complicationType == 61) { // Weather data 2 format string
-            return weatherHelper.getWeatherByFormat(propWeatherFormat2);
-        } else if (complicationType == 63 || complicationType == 64) { // Civil dawn / Civil dusk
-            if (weatherCondition != null) {
-                var loc = weatherCondition.observationLocationPosition;
-                if (loc != null) {
-                    var now = Time.now();
-                    var sunrise = Weather.getSunrise(loc, now);
-                    var sunset = Weather.getSunset(loc, now);
-                    if (sunrise != null && sunset != null) {
-                        var latDeg = loc.toDegrees()[0];
-                        var twilight = getCivilTwilight(latDeg as Double, sunrise, sunset);
-                        if (twilight != null) {
-                            return formatSunTime(complicationType == 63 ? twilight[0] : twilight[1], width, propIs24H, propHourFormat);
-                        }
-                    }
-                }
-            }
-            return "";
-        }
-        return null;
-    }
-
-    // Types: 5-7 (recovery/VO2), 11/14 (altitude), 21 (training), 30-33/38 (system), 45/47/53/54 (complications)
-    hidden function getComplicationValue(complicationType as Number, width as Number) as String? {
-        var numberFormat = "%d";
-        if (complicationType == 5) { // Time to Recovery (h)
-            return complications.getRecoveryTimeVal(numberFormat);
-        } else if (complicationType == 6) { // VO2 Max Running
-            var profile = UserProfile.getProfile();
-            if (profile.vo2maxRunning != null) {
-                return complications.vo2RunTrend + (profile.vo2maxRunning as Number).format(numberFormat);
-            }
-            return "";
-        } else if (complicationType == 7) { // VO2 Max Cycling
-            var profile = UserProfile.getProfile();
-            if (profile.vo2maxCycling != null) {
-                return complications.vo2BikeTrend + (profile.vo2maxCycling as Number).format(numberFormat);
-            }
-            return "";
-        } else if (complicationType == 11) { // Altitude (m)
-            var alt = complications.getAltitudeValue();
-            if (alt != null) {
-                return alt.format(numberFormat);
-            }
-            return "";
-        } else if (complicationType == 14) { // Altitude (ft)
-            var alt = complications.getAltitudeValue();
-            if (alt != null) {
-                return (alt * 3.28084).format(numberFormat);
-            }
-            return "";
-        } else if (complicationType == 21) { // Training status
-            return complications.getTrainingStatusVal();
-        } else if (complicationType == 30) { // Battery percentage
-            var battery = System.getSystemStats().battery;
-            return battery.format("%d");
-        } else if (complicationType == 31) { // Battery days remaining
-            var stats35 = System.getSystemStats();
-            if (stats35.batteryInDays != null) {
-                return Math.round(stats35.batteryInDays).format(numberFormat);
-            }
-            return "";
-        } else if (complicationType == 32) { // Notification count
-            var notif_count = System.getDeviceSettings().notificationCount;
-            if (notif_count != null) {
-                if (notif_count == 0) {
-                    return ""; // Hide when zero
-                } else {
-                    return notif_count.format(numberFormat);
-                }
-            }
-        } else if (complicationType == 33) { // Solar intensity
-            var stats37 = System.getSystemStats();
-            if (stats37.solarIntensity != null) {
-                return stats37.solarIntensity.format(numberFormat);
-            }
-            return "";
-        } else if (complicationType == 38) { // Alarms
-            return System.getDeviceSettings().alarmCount.format(numberFormat);
-        } else if (complicationType == 45) { // Time of the next Calendar Event
-            return complications.getCalendarEventVal(width);
-        } else if (complicationType == 47) { // PulseOx
-            return complications.getPulseOxVal(numberFormat);
-        } else if (complicationType == 53) { // CGM Glucose + Trend
-            return complications.getCgmReading();
-        } else if (complicationType == 54) { // CGM Age (minutes)
-            return complications.getCgmAge();
-        }
-        return null;
-    }
-
-    hidden function getValueByType(complicationType as Number, width as Number) as String {
-        var val = getClockValue(complicationType, width);
-        if (val == null) { val = getActivityValue(complicationType, width); }
-        if (val == null) { val = getWeatherValue(complicationType, width); }
-        if (val == null) { val = getComplicationValue(complicationType, width); }
-        return val != null ? val : "";
-    }
-
-    hidden function getLabelByType(complicationType as Number, labelSize as Number) as String {
-        // labelSize 1 = short, 2 = mid
-        if(complicationType == 15) { return propTzName1.toUpper() + ":"; }
-        if(complicationType == 37) { return propTzName2.toUpper() + ":"; }
-        switch(complicationType) {
-            case 0: return formatLabel(Rez.Strings.LABEL_WMIN_1, Rez.Strings.LABEL_WMIN_2, labelSize);
-            case 62: return formatLabel(Rez.Strings.LABEL_WHRS_1, Rez.Strings.LABEL_WHRS_2, labelSize);
-            case 1: return formatLabel(Rez.Strings.LABEL_DMIN_1, Rez.Strings.LABEL_DMIN_2, labelSize);
-            case 2:
-                if(propIsMetricDistance) { return formatLabel(Rez.Strings.LABEL_DKM_1, Rez.Strings.LABEL_DKM_2, labelSize); }
-                return formatLabel(Rez.Strings.LABEL_DMI_1, Rez.Strings.LABEL_DMI_2, labelSize);
-            case 3: return Application.loadResource(Rez.Strings.LABEL_FLOORS);
-            case 4: return formatLabel(Rez.Strings.LABEL_CLIMB_1, Rez.Strings.LABEL_CLIMB_2, labelSize);
-            case 5: return formatLabel(Rez.Strings.LABEL_RECOV_1, Rez.Strings.LABEL_RECOV_2, labelSize);
-            case 6: return formatLabel(Rez.Strings.LABEL_VO2_1, Rez.Strings.LABEL_VO2RUN_2, labelSize);
-            case 7: return formatLabel(Rez.Strings.LABEL_VO2_1, Rez.Strings.LABEL_VO2BIKE_2, labelSize);
-            case 8: return formatLabel(Rez.Strings.LABEL_RESP_1, Rez.Strings.LABEL_RESP_2, labelSize);
-            case 9: return Application.loadResource(Rez.Strings.LABEL_HR);
-            case 10: return formatLabel(Rez.Strings.LABEL_CAL_1, Rez.Strings.LABEL_CAL_2, labelSize);
-            case 11: return formatLabel(Rez.Strings.LABEL_ALT_1, Rez.Strings.LABEL_ALT_2, labelSize);
-            case 12: return Application.loadResource(Rez.Strings.LABEL_STRESS);
-            case 13: return formatLabel(Rez.Strings.LABEL_BBAT_1, Rez.Strings.LABEL_BBAT_2, labelSize);
-            case 14: return formatLabel(Rez.Strings.LABEL_ALT_1, Rez.Strings.LABEL_ALT_2, labelSize);
-            case 16: return Application.loadResource(Rez.Strings.LABEL_STEPS);
-            case 17: return formatLabel(Rez.Strings.LABEL_DIST_1, Rez.Strings.LABEL_DIST_2, labelSize);
-            case 18: return Application.loadResource(Rez.Strings.LABEL_PUSHES);
-            case 66:
-            case 67:
-                if(propIsMetricDistance) { return formatLabel(Rez.Strings.LABEL_MKM_1, Rez.Strings.LABEL_MRUNKM_2, labelSize); }
-                return formatLabel(Rez.Strings.LABEL_MMI_1, Rez.Strings.LABEL_MRUNMI_2, labelSize);
-            case 58:
-            case 19:
-                if(propIsMetricDistance) { return formatLabel(Rez.Strings.LABEL_WKM_1, Rez.Strings.LABEL_WRUNM_2, labelSize); }
-                return formatLabel(Rez.Strings.LABEL_WMI_1, Rez.Strings.LABEL_WRUNMI_2, labelSize);
-            case 59:
-            case 20:
-                if(propIsMetricDistance) { return formatLabel(Rez.Strings.LABEL_WKM_1, Rez.Strings.LABEL_WBIKEKM_2, labelSize); }
-                return formatLabel(Rez.Strings.LABEL_WMI_1, Rez.Strings.LABEL_WBIKEMI_2, labelSize);
-            case 21: return Application.loadResource(Rez.Strings.LABEL_TRAINING);
-            case 22: return Application.loadResource(Rez.Strings.LABEL_PRESSURE);
-            case 23: return formatLabel(Rez.Strings.LABEL_KG_1, Rez.Strings.LABEL_WEIGHT_2, labelSize);
-            case 24: return formatLabel(Rez.Strings.LABEL_LBS_1, Rez.Strings.LABEL_WEIGHT_2, labelSize);
-            case 25: return formatLabel(Rez.Strings.LABEL_ACAL_1, Rez.Strings.LABEL_ACAL_2, labelSize);
-            case 26: return Application.loadResource(Rez.Strings.LABEL_PRESSURE);
-            case 27: return Application.loadResource(Rez.Strings.LABEL_WEEK);
-            case 29:
-            case 28:
-                if(propIsMetricDistance) { return formatLabel(Rez.Strings.LABEL_WKM_1, Rez.Strings.LABEL_WDISTKM_2, labelSize); }
-                return formatLabel(Rez.Strings.LABEL_WMI_1, Rez.Strings.LABEL_WDISTMI_2, labelSize);
-            case 30: return formatLabel(Rez.Strings.LABEL_BATT_1, Rez.Strings.LABEL_BATT_2, labelSize);
-            case 31: return formatLabel(Rez.Strings.LABEL_BATTD_1, Rez.Strings.LABEL_BATTD_2, labelSize);
-            case 32: return formatLabel(Rez.Strings.LABEL_NOTIFS_1, Rez.Strings.LABEL_NOTIFS_1, labelSize);
-            case 33: return formatLabel(Rez.Strings.LABEL_SUN_1, Rez.Strings.LABEL_SUNINT_2, labelSize);
-            case 34: return formatLabel(Rez.Strings.LABEL_TEMP_1, Rez.Strings.LABEL_STEMP_2, labelSize);
-            case 35: return formatLabel(Rez.Strings.LABEL_SUNRISE_1, Rez.Strings.LABEL_SUNRISE_2, labelSize);
-            case 36: return formatLabel(Rez.Strings.LABEL_SUNSET_1, Rez.Strings.LABEL_SUNSET_2, labelSize);
-            case 38: return formatLabel(Rez.Strings.LABEL_ALARM_1, Rez.Strings.LABEL_ALARM_2, labelSize);
-            case 39: return formatLabel(Rez.Strings.LABEL_HIGH_1, Rez.Strings.LABEL_HIGH_2, labelSize);
-            case 40: return formatLabel(Rez.Strings.LABEL_LOW_1, Rez.Strings.LABEL_LOW_2, labelSize);
-            case 41: return formatLabel(Rez.Strings.LABEL_TEMP_1, Rez.Strings.LABEL_TEMP_1, labelSize);
-            case 42: return formatLabel(Rez.Strings.LABEL_PRECIP_1, Rez.Strings.LABEL_PRECIP_1, labelSize);
-            case 43: return formatLabel(Rez.Strings.LABEL_NEXTSUN_1, Rez.Strings.LABEL_NEXTSUN_2, labelSize);
-            case 45: return formatLabel(Rez.Strings.LABEL_NEXTCAL_1, Rez.Strings.LABEL_NEXTCAL_2, labelSize);
-            case 47: return formatLabel(Rez.Strings.LABEL_OX_1, Rez.Strings.LABEL_OX_2, labelSize);
-            case 50: return formatLabel(Rez.Strings.LABEL_ACC_1, Rez.Strings.LABEL_ACC_2, labelSize);
-            case 51: return formatLabel(Rez.Strings.LABEL_UV_1, Rez.Strings.LABEL_UV_2, labelSize);
-            case 52: return formatLabel(Rez.Strings.LABEL_HUM_1, Rez.Strings.LABEL_HUM_2, labelSize);
-            case 53: return WatchUi.loadResource(Rez.Strings.LABEL_CGM) as String;
-            case 54: return WatchUi.loadResource(Rez.Strings.LABEL_CGMAGE) as String;
-            case 55: return formatLabel(Rez.Strings.LABEL_FL, Rez.Strings.LABEL_FL_2, labelSize);
-            case 56: return formatLabel(Rez.Strings.LABEL_HRS_NEXT_SUN_EVENT_1, Rez.Strings.LABEL_HRS_NEXT_SUN_EVENT_1, labelSize);
-            case 57: return formatLabel(Rez.Strings.LABEL_RHR_1, Rez.Strings.LABEL_RHR_2, labelSize);
-            case 63: return Application.loadResource(Rez.Strings.LABEL_DAWN_1) as String;
-            case 64: return Application.loadResource(Rez.Strings.LABEL_DUSK_1) as String;
-            case 65:
-                if(propIsMetricDistance) { return formatLabel(Rez.Strings.LABEL_WKM_1, Rez.Strings.LABEL_WSWIMKM_2, labelSize); }
-                return formatLabel(Rez.Strings.LABEL_WMI_1, Rez.Strings.LABEL_WSWIMMI_2, labelSize);
-            case 68: return formatLabel(Rez.Strings.LABEL_CNT_1, Rez.Strings.LABEL_CNT_2, labelSize);
-        }
-        return "";
-    }
     // Square helper functions - only compiled for square devices
     (:Square)
     hidden function loadBottomField2Property() as Void {
@@ -2172,10 +1649,10 @@ class Segment34View extends WatchUi.WatchFace {
 
     (:Square)
     hidden function computeBottomField2Values(values as Dictionary) as Void {
-        values[:dataBottom2] = getValueByType(propBottomField2Shows, 5);
+        values[:dataBottom2] = resolver.getValueByType(propBottomField2Shows, 5);
         if (propBottomFieldShows != -2 and propBottomField2Shows != -2) {
-            values[:dataLabelBottom] = getLabelByType(propBottomFieldShows, 2);
-            values[:dataLabelBottom2] = getLabelByType(propBottomField2Shows, 2);
+            values[:dataLabelBottom] = resolver.getLabelByType(propBottomFieldShows, 2);
+            values[:dataLabelBottom2] = resolver.getLabelByType(propBottomField2Shows, 2);
         }
     }
 
@@ -2348,15 +1825,15 @@ class Segment34Delegate extends WatchUi.WatchFaceDelegate {
             switch(view.nightModeOverride) {
                 case 1:
                     view.nightModeOverride = 0;
-                    view.infoMessage = "DAY THEME";
+                    view.resolver.infoMessage = "DAY THEME";
                     break;
                 case 0:
                     view.nightModeOverride = -1;
-                    view.infoMessage = "THEME AUTO";
+                    view.resolver.infoMessage = "THEME AUTO";
                     break;
                 default:
                     view.nightModeOverride = 1;
-                    view.infoMessage = "NIGHT THEME";
+                    view.resolver.infoMessage = "NIGHT THEME";
             }
             view.onSettingsChanged();
         }
