@@ -234,7 +234,7 @@ All `themeColors[x]` reads become `theme.colors[x]`.
 
 ---
 
-### Step 7 — `source/WeatherDisplayHelper.mc` (weather display formatting)
+### Step 7 — `source/WeatherDisplayHelper.mc` (weather display formatting) ✅ COMPLETE
 **Functions to move:**
 - `getCityName()` — reads weatherCondition → add as param
 - `getWeatherCondition()` — reads owmError, weatherCondition; writes infoMessage
@@ -280,7 +280,7 @@ Instantiated once in `computeDisplayValues` (stack, not heap — will be GC'd). 
 
 ---
 
-### Step 8 — `source/GraphRenderer.mc` (graph subsystem)
+### Step 8 — `source/GraphRenderer.mc` (graph subsystem) ✅ COMPLETE
 **Functions to move:**
 - `drawGraph(dc, data, data2, x, y, h)` — reads graph layout vars, propGraphData, propGraphStyle, etc.
 - `drawBarGraph(dc, data, data2, ...)` — reads graphGoalLine, themeColors, propGraphData
@@ -368,8 +368,8 @@ Initialized in `reloadSettings()`, re-configured in `updateProperties()`.
 | 4 | `refactor-activity-data` | `ActivityDataHelper.mc` | 220 | Low-med | ✅ |
 | 5 | `refactor-complication-helper` | `ComplicationHelper.mc` | 200 | Medium | ✅ |
 | 6 | `refactor-theme-manager` | `ThemeManager.mc` | 160 | Med-high | ✅ |
-| 7 | `refactor-weather-display` | `WeatherDisplayHelper.mc` | 300 | Medium |
-| 8 | `refactor-graph-renderer` | `GraphRenderer.mc` | 420 | Medium |
+| 7 | `refactor-weather-display` | `WeatherDisplayHelper.mc` | 300 | Medium | ✅ |
+| 8 | `refactor-graph-renderer` | `GraphRenderer.mc` | 420 | Medium | ✅ |
 | 9 | `refactor-split-getvaluebtype` | (in-place) | 0 net | Medium |
 | 10 | `refactor-value-resolver` | `ValueResolver.mc` | 750 | High |
 

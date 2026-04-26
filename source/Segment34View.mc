@@ -8,6 +8,24 @@ import Toybox.Weather;
 import Toybox.Complications;
 using Toybox.Position;
 
+// Color theme index constants — module-level so all helper classes can reference them.
+enum colorNames {
+    bg = 0,
+    clock,
+    clockBg,
+    outline,
+    dataVal,
+    fieldBg,
+    fieldLbl,
+    date,
+    dateDim,
+    notif,
+    stress,
+    bodybatt,
+    moon,
+    lowBatt
+}
+
 (:background_excluded)
 class Segment34View extends WatchUi.WatchFace {
 
@@ -52,7 +70,7 @@ class Segment34View extends WatchUi.WatchFace {
     // Cached graph data — sensor history only changes once per minute,
     // so we skip the expensive SensorHistory iteration on sub-minute updates.
     hidden var cachedGraphData as Array<Number>? = null;
-    hidden var cachedGraphData2 as Array<Number>? = null; // vigorous component for active minutes
+    // cachedGraphData2 lives in graphRenderer
     hidden var cachedGraphDataSource as Number = -1;
     hidden var lastGraphMinute as Number = -1;
 
@@ -94,9 +112,7 @@ class Segment34View extends WatchUi.WatchFace {
     hidden var cachedValues as Dictionary = {};
     hidden var cachedTempUnit as String = "C";
 
-    hidden var graphGoalLine as Number? = null;
-    hidden var cachedGraphYMin as Float = 0.0;
-    hidden var cachedGraphYMax as Float = 100.0;
+    // graphGoalLine, cachedGraphYMin, cachedGraphYMax live in graphRenderer
     hidden var lastHfTime as Number? = null;
     hidden var lastCcHash as Number? = null;
     hidden var isLowMem as Boolean = false;
@@ -104,6 +120,7 @@ class Segment34View extends WatchUi.WatchFace {
     hidden var doesPartialUpdate as Boolean = false;
     hidden var complications as ComplicationHelper = new ComplicationHelper();
     hidden var weatherHelper as WeatherDisplayHelper = new WeatherDisplayHelper();
+    hidden var graphRenderer as GraphRenderer = new GraphRenderer();
     
     hidden var propIs24H as Boolean = false;
     hidden var propTheme as Integer = 0;
@@ -187,23 +204,6 @@ class Segment34View extends WatchUi.WatchFace {
     hidden var strLabelBottomFourth as String = "";
 
 
-    enum colorNames {
-        bg = 0,
-        clock,
-        clockBg,
-        outline,
-        dataVal,
-        fieldBg,
-        fieldLbl,
-        date,
-        dateDim,
-        notif,
-        stress,
-        bodybatt,
-        moon,
-        lowBatt
-    }
-
     var clockBgText = "";
 
     (:Round260) const barWidth = 3;
@@ -244,6 +244,12 @@ class Segment34View extends WatchUi.WatchFace {
         }
 
         halfMarginY = Math.round(marginY / 2);
+
+        graphRenderer.configure(
+            graphBarWidth, graphBarSpacing, graphTargetWidth, graphHalfWidth, halfMarginY,
+            fontLabel, labelHeight, propGraphData, propGraphStyle, propGraphAxisLabels,
+            propIs24H, propIsMetricDistance
+        );
 
         calculateLayout();
         calculateBarLimits();
@@ -663,12 +669,12 @@ class Segment34View extends WatchUi.WatchFace {
             if(cachedGraphData == null
                     or currentMinute != lastGraphMinute
                     or propGraphData != cachedGraphDataSource) {
-                cachedGraphData = getDataArrayByType(propGraphData);
+                cachedGraphData = graphRenderer.getDataArrayByType(propGraphData);
                 cachedGraphDataSource = propGraphData;
                 lastGraphMinute = currentMinute;
             }
             values[:dataGraph1] = cachedGraphData;
-            values[:dataGraph1b] = (propGraphData == 10) ? cachedGraphData2 : null;
+            values[:dataGraph1b] = (propGraphData == 10) ? graphRenderer.cachedGraphData2 : null;
         } else {
             values[:dataGraph1] = null;
         }
@@ -888,7 +894,7 @@ class Segment34View extends WatchUi.WatchFace {
         if(propTopPartShows == 2) {
             var xLabelSpace = (propGraphStyle > 0 && propGraphAxisLabels) ? labelHeight + 2 : 0;
             yn3 = yn2 - marginY - graphHeight - xLabelSpace;
-            drawGraph(dc, values[:dataGraph1], values[:dataGraph1b], centerX, yn3, graphHeight);
+            graphRenderer.drawGraph(dc, values[:dataGraph1], values[:dataGraph1b], centerX, yn3, graphHeight, theme.colors);
         } else {
             var top_data_height = marginY;
             var top_field_font = fontTinyData;
@@ -1234,151 +1240,6 @@ class Segment34View extends WatchUi.WatchFace {
         dc.drawLine(x1, barBottom - (70 * scale), x2, barBottom - (70 * scale));
         dc.drawLine(x1, barBottom - (85 * scale), x2, barBottom - (85 * scale));
         dc.setPenWidth(1);
-    }
-
-    hidden function drawGraph(dc as Dc, data as Array<Number>?, data2 as Array<Number>?, x as Number, y as Number, h as Number) as Void {
-        if(data == null || data.size() == 0) { return; }
-        var scale = 100.0 / h;
-        var bw = graphBarWidth;
-        var bs = graphBarSpacing;
-
-        if(propGraphAxisLabels) { y = y + halfMarginY; }
-
-        if(propGraphData >= 8) {
-            // Daily data mode: bar widths fill the device's graph area
-            var n = data.size();
-            bs = 6;
-            bw = Math.round((graphHalfWidth.toFloat() * 2 - bs.toFloat() * (n - 1)) / n).toNumber();
-            if(bw < 4) { bw = 4; }
-        }
-        var half_width = Math.round((data.size() * (bw + bs)) / 2);
-
-        if(propGraphStyle > 0) {
-            // Line graph: fixed total width regardless of data point count
-            half_width = graphHalfWidth;
-
-            // Shift right when axis labels are shown, to create space for Y-axis labels
-            var xShift = propGraphAxisLabels ? 10 : 0;
-            drawLineGraph(dc, data, x + xShift, y, h, half_width, scale);
-        } else {
-            drawBarGraph(dc, data, data2, x, y, h, half_width, bw, bs, scale);
-        }
-    }
-
-    hidden function drawBarGraph(dc as Dc, data as Array<Number>, data2 as Array<Number>?, x as Number, y as Number, h as Number, half_width as Number, bw as Number, bs as Number, scale as Float) as Void {
-        if(graphGoalLine != null) {
-            var goal_y = y + (h - Math.round(graphGoalLine / scale));
-            dc.setColor(theme.colors[fieldLbl], Graphics.COLOR_TRANSPARENT);
-            dc.drawLine(x - half_width, goal_y, x + half_width, goal_y);
-        }
-
-        dc.setColor(theme.colors[clock], Graphics.COLOR_TRANSPARENT);
-        for(var i = 0; i < data.size(); i++) {
-            if(data[i] == -1) { continue; } // gap (e.g. stress not measurable)
-            if(propGraphData == 7) {
-                dc.setColor(getStressColor(data[i]), Graphics.COLOR_TRANSPARENT);
-            }
-            var bar_x = x - half_width + i * (bw + bs);
-            if(propGraphData >= 8 && data[i] == 0) {
-                // Zero value: draw a 1px stub
-                dc.setColor(theme.colors[dateDim], Graphics.COLOR_TRANSPARENT);
-                dc.fillRectangle(bar_x, y + h - 1, bw, 1);
-                dc.setColor(theme.colors[clock], Graphics.COLOR_TRANSPARENT);
-                continue;
-            }
-            var bar_height = Math.round(data[i] / scale);
-            if(data2 != null && i < data2.size() && data2[i] > 0) {
-                // Stacked bar: bottom = moderate (date color), top = vigorous (clock color)
-                var vigorous_height = Math.round(data2[i] / scale);
-                if(vigorous_height > bar_height) { vigorous_height = bar_height; }
-                var moderate_height = bar_height - vigorous_height;
-                if(moderate_height > 0) {
-                    dc.setColor(theme.colors[date], Graphics.COLOR_TRANSPARENT);
-                    dc.fillRectangle(bar_x, y + h - bar_height, bw, moderate_height);
-                }
-                dc.setColor(theme.colors[clock], Graphics.COLOR_TRANSPARENT);
-                dc.fillRectangle(bar_x, y + h - vigorous_height, bw, vigorous_height);
-            } else {
-                dc.fillRectangle(bar_x, y + (h - bar_height), bw, bar_height);
-            }
-        }
-    }
-
-    hidden function drawLineGraph(dc as Dc, data as Array<Number>, x as Number, y as Number, h as Number, half_width as Number, scale as Float) as Void {
-        var n = data.size();
-        var graphLeft = x - half_width;
-        var graphRight = x + half_width;
-        var totalW = graphRight - graphLeft;
-
-        // Draw axes
-        dc.setColor(theme.colors[fieldLbl], Graphics.COLOR_TRANSPARENT);
-        dc.setPenWidth(1);
-        dc.drawLine(graphLeft, y + h, graphRight, y + h);   // X axis
-        dc.drawLine(graphLeft, y, graphLeft, y + h);         // Y axis
-
-        // Draw axis labels if enabled
-        if(propGraphAxisLabels) {
-            var maxStr = formatGraphAxisValue(cachedGraphYMax);
-            var minStr = formatGraphAxisValue(cachedGraphYMin);
-            dc.drawText(graphLeft - 2, y, fontLabel, maxStr, Graphics.TEXT_JUSTIFY_RIGHT);
-            dc.drawText(graphLeft - 2, y + h - labelHeight, fontLabel, minStr, Graphics.TEXT_JUSTIFY_RIGHT);
-
-            var leftLabel = getGraphXLabel(true);
-            var rightLabel = getGraphXLabel(false);
-            dc.drawText(graphLeft, y + h, fontLabel, leftLabel, Graphics.TEXT_JUSTIFY_LEFT);
-            dc.drawText(graphRight, y + h, fontLabel, rightLabel, Graphics.TEXT_JUSTIFY_RIGHT);
-        }
-
-        // Draw line and optional dots
-        dc.setColor(theme.colors[clock], Graphics.COLOR_TRANSPARENT);
-        var prevX = -1;
-        var prevY = -1;
-        for(var i = 0; i < n; i++) {
-            if(data[i] < 0) { prevX = -1; prevY = -1; continue; } // gap
-            var ptX = n > 1 ? graphLeft + Math.round(i.toFloat() * totalW / (n - 1)) : x;
-            var ptY = y + h - 1 - Math.round(data[i] / scale);
-            if(ptY < y) { ptY = y; }
-
-            if(prevX >= 0) {
-                dc.drawLine(prevX, prevY, ptX, ptY);
-            }
-            if(propGraphStyle == 2) {
-                if(propGraphData == 7) {
-                    dc.setColor(getStressColor(data[i]), Graphics.COLOR_TRANSPARENT);
-                } else {
-                    dc.setColor(theme.colors[dataVal], Graphics.COLOR_TRANSPARENT);
-                }
-                dc.fillRectangle(ptX - 1, ptY - 1, 3, 3);
-                dc.setColor(theme.colors[clock], Graphics.COLOR_TRANSPARENT);
-            }
-            prevX = ptX;
-            prevY = ptY;
-        }
-    }
-
-    // Format a Y-axis value for display; uses "k" suffix for values >= 1000.
-    // Returns the X-axis label for the leftmost (isLeft=true) or rightmost point.
-    // For 2-hour data: formatted time; for 7-day data: abbreviated weekday.
-    hidden function getGraphXLabel(isLeft as Boolean) as String {
-        if(propGraphData >= 8) {
-            var daysBack = isLeft ? 6 : 0;
-            var target = Time.now().subtract(new Time.Duration(daysBack * 86400));
-            var info = Time.Gregorian.info(target, Time.FORMAT_SHORT);
-            return dayName(info.day_of_week);
-        } else {
-            var minutesBack = isLeft ? 120 : 0;
-            var target = Time.now().subtract(new Time.Duration(minutesBack * 60));
-            var info = Time.Gregorian.info(target, Time.FORMAT_SHORT);
-            var h = info.hour;
-            var m = info.min;
-            if(!propIs24H) {
-                var ampm = h >= 12 ? "P" : "A";
-                h = h % 12;
-                if(h == 0) { h = 12; }
-                return h.toString() + ":" + m.format("%02d") + ampm;
-            }
-            return h.format("%02d") + ":" + m.format("%02d");
-        }
     }
 
     (:AMOLED)
@@ -2163,179 +2024,6 @@ class Segment34View extends WatchUi.WatchFace {
         }
 
         return val;
-    }
-
-    hidden function getDataArrayByType(dataSource as Number) as Array<Number> {
-        if(dataSource == 8 or dataSource == 9 or dataSource == 10) {
-            return getDailyDataArray(dataSource);
-        }
-
-        var twoHours = new Time.Duration(7200);
-        var iterator = null;
-        var max = null;
-
-        if(dataSource == 0) {
-            iterator = Toybox.SensorHistory.getBodyBatteryHistory({:period => twoHours, :order => Toybox.SensorHistory.ORDER_OLDEST_FIRST});
-            max = 100;
-        } else if(dataSource == 1) {
-            iterator = Toybox.SensorHistory.getElevationHistory({:period => twoHours, :order => Toybox.SensorHistory.ORDER_OLDEST_FIRST});
-        } else if(dataSource == 2) {
-            iterator = Toybox.SensorHistory.getHeartRateHistory({:period => twoHours, :order => Toybox.SensorHistory.ORDER_OLDEST_FIRST});
-        } else if(dataSource == 3) {
-            iterator = Toybox.SensorHistory.getOxygenSaturationHistory({:period => twoHours, :order => Toybox.SensorHistory.ORDER_OLDEST_FIRST});
-            max = 100;
-        } else if(dataSource == 4) {
-            iterator = Toybox.SensorHistory.getPressureHistory({:period => twoHours, :order => Toybox.SensorHistory.ORDER_OLDEST_FIRST});
-        } else if(dataSource == 5 or dataSource == 7) {
-            iterator = Toybox.SensorHistory.getStressHistory({:period => twoHours, :order => Toybox.SensorHistory.ORDER_OLDEST_FIRST});
-            max = 100;
-        } else if(dataSource == 6) {
-            iterator = Toybox.SensorHistory.getTemperatureHistory({:period => twoHours, :order => Toybox.SensorHistory.ORDER_OLDEST_FIRST});
-        }
-
-        if(iterator == null) { return []; }
-        if(max == null) { max = iterator.getMax(); }
-        var min = iterator.getMin();
-        if(min == null or max == null) { return []; }
-
-        var hrMin = 0;
-        if(dataSource == 2) {
-            var hrProfile = UserProfile.getProfile();
-            if(hrProfile != null && hrProfile.restingHeartRate != null && hrProfile.restingHeartRate > 30) {
-                hrMin = hrProfile.restingHeartRate;
-            }
-        }
-
-        // Set Y axis bounds for axis labels
-        if(dataSource == 0) {
-            cachedGraphYMin = 0.0; cachedGraphYMax = 100.0;
-        } else if(dataSource == 1 or dataSource == 4) {
-            var rawMin = min * 0.9;
-            cachedGraphYMin = dataSource == 4 ? (rawMin / 100.0).toFloat() : rawMin.toFloat();
-            cachedGraphYMax = dataSource == 4 ? (max.toFloat() / 100.0) : max.toFloat();
-        } else if(dataSource == 2) {
-            cachedGraphYMin = hrMin.toFloat(); cachedGraphYMax = max.toFloat();
-        } else if(dataSource == 3) {
-            cachedGraphYMin = 50.0; cachedGraphYMax = 100.0;
-        } else if(dataSource == 5 or dataSource == 7) {
-            cachedGraphYMin = 0.0; cachedGraphYMax = 100.0;
-        } else if(dataSource == 6) {
-            cachedGraphYMin = min.toFloat(); cachedGraphYMax = max.toFloat();
-        }
-
-        var ret = [];
-        var diff = max - (min * 0.9);
-        var isStress = (dataSource == 5 or dataSource == 7);
-        var sample = iterator.next();
-        while(sample != null) {
-            if(dataSource == 2) {
-                if(sample.data != null and sample.data != 0 and sample.data < 255) {
-                    var hrRange = max - hrMin;
-                    var normalized = hrRange > 0 ? Math.round((sample.data.toFloat() - hrMin) / hrRange * 100).toNumber() : 0;
-                    if(normalized < 0) { normalized = 0; }
-                    ret.add(normalized);
-                }
-            } else if(dataSource == 1 or dataSource == 4) {
-                if(sample.data != null) {
-                    ret.add(Math.round((sample.data.toFloat() - Math.round(min * 0.9)) / diff * 100).toNumber());
-                }
-            } else if(dataSource == 3) {
-                if(sample.data != null) {
-                    ret.add(Math.round((sample.data.toFloat() - 50.0) / 50.0 * 100).toNumber());
-                }
-            } else {
-                if(sample.data != null) {
-                    ret.add(Math.round(sample.data.toFloat() / max * 100).toNumber());
-                } else if(isStress) {
-                    ret.add(-1); // gap: stress not measurable, preserve for display
-                }
-            }
-            sample = iterator.next();
-        }
-
-        return downsampleGraph(ret);
-    }
-
-    // Daily activity graph (distance / steps / active minutes), past 6 days + today.
-    hidden function getDailyDataArray(dataSource as Number) as Array<Number> {
-        graphGoalLine = null;
-        cachedGraphData2 = null;
-        var history = ActivityMonitor.getHistory();
-        var todayInfo = ActivityMonitor.getInfo();
-        var rawData = [];
-        var rawVigorous = [];
-
-        if(history != null) {
-            var daysAvail = history.size() < 6 ? history.size() : 6;
-            for(var i = daysAvail - 1; i >= 0; i--) {
-                rawData.add(getHistoryDayValue(history[i], dataSource));
-                if(dataSource == 10) {
-                    rawVigorous.add(history[i].activeMinutes != null ? history[i].activeMinutes.vigorous * 2 : 0);
-                }
-            }
-        }
-        rawData.add(getTodayActivityValue(todayInfo, dataSource));
-        if(dataSource == 10) {
-            rawVigorous.add(todayInfo.activeMinutesDay != null ? todayInfo.activeMinutesDay.vigorous * 2 : 0);
-        }
-
-        var maxVal = 0;
-        for(var i = 0; i < rawData.size(); i++) {
-            if(rawData[i] > maxVal) { maxVal = rawData[i]; }
-        }
-
-        cachedGraphYMin = 0.0;
-        if(dataSource == 8) {
-            // Distance is in cm; convert to user's distance unit for the axis label
-            cachedGraphYMax = maxVal.toFloat() / (propIsMetricDistance ? 100000.0 : 160934.4);
-        } else {
-            cachedGraphYMax = maxVal.toFloat();
-        }
-
-        var ret = [];
-        if(maxVal > 0) {
-            for(var i = 0; i < rawData.size(); i++) {
-                ret.add(Math.round(rawData[i].toFloat() / maxVal * 100).toNumber());
-            }
-            if(dataSource == 9 and todayInfo.stepGoal != null and todayInfo.stepGoal > 0) {
-                var goalNorm = Math.round(todayInfo.stepGoal.toFloat() / maxVal * 100).toNumber();
-                if(goalNorm <= 100) { graphGoalLine = goalNorm; }
-            }
-            if(dataSource == 10) {
-                var vigRet = [];
-                for(var i = 0; i < rawVigorous.size(); i++) {
-                    vigRet.add(Math.round(rawVigorous[i].toFloat() / maxVal * 100).toNumber());
-                }
-                cachedGraphData2 = vigRet;
-            }
-        }
-        return ret;
-    }
-
-    hidden function getHistoryDayValue(dayInfo, dataSource as Number) as Number {
-        if(dataSource == 8) { return dayInfo.distance != null ? dayInfo.distance : 0; }
-        if(dataSource == 9) { return dayInfo.steps != null ? dayInfo.steps : 0; }
-        if(dataSource == 10) { return dayInfo.activeMinutes != null ? dayInfo.activeMinutes.total : 0; }
-        return 0;
-    }
-
-    hidden function getTodayActivityValue(todayInfo, dataSource as Number) as Number {
-        if(dataSource == 8) { return todayInfo.distance != null ? todayInfo.distance : 0; }
-        if(dataSource == 9) { return todayInfo.steps != null ? todayInfo.steps : 0; }
-        if(dataSource == 10) { return todayInfo.activeMinutesDay != null ? todayInfo.activeMinutesDay.total : 0; }
-        return 0;
-    }
-
-    hidden function downsampleGraph(data as Array<Number>) as Array<Number> {
-        if(data.size() <= graphTargetWidth) { return data; }
-        var reduced = [];
-        var step = (data.size() as Float) / graphTargetWidth.toFloat();
-        for(var i = 0; i < graphTargetWidth; i++) {
-            var idx = Math.round(i * step).toNumber();
-            if(idx >= data.size()) { idx = data.size() - 1; }
-            reduced.add(data[idx]);
-        }
-        return reduced;
     }
 
     hidden function getLabelByType(complicationType as Number, labelSize as Number) as String {
