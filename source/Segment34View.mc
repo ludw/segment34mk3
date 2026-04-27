@@ -919,8 +919,10 @@ class Segment34View extends WatchUi.WatchFace {
 
         if(isSleeping and canBurnIn) {
             drawAOD(dc, now, cachedValues);
-        } else if(!propExperimentalBattery or valuesUpdated or slowUpdated or now.min != lastDrawnMinute) {
-            // Full redraw: optimizations off, or values/theme changed, or minute flipped.
+        } else if(!propExperimentalBattery or valuesUpdated or slowUpdated or now.min != lastDrawnMinute
+                  or System.getSystemStats().charging) {
+            // Full redraw: optimizations off, values/theme changed, minute flipped, or charging
+            // (charging overlay may disturb the screen at any time; no point saving power on charger).
             drawWatchface(dc, now, false, cachedValues);
             lastDrawnMinute = now.min;
         } else if(canBurnIn and propSecondsShows == -3 and propShowSeconds) {
