@@ -113,6 +113,7 @@ class Segment34View extends WatchUi.WatchFace {
     hidden var weatherStorage as WeatherStorage = new WeatherStorage();
 
     hidden var doesPartialUpdate as Boolean = false;
+    hidden var lastDrawnMinute as Number = -1;
     hidden var dataHelper as DataHelper = new DataHelper();
     hidden var weatherHelper as WeatherDisplayHelper = new WeatherDisplayHelper();
     hidden var graphRenderer as GraphRenderer = new GraphRenderer();
@@ -838,6 +839,7 @@ class Segment34View extends WatchUi.WatchFace {
         visible = true;
         lastUpdate = null;
         lastSlowUpdate = null;
+        lastDrawnMinute = -1;
     }
 
     // Called when this View is removed from the screen.
@@ -845,12 +847,14 @@ class Segment34View extends WatchUi.WatchFace {
     // This includes freeing resources from memory.
     function onHide() as Void {
         visible = false;
+        lastDrawnMinute = -1;
     }
 
     // The user has just looked at their watch. Timers and animations may be started here.
     function onExitSleep() as Void {
         lastUpdate = null;
         lastSlowUpdate = null;
+        lastDrawnMinute = -1;
         isSleeping = false;
         WatchUi.requestUpdate();
     }
@@ -859,6 +863,7 @@ class Segment34View extends WatchUi.WatchFace {
     function onEnterSleep() as Void {
         lastUpdate = null;
         lastSlowUpdate = null;
+        lastDrawnMinute = -1;
         isSleeping = true;
         WatchUi.requestUpdate();
     }
@@ -867,11 +872,13 @@ class Segment34View extends WatchUi.WatchFace {
         reloadSettings();
         lastUpdate = null;
         lastSlowUpdate = null;
+        lastDrawnMinute = -1;
         WatchUi.requestUpdate();
     }
 
     public function forceDataRefresh() as Void {
         lastUpdate = null;
+        lastDrawnMinute = -1;
     }
 
     // === UPDATE ENTRY POINTS ===
@@ -883,31 +890,46 @@ class Segment34View extends WatchUi.WatchFace {
         var now = Time.Gregorian.info(Time.now(), Time.FORMAT_SHORT);
         var unix_timestamp = Time.now().value();
 
-        if(doesPartialUpdate) {
-            dc.clearClip();
-            doesPartialUpdate = false;
-        }
-
+        var slowUpdated = false;
         if(now.sec % 60 == 0 or lastSlowUpdate == null or unix_timestamp - lastSlowUpdate >= 60) {
             lastSlowUpdate = unix_timestamp;
             updateColorTheme();
             updateWeather();
             dataHelper.updateVo2History();
+            slowUpdated = true;
         }
 
+        var valuesUpdated = false;
         if(lastUpdate == null or unix_timestamp - lastUpdate >= propUpdateFreq) {
             lastUpdate = unix_timestamp;
             cachedValues = computeDisplayValues(now);
+            valuesUpdated = true;
         } else {
             // Only update time-sensitive values
             cachedValues[:dataClock] = getClockData(now);
             cachedValues[:dataSeconds] = getValueForSeconds(now);
         }
 
+        if(doesPartialUpdate) {
+            dc.clearClip();
+            doesPartialUpdate = false;
+        }
+
         if(isSleeping and canBurnIn) {
             drawAOD(dc, now, cachedValues);
         } else {
-            drawWatchface(dc, now, false, cachedValues);
+            // Skip full redraw when nothing visible has changed.
+            // Exceptions: values/theme updated, minute boundary crossed, or AMOLED
+            // device showing seconds (onPartialUpdate is disabled, must draw each second).
+            var needsFullDraw = valuesUpdated
+                or slowUpdated
+                or (now.min != lastDrawnMinute)
+                or (canBurnIn and propSecondsShows == -3);
+
+            if(needsFullDraw) {
+                drawWatchface(dc, now, false, cachedValues);
+                lastDrawnMinute = now.min;
+            }
         }
     }
 
