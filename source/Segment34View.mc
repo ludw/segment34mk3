@@ -917,20 +917,17 @@ class Segment34View extends WatchUi.WatchFace {
 
         if(isSleeping and canBurnIn) {
             drawAOD(dc, now, cachedValues);
-        } else {
-            // Skip full redraw when nothing visible has changed.
-            // Exceptions: values/theme updated, minute boundary crossed, or AMOLED
-            // device showing seconds (onPartialUpdate is disabled, must draw each second).
-            var needsFullDraw = valuesUpdated
-                or slowUpdated
-                or (now.min != lastDrawnMinute)
-                or (canBurnIn and propSecondsShows == -3);
-
-            if(needsFullDraw) {
-                drawWatchface(dc, now, false, cachedValues);
-                lastDrawnMinute = now.min;
-            }
+        } else if(valuesUpdated or slowUpdated or now.min != lastDrawnMinute) {
+            // Full redraw: computed values changed, theme/weather refreshed, or minute flipped.
+            drawWatchface(dc, now, false, cachedValues);
+            lastDrawnMinute = now.min;
+        } else if(canBurnIn and propSecondsShows == -3 and propShowSeconds) {
+            // AMOLED: onPartialUpdate is unavailable; only the seconds digit changed.
+            // Redraw just the seconds clip area — avoids clear + gradient bitmap + all drawText calls.
+            drawPartialSeconds(dc, cachedValues[:dataSeconds] as String);
+            dc.clearClip();
         }
+        // MIP + nothing changed: onPartialUpdate handles seconds; nothing to do here.
     }
 
     function onPartialUpdate(dc) {
@@ -939,14 +936,18 @@ class Segment34View extends WatchUi.WatchFace {
         doesPartialUpdate = true;
 
         var now = Time.Gregorian.info(Time.now(), Time.FORMAT_SHORT);
+        drawPartialSeconds(dc, now.sec.format("%02d"));
+        // Clip is intentionally left set; onUpdate will call clearClip() via doesPartialUpdate.
+    }
+
+    // Redraws only the seconds clip region. Does NOT call clearClip() — caller is responsible.
+    // onPartialUpdate (MIP) leaves clip set for onUpdate to clean up via doesPartialUpdate.
+    // The AMOLED path in onUpdate calls clearClip() itself immediately after.
+    hidden function drawPartialSeconds(dc as Dc, seconds as String) as Void {
         var y1 = baseY + halfClockHeight + marginY;
-
-        var seconds = now.sec.format("%02d");
-
-        dc.setClip(baseX + halfClockWidth - textSideAdj - secondsClipWidth, y1, secondsClipWidth, smallDataHeight+1);
+        dc.setClip(baseX + halfClockWidth - textSideAdj - secondsClipWidth, y1, secondsClipWidth, smallDataHeight + 1);
         dc.setColor(theme.colors[bg], theme.colors[bg]);
         dc.clear();
-
         dc.setColor(theme.colors[date], Graphics.COLOR_TRANSPARENT);
         dc.drawText(baseX + halfClockWidth - textSideAdj, y1, fontSmallData, seconds, Graphics.TEXT_JUSTIFY_RIGHT);
     }
