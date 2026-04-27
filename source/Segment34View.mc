@@ -1143,7 +1143,7 @@ class Segment34View extends WatchUi.WatchFace {
 
         // Draw Top data fields or graph
         if(propTopPartShows == 2) {
-            var xLabelSpace = (propGraphStyle > 0 && propGraphAxisLabels) ? labelHeight + 2 : 0;
+            var xLabelSpace = propGraphAxisLabels ? labelHeight + 2 : 0;
             yn3 = yn2 - marginY - graphHeight - xLabelSpace;
             graphRenderer.drawGraph(dc, values[:dataGraph1], values[:dataGraph1b], centerX, yn3, graphHeight, theme.colors);
         } else {
