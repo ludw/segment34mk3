@@ -1384,4 +1384,9 @@
                 <listEntry value="3">@Strings.settings_hide_bottom_labels</listEntry>
             </settingConfig>
     </setting>
+
+    <setting propertyKey="@Properties.experimentalBattOpt" title="@Strings.settings_experimental_batt_opt">
+        <settingConfig type="boolean" />
+    </setting>
+
 </settings>

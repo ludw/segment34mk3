@@ -79,4 +79,5 @@
     <property id="owmApiKey" type="string"></property>
     <property id="owmLocationOverride" type="string"></property>
     <property id="owmRefreshInterval" type="number">7200</property>
+    <property id="experimentalBattOpt" type="boolean">false</property>
 </properties>

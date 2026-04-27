@@ -172,6 +172,7 @@ class GraphRenderer {
 
         // Draw axis labels if enabled
         if(_propGraphAxisLabels) {
+            dc.setColor(themeColors[dataVal], Graphics.COLOR_TRANSPARENT);
             var maxStr = formatGraphAxisValue(cachedGraphYMax);
             var minStr = formatGraphAxisValue(cachedGraphYMin);
             dc.drawText(graphLeft - 2, y, _fontLabel, maxStr, Graphics.TEXT_JUSTIFY_RIGHT);

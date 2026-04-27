@@ -190,7 +190,7 @@ class Segment34View extends WatchUi.WatchFace {
     hidden var propSmallFontVariant as Number = 0;
     hidden var propBottomFontVariant as Number = 2;
     hidden var propStressDynamicColor as Boolean = false;
-
+    hidden var propExperimentalBattOpt as Boolean = false;
 
     var clockBgText = "";
 
@@ -324,6 +324,7 @@ class Segment34View extends WatchUi.WatchFace {
         propSmallFontVariant = p.getValue("smallFontVariant") as Number;
         propBottomFontVariant = p.getValue("bottomFontVariant") as Number;
         propStressDynamicColor = p.getValue("stressDynamicColor") as Boolean;
+        propExperimentalBattOpt = p.getValue("experimentalBattOpt") as Boolean;
         propWeatherProvider = p.getValue("weatherProvider") as Number;
 
         theme.resetNightMode(); // force update color theme
@@ -880,8 +881,10 @@ class Segment34View extends WatchUi.WatchFace {
     function onUpdate(dc as Dc) as Void {
         if(!visible) { return; }
 
-        var now = Time.Gregorian.info(Time.now(), Time.FORMAT_SHORT);
-        var unix_timestamp = Time.now().value();
+        var nowMoment = Time.now();
+        var unix_timestamp = nowMoment.value();
+        var now = Time.Gregorian.info(nowMoment, Time.FORMAT_SHORT);
+        var needsFullRedraw = doesPartialUpdate;
 
         if(doesPartialUpdate) {
             dc.clearClip();
@@ -893,11 +896,13 @@ class Segment34View extends WatchUi.WatchFace {
             updateColorTheme();
             updateWeather();
             dataHelper.updateVo2History();
+            needsFullRedraw = true;
         }
 
         if(lastUpdate == null or unix_timestamp - lastUpdate >= propUpdateFreq) {
             lastUpdate = unix_timestamp;
             cachedValues = computeDisplayValues(now);
+            needsFullRedraw = true;
         } else {
             // Only update time-sensitive values
             cachedValues[:dataClock] = getClockData(now);
@@ -907,7 +912,7 @@ class Segment34View extends WatchUi.WatchFace {
         if(isSleeping and canBurnIn) {
             drawAOD(dc, now, cachedValues);
         } else {
-            drawWatchface(dc, now, false, cachedValues);
+            drawWatchface(dc, now, false, cachedValues, propExperimentalBattOpt && !needsFullRedraw);
         }
     }
 
@@ -1104,10 +1109,10 @@ class Segment34View extends WatchUi.WatchFace {
 
     // === DRAW CHAIN ===
 
-    hidden function drawWatchface(dc as Dc, now as Gregorian.Info, aod as Boolean, values as Dictionary) as Void {
+    hidden function drawWatchface(dc as Dc, now as Gregorian.Info, aod as Boolean, values as Dictionary, skipClear as Boolean) as Void {
         // Clear
         dc.setColor(theme.colors[bg], theme.colors[bg]);
-        dc.clear();
+        if(!skipClear) { dc.clear(); }
         var yn1 = baseY - halfClockHeight - marginY - smallDataHeight;
         var yn2 = yn1 - marginY - smallDataHeight;
         var yn3 = yn2 - marginY - labelHeight - tinyDataHeight - halfMarginY - aboveLine2Adjustment;
@@ -1210,6 +1215,11 @@ class Segment34View extends WatchUi.WatchFace {
         
         // Draw seconds
         if(propShowSeconds) {
+            if(skipClear) {
+                dc.setColor(theme.colors[bg], theme.colors[bg]);
+                dc.fillRectangle(baseX + halfClockWidth - textSideAdj - secondsClipWidth * 2, y1, secondsClipWidth * 2, smallDataHeight + 1);
+                dc.setColor(theme.colors[date], Graphics.COLOR_TRANSPARENT);
+            }
             dc.drawText(baseX + halfClockWidth - textSideAdj, y1, fontSmallData, values[:dataSeconds], Graphics.TEXT_JUSTIFY_RIGHT);
         }
 
@@ -1257,7 +1267,7 @@ class Segment34View extends WatchUi.WatchFace {
         dc.clear();
 
         if(propAodStyle == 2) {
-            drawWatchface(dc, now, true, values);
+            drawWatchface(dc, now, true, values, false);
             drawPattern(dc, 0x000000, (now.min % 3));
         } else if (propAodStyle == 1) {
             if(propClockOutlineStyle == 0 or propClockOutlineStyle == 2) {

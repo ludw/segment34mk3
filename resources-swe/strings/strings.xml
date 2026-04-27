@@ -516,4 +516,5 @@
     <string id="settings_daily_counter" scope="settings">Räknare (återställs dagligen, långtryck för att öka)</string>
     <string id="settings_increase_counter" scope="settings">Öka räknaren</string>
     <string id="settings_decrease_counter" scope="settings">Minska räknaren</string>
+    <string id="settings_experimental_batt_opt" scope="settings">Experimental battery optimization</string>
 </strings>

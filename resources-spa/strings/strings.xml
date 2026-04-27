@@ -524,4 +524,5 @@
     <string id="settings_daily_counter" scope="settings">Contador (reinicio diario, mantén pulsado para aumentar)</string>
     <string id="settings_increase_counter" scope="settings">Aumentar contador</string>
     <string id="settings_decrease_counter" scope="settings">Disminuir contador</string>
+    <string id="settings_experimental_batt_opt" scope="settings">Experimental battery optimization</string>
 </strings>

@@ -501,4 +501,5 @@
     <string id="settings_every_30_min" scope="settings">Every 30 min</string>
     <string id="settings_every_hour" scope="settings">Every hour</string>
     <string id="settings_every_2_hours" scope="settings">Every 2 hours</string>
+    <string id="settings_experimental_batt_opt" scope="settings">Experimental battery optimization</string>
 </strings>

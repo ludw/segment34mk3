@@ -516,4 +516,5 @@
     <string id="settings_daily_counter" scope="settings">Contatore (reset giornaliero, tieni premuto per aumentare)</string>
     <string id="settings_increase_counter" scope="settings">Aumenta contatore</string>
     <string id="settings_decrease_counter" scope="settings">Diminuisci contatore</string>
+    <string id="settings_experimental_batt_opt" scope="settings">Experimental battery optimization</string>
 </strings>

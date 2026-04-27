@@ -515,4 +515,5 @@
     <string id="settings_daily_counter" scope="settings">Licznik (reset codzienny, długie naciśnięcie aby zwiększyć)</string>
     <string id="settings_increase_counter" scope="settings">Zwiększ licznik</string>
     <string id="settings_decrease_counter" scope="settings">Zmniejsz licznik</string>
+    <string id="settings_experimental_batt_opt" scope="settings">Experimental battery optimization</string>
 </strings>
