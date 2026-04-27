@@ -5,6 +5,7 @@ import Toybox.Complications;
 import Toybox.Graphics;
 import Toybox.Lang;
 import Toybox.Math;
+import Toybox.Position;
 import Toybox.System;
 import Toybox.Time;
 import Toybox.UserProfile;
@@ -528,5 +529,235 @@ class DataHelper {
         if (profile.vo2maxCycling != null) {
             vo2BikeTrend = getVo2Trend("vo2bike_hist", profile.vo2maxCycling as Number);
         }
+    }
+
+    // --- Formatted value getters for ValueResolver switch ---
+
+    function getActiveMinutesWeekFormatted() as String {
+        var info = ActivityMonitor.getInfo();
+        if (info.activeMinutesWeek != null) { return info.activeMinutesWeek.total.format("%d"); }
+        return "";
+    }
+
+    function getActiveHoursWeekFormatted() as String {
+        var info = ActivityMonitor.getInfo();
+        if (info.activeMinutesWeek != null) { return (info.activeMinutesWeek.total / 60.0).format("%.1f"); }
+        return "";
+    }
+
+    function getDailyActiveMinutesFormatted() as String {
+        var info = ActivityMonitor.getInfo();
+        if (info.activeMinutesDay != null) { return info.activeMinutesDay.total.format("%d"); }
+        return "";
+    }
+
+    function getDailyDistanceFormatted(isMetric as Boolean, width as Number) as String {
+        var info = ActivityMonitor.getInfo();
+        if (info.distance != null) {
+            return formatDistanceByWidth(info.distance / (isMetric ? 100000.0 : 160900.0), width);
+        }
+        return "";
+    }
+
+    function getFloorsClimbedFormatted() as String {
+        var info = ActivityMonitor.getInfo();
+        if (info.floorsClimbed != null) { return info.floorsClimbed.format("%d"); }
+        return "";
+    }
+
+    function getMetersClimbedFormatted() as String {
+        var info = ActivityMonitor.getInfo();
+        if (info.metersClimbed != null) { return info.metersClimbed.format("%d"); }
+        return "";
+    }
+
+    function getVo2RunFormatted() as String {
+        var profile = UserProfile.getProfile();
+        if (profile.vo2maxRunning != null) { return vo2RunTrend + (profile.vo2maxRunning as Number).format("%d"); }
+        return "";
+    }
+
+    function getVo2BikeFormatted() as String {
+        var profile = UserProfile.getProfile();
+        if (profile.vo2maxCycling != null) { return vo2BikeTrend + (profile.vo2maxCycling as Number).format("%d"); }
+        return "";
+    }
+
+    function getRespirationRateFormatted() as String {
+        var info = ActivityMonitor.getInfo();
+        if (info.respirationRate != null) { return info.respirationRate.format("%d"); }
+        return "";
+    }
+
+    function getHeartRateFormatted() as String {
+        var actInfo = Activity.getActivityInfo();
+        var sample = actInfo.currentHeartRate;
+        if (sample != null) { return sample.format("%01d"); }
+        var history = ActivityMonitor.getHeartRateHistory(1, true);
+        if (history != null) {
+            var hist = history.next();
+            if (hist != null && hist.heartRate != ActivityMonitor.INVALID_HR_SAMPLE) {
+                return hist.heartRate.format("%01d");
+            }
+        }
+        return "";
+    }
+
+    function getCaloriesFormatted() as String {
+        var info = ActivityMonitor.getInfo();
+        if (info.calories != null) { return info.calories.format("%d"); }
+        return "";
+    }
+
+    function getAltitudeMFormatted() as String {
+        var alt = getAltitudeValue();
+        if (alt != null) { return alt.format("%d"); }
+        return "";
+    }
+
+    function getAltitudeFtFormatted() as String {
+        var alt = getAltitudeValue();
+        if (alt != null) { return (alt * 3.28084).format("%d"); }
+        return "";
+    }
+
+    function getStressFormatted() as String {
+        var st = getStressData();
+        if (st != null) { return st.format("%d"); }
+        return "";
+    }
+
+    function getBBFormatted() as String {
+        var bb = getBBData();
+        if (bb != null) { return bb.format("%d"); }
+        return "";
+    }
+
+    function getStepsFormatted(width as Number) as String {
+        var info = ActivityMonitor.getInfo();
+        if (info.steps != null) {
+            var steps = info.steps;
+            if (width >= 5 || (width == 4 && steps < 10000)) { return steps.format("%d"); }
+            return (steps / 1000).format("%d") + "K";
+        }
+        return "";
+    }
+
+    function getRawDistanceMFormatted() as String {
+        var info = ActivityMonitor.getInfo();
+        if (info.distance != null) { return (info.distance / 100).format("%d"); }
+        return "";
+    }
+
+    function getWheelchairPushesFormatted() as String {
+        var info = ActivityMonitor.getInfo();
+        if (info.pushes != null) { return info.pushes.format("%d"); }
+        return "";
+    }
+
+    function getWeightKgFormatted(width as Number) as String {
+        var profile = UserProfile.getProfile();
+        if (profile.weight != null) {
+            var weight_kg = profile.weight / 1000.0;
+            return weight_kg.format(width == 3 ? "%d" : "%.1f");
+        }
+        return "";
+    }
+
+    function getWeightLbsFormatted() as String {
+        var profile = UserProfile.getProfile();
+        if (profile.weight != null) { return (profile.weight * 0.00220462).format("%d"); }
+        return "";
+    }
+
+    function getActiveCaloriesFormatted() as String {
+        var info = ActivityMonitor.getInfo();
+        var rest_calories = getRestCalories();
+        if (info.calories != null && rest_calories > 0) {
+            var active_calories = info.calories - rest_calories;
+            return active_calories > 0 ? active_calories.format("%d") : "0";
+        }
+        return "";
+    }
+
+    function getActiveTotalCaloriesFormatted() as String {
+        var info = ActivityMonitor.getInfo();
+        var rest_calories = getRestCalories();
+        var total_calories = info.calories != null ? info.calories : 0;
+        var active_calories = total_calories - rest_calories;
+        active_calories = active_calories > 0 ? active_calories : 0;
+        return active_calories.format("%d") + "/" + total_calories.format("%d");
+    }
+
+    function getBatteryDaysFormatted() as String {
+        var stats = System.getSystemStats();
+        if (stats.batteryInDays != null) { return Math.round(stats.batteryInDays).format("%d"); }
+        return "";
+    }
+
+    function getNotificationCountFormatted() as String {
+        var notif_count = System.getDeviceSettings().notificationCount;
+        if (notif_count != null && notif_count > 0) { return notif_count.format("%d"); }
+        return "";
+    }
+
+    function getSolarIntensityFormatted() as String {
+        var stats = System.getSystemStats();
+        if (stats.solarIntensity != null) { return stats.solarIntensity.format("%d"); }
+        return "";
+    }
+
+    function getRestingHeartRateFormatted() as String {
+        var profile = UserProfile.getProfile();
+        if (profile.restingHeartRate != null) { return profile.restingHeartRate.format("%d"); }
+        return "";
+    }
+
+    // Handles types 58 (run 7d), 59 (bike 7d), 65 (swim 7d), 66 (run month), 67 (run 28d).
+    function getRecentActivityDistFormatted(complicationType as Number, distFactor as Float, width as Number) as String {
+        if (Time.now().value() - _lastActivityDistUpdate >= 60 * 5) {
+            _lastActivityDistUpdate = Time.now().value();
+            updateActivityDistCache();
+        }
+        var dist = 0;
+        if      (complicationType == 58) { dist = _cachedRunDist7Days; }
+        else if (complicationType == 59) { dist = _cachedBikeDist7Days; }
+        else if (complicationType == 65) { dist = _cachedSwimDist7Days; }
+        else if (complicationType == 66) { dist = _cachedRunDistMonth; }
+        else                             { dist = _cachedRunDist28Days; }
+        return formatDistanceByWidth(dist * distFactor, width);
+    }
+
+    function getDailyCounterFormatted() as String {
+        var today = Time.Gregorian.info(Time.now(), Time.FORMAT_SHORT);
+        var todayKey = today.year * 10000 + today.month * 100 + today.day;
+        var storedKey = Application.Storage.getValue("dailyCounterDay") as Number?;
+        if (storedKey == null || storedKey != todayKey) {
+            Application.Storage.setValue("dailyCounterDay", todayKey);
+            Application.Storage.setValue("dailyCounter", 0);
+        }
+        var count = Application.Storage.getValue("dailyCounter") as Number?;
+        return (count != null ? count : 0).format("%d");
+    }
+
+    function getLocationDecDegFormatted() as String {
+        var pos = Activity.getActivityInfo().currentLocation;
+        if (pos != null) { return pos.toDegrees()[0] + " " + pos.toDegrees()[1]; }
+        return Application.loadResource(Rez.Strings.LABEL_POS_NA) as String;
+    }
+
+    function getLocationMgrsFormatted() as String {
+        var pos = Activity.getActivityInfo().currentLocation;
+        if (pos != null) { return pos.toGeoString(Position.GEO_MGRS); }
+        return Application.loadResource(Rez.Strings.LABEL_POS_NA) as String;
+    }
+
+    function getLocationAccuracyFormatted(width as Number) as String {
+        var acc = Activity.getActivityInfo().currentLocationAccuracy;
+        if (acc != null) {
+            if (width < 4) { return (acc as Number).format("%d"); }
+            return ["N/A", "LAST", "POOR", "USBL", "GOOD"][acc];
+        }
+        return "";
     }
 }

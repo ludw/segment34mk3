@@ -3,6 +3,7 @@
 import Toybox.Application;
 import Toybox.Lang;
 import Toybox.Math;
+import Toybox.SensorHistory;
 import Toybox.System;
 import Toybox.Time;
 import Toybox.Time.Gregorian;
@@ -211,5 +212,77 @@ class WeatherDisplayHelper {
             i += 1;
         }
         return result;
+    }
+
+    // --- Formatted value getters for ValueResolver switch ---
+
+    function getSensorTemperatureFormatted() as String {
+        var tempIterator = SensorHistory.getTemperatureHistory({:period => 1});
+        if (tempIterator != null) {
+            var temp = tempIterator.next();
+            if (temp != null && temp.data != null) {
+                return formatTemperature(convertTemperature(temp.data, _tempUnit), _showTempUnit, _tempUnit);
+            }
+        }
+        return "";
+    }
+
+    function getSunriseOrSunsetFormatted(complicationType as Number, width as Number) as String {
+        if (_w != null) {
+            var loc = (_w as StoredWeather).observationLocationPosition;
+            if (loc != null) {
+                var now = Time.now();
+                var s = (complicationType == 35) ? Weather.getSunrise(loc, now) : Weather.getSunset(loc, now);
+                return formatSunTime(s, width, _is24H, _hourFormat);
+            }
+        }
+        return "";
+    }
+
+    function getHighTempFormatted() as String {
+        if (_w != null && (_w as StoredWeather).highTemperature != null) {
+            return formatTemperature(convertTemperature((_w as StoredWeather).highTemperature, _tempUnit), _showTempUnit, _tempUnit);
+        }
+        return "";
+    }
+
+    function getLowTempFormatted() as String {
+        if (_w != null && (_w as StoredWeather).lowTemperature != null) {
+            return formatTemperature(convertTemperature((_w as StoredWeather).lowTemperature, _tempUnit), _showTempUnit, _tempUnit);
+        }
+        return "";
+    }
+
+    function getPrecipFormatted(width as Number) as String {
+        var val = getPrecip();
+        if (width == 3 && val.equals("100%")) { val = "100"; }
+        return val;
+    }
+
+    function getNextSunEventFormatted(width as Number) as String {
+        var nextSunEventArray = getNextSunEvent(_w);
+        if (nextSunEventArray != null && nextSunEventArray.size() == 2) {
+            return formatSunTime(nextSunEventArray[0], width, _is24H, _hourFormat);
+        }
+        return "";
+    }
+
+    function getCivilTwilightFormatted(complicationType as Number, width as Number) as String {
+        if (_w != null) {
+            var loc = (_w as StoredWeather).observationLocationPosition;
+            if (loc != null) {
+                var now = Time.now();
+                var sunrise = Weather.getSunrise(loc, now);
+                var sunset = Weather.getSunset(loc, now);
+                if (sunrise != null && sunset != null) {
+                    var latDeg = loc.toDegrees()[0];
+                    var twilight = getCivilTwilight(latDeg as Double, sunrise, sunset);
+                    if (twilight != null) {
+                        return formatSunTime(complicationType == 63 ? twilight[0] : twilight[1], width, _is24H, _hourFormat);
+                    }
+                }
+            }
+        }
+        return "";
     }
 }
