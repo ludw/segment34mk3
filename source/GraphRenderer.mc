@@ -164,14 +164,13 @@ class GraphRenderer {
         var graphRight = x + half_width;
         var totalW = graphRight - graphLeft;
 
-        // Draw axes
-        dc.setColor(themeColors[fieldLbl], Graphics.COLOR_TRANSPARENT);
-        dc.setPenWidth(1);
-        dc.drawLine(graphLeft, y + h, graphRight, y + h);   // X axis
-        dc.drawLine(graphLeft, y, graphLeft, y + h);         // Y axis
-
-        // Draw axis labels if enabled
+        // Draw axes and labels if enabled
         if(_propGraphAxisLabels) {
+            dc.setColor(themeColors[fieldLbl], Graphics.COLOR_TRANSPARENT);
+            dc.setPenWidth(1);
+            dc.drawLine(graphLeft, y + h, graphRight, y + h);   // X axis
+            dc.drawLine(graphLeft, y, graphLeft, y + h);         // Y axis
+
             dc.setColor(themeColors[dataVal], Graphics.COLOR_TRANSPARENT);
             var maxStr = formatGraphAxisValue(cachedGraphYMax);
             var minStr = formatGraphAxisValue(cachedGraphYMin);
