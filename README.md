@@ -79,14 +79,13 @@ For refactorings and optimizations keep in mind that:
 | `resources-{deu,fre,ita,pol,spa,swe}/` | Translated strings for 6 languages; must stay in sync with English |
 
 ## Things people have asked for (may or may not be implemented)
- - Narrower ":"
- - Phone connection
-
+- Weather data in the grafs like precipitation over 12h and longer pressure trends
 
 ## Change log
-1.8
+2.0
 - Option for a narrow ":" separating hours and min
 - Icon for Phone connected
+- Support for Forerunner 70, 170 and 170 Music.
 
 1.7
 - Larger icons on high res screens

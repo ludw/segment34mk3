@@ -48,6 +48,9 @@ fr57042mm.excludeAnnotations = Round260;Round280;Round360;Round416;Round454;MIP;
 instinct3amoled45mm.excludeAnnotations = Round260;Round280;Round360;Round416;Round454;MIP;Square
 venu441mm.excludeAnnotations = Round260;Round280;Round360;Round416;Round454;MIP;Square
 vivoactive6.excludeAnnotations = Round260;Round280;Round360;Round416;Round454;MIP;Square
+fr170.excludeAnnotations = Round260;Round280;Round360;Round416;Round454;MIP;Square
+fr170m.excludeAnnotations = Round260;Round280;Round360;Round416;Round454;MIP;Square
+fr70.excludeAnnotations = Round260;Round280;Round360;Round416;Round454;MIP;Square
 
 # -----------------------------------------------------------------------------
 # 416x416 AMOLED DEVICES
