@@ -82,6 +82,10 @@ For refactorings and optimizations keep in mind that:
 - Weather data in the grafs like precipitation over 12h and longer pressure trends
 
 ## Change log
+2.1
+- Option to show a small graph instead of the bottom 5 digit field
+
+
 2.0
 - Option for a narrow ":" separating hours and min
 - Icon for Phone connected

@@ -11,10 +11,10 @@ import Toybox.WatchUi;
 
 class GraphRenderer {
 
-    // Mini graph field codes: 100–110 map to graph data sources 0–10.
+    // Mini graph field codes: 100–111 map to graph data sources 0–11.
     // Used by bottomFieldShows / bottomField2Shows to select a graph instead of a data value.
     static function isGraphCode(code as Number) as Boolean {
-        return code >= 100 and code <= 110;
+        return code >= 100 and code <= 111;
     }
 
     static function graphCodeToDataSource(code as Number) as Number {
@@ -113,7 +113,13 @@ class GraphRenderer {
 
         if(_propGraphYAxisLabels) { y = y + _halfMarginY; }
 
-        if(_propGraphData >= 8) {
+        if(_propGraphData == 11) {
+            // Precipitation: fill graph area with tighter spacing than daily data
+            var n = data.size();
+            bs = 2;
+            bw = Math.round((_halfWidth.toFloat() * 2 - bs.toFloat() * (n - 1)) / n).toNumber();
+            if(bw < 2) { bw = 2; }
+        } else if(_propGraphData >= 8) {
             // Daily data mode: bar widths fill the device's graph area
             var n = data.size();
             bs = 6;
@@ -270,7 +276,14 @@ class GraphRenderer {
         var epochMin = nowMoment.value() / 60;
         if (epochMin == _cachedXLabelEpochMin) { return; }
         _cachedXLabelEpochMin = epochMin;
-        if (_propGraphData >= 8) {
+        if (_propGraphData == 11) {
+            // Precipitation: show current time and time +8h
+            var infoNow = Time.Gregorian.info(nowMoment, Time.FORMAT_SHORT);
+            var target8h = nowMoment.add(new Time.Duration(8 * 3600));
+            var info8h = Time.Gregorian.info(target8h, Time.FORMAT_SHORT);
+            _cachedXLabelLeft = formatXLabel(infoNow.hour, infoNow.min);
+            _cachedXLabelRight = formatXLabel(info8h.hour, info8h.min);
+        } else if (_propGraphData >= 8) {
             var infoNow = Time.Gregorian.info(nowMoment, Time.FORMAT_SHORT);
             var target6 = nowMoment.subtract(new Time.Duration(6 * 86400));
             var info6 = Time.Gregorian.info(target6, Time.FORMAT_SHORT);
@@ -301,6 +314,9 @@ class GraphRenderer {
 
         if(dataSource == 8 or dataSource == 9 or dataSource == 10) {
             return getDailyDataArray(dataSource);
+        }
+        if(dataSource == 11) {
+            return getPrecipitationDataArray();
         }
 
         var twoHours = new Time.Duration(7200);
@@ -490,6 +506,40 @@ class GraphRenderer {
         if(dataSource == 9) { return todayInfo.steps != null ? todayInfo.steps : 0; }
         if(dataSource == 10) { return todayInfo.activeMinutesDay != null ? todayInfo.activeMinutesDay.total : 0; }
         return 0;
+    }
+
+    // Precipitation probability (0–100%) for the next 12 hours from hourly forecast.
+    // Works with any weather provider that stores hourly_forecast in Application.Storage.
+    hidden function getPrecipitationDataArray() as Array<Number> {
+        graphGoalLine = null;
+        cachedGraphData2 = null;
+        cachedGraphYMin = 0.0;
+        cachedGraphYMax = 100.0;
+
+        var hf_data = Application.Storage.getValue("hourly_forecast") as Array?;
+        if(hf_data == null || hf_data.size() == 0) { return []; }
+
+        var nowEpoch = Time.now().value();
+        var ret = [];
+
+        for(var i = 0; i < hf_data.size(); i++) {
+            var entry = hf_data[i] as Dictionary?;
+            if(entry == null) { continue; }
+            var forecastTime = entry.get("forecastTime");
+            if(forecastTime == null) { continue; }
+
+            var secsAhead = (forecastTime as Number) - nowEpoch;
+            if(secsAhead < 0 or secsAhead >= 8 * 3600) { continue; }
+
+            var pop = entry.get("precipitationChance");
+            if(pop != null) {
+                ret.add(pop as Number);
+            } else {
+                ret.add(0);
+            }
+        }
+
+        return ret;
     }
 
 }

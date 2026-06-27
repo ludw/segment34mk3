@@ -345,6 +345,7 @@
     <string id="settings_daily_distance_7d" scope="settings">Daily distance (7 days)</string>
     <string id="settings_daily_steps_7d" scope="settings">Daily steps (7 days)</string>
     <string id="settings_daily_active_minutes_7d" scope="settings">Daily active minutes (7 days)</string>
+    <string id="settings_precipitation_next_8h" scope="settings">Precipitation next 8h (best with OpenMeteo)</string>
     <string id="settings_graph_prefix_body_battery_history" scope="settings">Graph: Body battery history</string>
     <string id="settings_graph_prefix_elevation_history" scope="settings">Graph: Elevation history</string>
     <string id="settings_graph_prefix_heart_rate_history" scope="settings">Graph: Heart rate history</string>
@@ -356,6 +357,7 @@
     <string id="settings_graph_prefix_daily_distance_7d" scope="settings">Graph: Daily distance (7 days)</string>
     <string id="settings_graph_prefix_daily_steps_7d" scope="settings">Graph: Daily steps (7 days)</string>
     <string id="settings_graph_prefix_daily_active_minutes_7d" scope="settings">Graph: Daily active minutes (7 days)</string>
+    <string id="settings_graph_prefix_precipitation_next_8h" scope="settings">Graph: Precipitation next 8h (best with OpenMeteo)</string>
     <string id="settings_small_font_variant" scope="settings">Small dot matrix font variant:</string>
     <string id="settings_bottom_font_variant" scope="settings">Bottom fields font variant:</string>
     <string id="settings_dots" scope="settings">Dots</string>

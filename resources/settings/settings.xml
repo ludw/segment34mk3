@@ -302,8 +302,9 @@
                 <listEntry value="8">@Strings.settings_daily_distance_7d</listEntry>
                 <listEntry value="9">@Strings.settings_daily_steps_7d</listEntry>
                 <listEntry value="10">@Strings.settings_daily_active_minutes_7d</listEntry>
+                <listEntry value="11">@Strings.settings_precipitation_next_8h</listEntry>
             </settingConfig>
-    </setting>
+        </setting>
 
     <setting propertyKey="@Properties.histogramSize" title="@Strings.settings_graph_size">
         <settingConfig type="list">
@@ -826,6 +827,7 @@
             <listEntry value="108">@Strings.settings_graph_prefix_daily_distance_7d</listEntry>
             <listEntry value="109">@Strings.settings_graph_prefix_daily_steps_7d</listEntry>
             <listEntry value="110">@Strings.settings_graph_prefix_daily_active_minutes_7d</listEntry>
+            <listEntry value="111">@Strings.settings_graph_prefix_precipitation_next_8h</listEntry>
         </settingConfig>
     </setting>
 
@@ -880,6 +882,7 @@
             <listEntry value="108">@Strings.settings_graph_prefix_daily_distance_7d</listEntry>
             <listEntry value="109">@Strings.settings_graph_prefix_daily_steps_7d</listEntry>
             <listEntry value="110">@Strings.settings_graph_prefix_daily_active_minutes_7d</listEntry>
+            <listEntry value="111">@Strings.settings_graph_prefix_precipitation_next_8h</listEntry>
         </settingConfig>
     </setting>
 
