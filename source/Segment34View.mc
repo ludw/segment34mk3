@@ -749,6 +749,8 @@ class Segment34View extends WatchUi.WatchFace {
         largeDataWidth = 24;
         bottomDataWidth = 24;
         barBottomAdj = 2;
+        graphBarWidth = 2;
+        graphBarSpacing = 2;
         graphHeight = (propGraphSize == 1) ? 40 : 30;
         graphTargetWidth = 45;
         graphHalfWidth = screenWidth / 4;
