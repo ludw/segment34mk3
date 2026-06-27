@@ -63,6 +63,7 @@ class Segment34View extends WatchUi.WatchFace {
     hidden var graphHalfWidth as Number = 0;  // max half-width of graph area; set per device in loadResources()
     hidden var propGraphSize as Number = 0;
     hidden var propGraphStyle as Number = 0;
+    hidden var propBottomGraphStyle as Number = 0;
     hidden var propGraphXAxisLabels as Boolean = false;
     hidden var propGraphYAxisLabels as Boolean = false;
     hidden var bottomFieldWidths as Array<Number> = [3, 3, 3, 0];
@@ -239,7 +240,7 @@ class Segment34View extends WatchUi.WatchFace {
             ? GraphRenderer.graphCodeToDataSource(propBottomFieldShows) : 0;
         bottomGraphRenderer.configure(
             graphBarWidth, graphBarSpacing, bottomGraphTargetWidth, bottomGraphHalfWidth, halfMarginY,
-            fontLabel, labelHeight, bottomGraphDataSource, 0, false, false,
+            fontLabel, labelHeight, bottomGraphDataSource, propBottomGraphStyle, false, false,
             0, propIs24H, propIsMetricDistance
         );
         configureBottomGraphRenderer2(bottomGraphTargetWidth, bottomGraphHalfWidth);
@@ -264,6 +265,7 @@ class Segment34View extends WatchUi.WatchFace {
         propGraphData = p.getValue("histogramData") as Number;
         propGraphSize = p.getValue("histogramSize") as Number;
         propGraphStyle = p.getValue("graphStyle") as Number;
+        propBottomGraphStyle = p.getValue("bottomGraphStyle") as Number;
         propGraphXAxisLabels = p.getValue("graphXAxisLabels") as Boolean;
         propGraphYAxisLabels = p.getValue("graphYAxisLabels") as Boolean;
         graphRenderer.clearCache();
@@ -1694,7 +1696,7 @@ class Segment34View extends WatchUi.WatchFace {
             ? GraphRenderer.graphCodeToDataSource(propBottomField2Shows) : 0;
         bottomGraphRenderer2.configure(
             graphBarWidth, graphBarSpacing, targetWidth, halfWidth, halfMarginY,
-            fontLabel, labelHeight, ds, 0, false, false,
+            fontLabel, labelHeight, ds, propBottomGraphStyle, false, false,
             0, propIs24H, propIsMetricDistance
         );
     }

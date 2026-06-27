@@ -883,6 +883,14 @@
         </settingConfig>
     </setting>
 
+    <setting propertyKey="@Properties.bottomGraphStyle" title="@Strings.settings_bottom_graph_style">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.settings_graph_style_bars</listEntry>
+            <listEntry value="1">@Strings.settings_graph_style_line</listEntry>
+            <listEntry value="2">@Strings.settings_graph_style_dots</listEntry>
+        </settingConfig>
+    </setting>
+
     <setting propertyKey="@Properties.batteryVariant" title="@Strings.settings_battery_display">
             <settingConfig type="list">
                 <listEntry value="-1">Auto (hidden for large font + bottom 5 digit shown)</listEntry>
