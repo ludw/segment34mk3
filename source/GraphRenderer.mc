@@ -11,6 +11,16 @@ import Toybox.WatchUi;
 
 class GraphRenderer {
 
+    // Mini graph field codes: 100–110 map to graph data sources 0–10.
+    // Used by bottomFieldShows / bottomField2Shows to select a graph instead of a data value.
+    static function isGraphCode(code as Number) as Boolean {
+        return code >= 100 and code <= 110;
+    }
+
+    static function graphCodeToDataSource(code as Number) as Number {
+        return code - 100;
+    }
+
     // Layout params (set via configure())
     hidden var _barWidth as Number = 2;
     hidden var _barSpacing as Number = 2;
@@ -40,7 +50,28 @@ class GraphRenderer {
     hidden var _cachedXLabelLeft as String = "";
     hidden var _cachedXLabelRight as String = "";
 
+    // Data cache: avoids expensive SensorHistory iteration on sub-minute updates.
+    // Shared by top graph and mini graph — each GraphRenderer instance caches independently.
+    hidden var _cachedData as Array<Number>? = null;
+    hidden var _cachedDataSource as Number = -1;
+    hidden var _cachedMinute as Number = -1;
+
     function initialize() {}
+
+    // Returns cached graph data, re-fetching only when the minute changes or the data source changes.
+    // SensorHistory updates at most once per minute, so more frequent reads are wasted CPU.
+    function getCachedDataArray(dataSource as Number, currentMinute as Number) as Array<Number>? {
+        if(_cachedData == null or currentMinute != _cachedMinute or dataSource != _cachedDataSource) {
+            _cachedData = getDataArrayByType(dataSource);
+            _cachedDataSource = dataSource;
+            _cachedMinute = currentMinute;
+        }
+        return _cachedData;
+    }
+
+    function clearCache() as Void {
+        _cachedData = null;
+    }
 
     function configure(
         barWidth as Number,

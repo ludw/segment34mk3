@@ -67,12 +67,6 @@ class Segment34View extends WatchUi.WatchFace {
     hidden var propGraphYAxisLabels as Boolean = false;
     hidden var bottomFieldWidths as Array<Number> = [3, 3, 3, 0];
 
-    // Cached graph data — sensor history only changes once per minute,
-    // so we skip the expensive SensorHistory iteration on sub-minute updates.
-    hidden var cachedGraphData as Array<Number>? = null;
-    hidden var cachedGraphDataSource as Number = -1;
-    hidden var lastGraphMinute as Number = -1;
-
     hidden var fontMoon as WatchUi.FontResource?;
     hidden var fontIcons as WatchUi.FontResource?;
     hidden var fontClock as WatchUi.FontResource?;
@@ -116,6 +110,8 @@ class Segment34View extends WatchUi.WatchFace {
     hidden var dataHelper as DataHelper = new DataHelper();
     hidden var weatherHelper as WeatherDisplayHelper = new WeatherDisplayHelper();
     hidden var graphRenderer as GraphRenderer = new GraphRenderer();
+    hidden var bottomGraphRenderer as GraphRenderer = new GraphRenderer();
+    (:Square) hidden var bottomGraphRenderer2 as GraphRenderer = new GraphRenderer();
     public var resolver as ValueResolver = new ValueResolver(weatherHelper, dataHelper);
     
     hidden var propIs24H as Boolean = false;
@@ -236,6 +232,18 @@ class Segment34View extends WatchUi.WatchFace {
             propFontSize == 1 ? 1 : 0, propIs24H, propIsMetricDistance
         );
 
+        var bottomFieldWidth = bottomDataWidth * 5;
+        var bottomGraphTargetWidth = Math.round(bottomFieldWidth / 2);
+        var bottomGraphHalfWidth = Math.round(bottomFieldWidth / 2);
+        var bottomGraphDataSource = GraphRenderer.isGraphCode(propBottomFieldShows)
+            ? GraphRenderer.graphCodeToDataSource(propBottomFieldShows) : 0;
+        bottomGraphRenderer.configure(
+            1, 1, bottomGraphTargetWidth, bottomGraphHalfWidth, halfMarginY,
+            fontLabel, labelHeight, bottomGraphDataSource, 0, false, false,
+            0, propIs24H, propIsMetricDistance
+        );
+        configureBottomGraphRenderer2(bottomGraphTargetWidth, bottomGraphHalfWidth);
+
         calculateLayout();
         calculateBarLimits();
         updateWeather();
@@ -258,7 +266,8 @@ class Segment34View extends WatchUi.WatchFace {
         propGraphStyle = p.getValue("graphStyle") as Number;
         propGraphXAxisLabels = p.getValue("graphXAxisLabels") as Boolean;
         propGraphYAxisLabels = p.getValue("graphYAxisLabels") as Boolean;
-        cachedGraphData = null; // force graph data refresh when properties change
+        graphRenderer.clearCache();
+        bottomGraphRenderer.clearCache();
         propSunriseFieldShows = p.getValue("sunriseFieldShows") as Number;
         propSunsetFieldShows = p.getValue("sunsetFieldShows") as Number;
         propWeatherLine1Shows = p.getValue("weatherLine1Shows") as Number;
@@ -818,8 +827,10 @@ class Segment34View extends WatchUi.WatchFace {
             bottomFive1X = centerX - (gap / 2) - (fieldWidth / 2);
             bottomFive2X = centerX + (gap / 2) + (fieldWidth / 2);
 
-            // Shift the entire row DOWN to make room for labels above (only if labels visible)
-            if (propLabelVisibility == 0 or propLabelVisibility == 2) {
+            // Shift the entire row DOWN to make room for labels above (only if labels visible
+            // and at least one field is a non-graph field — graph fields have no labels)
+            if ((propLabelVisibility == 0 or propLabelVisibility == 2)
+                and (!GraphRenderer.isGraphCode(propBottomFieldShows) or !GraphRenderer.isGraphCode(propBottomField2Shows))) {
                 bottomFiveY = bottomFiveY + labelHeight + labelMargin;
             }
         } else {
@@ -944,21 +955,22 @@ class Segment34View extends WatchUi.WatchFace {
         
         values[:dataClock] = getClockData(now);
         values[:dataMoon] = (propTopPartShows == 0) ? moonPhase(now, propHemisphere) : "";
+        var currentMinute = now.hour * 60 + now.min;
         if(propTopPartShows == 2) {
-            var currentMinute = now.hour * 60 + now.min;
-            // Only re-fetch sensor history when the minute changes or the data source changed.
-            // SensorHistory updates at most once per minute, so more frequent reads are wasted.
-            if(cachedGraphData == null
-                    or currentMinute != lastGraphMinute
-                    or propGraphData != cachedGraphDataSource) {
-                cachedGraphData = graphRenderer.getDataArrayByType(propGraphData);
-                cachedGraphDataSource = propGraphData;
-                lastGraphMinute = currentMinute;
-            }
-            values[:dataGraph1] = cachedGraphData;
+            values[:dataGraph1] = graphRenderer.getCachedDataArray(propGraphData, currentMinute);
             values[:dataGraph1b] = (propGraphData == 10) ? graphRenderer.cachedGraphData2 : null;
         } else {
             values[:dataGraph1] = null;
+        }
+
+        // Bottom mini graph data (if bottomFieldShows is a graph code)
+        if(GraphRenderer.isGraphCode(propBottomFieldShows)) {
+            var ds = GraphRenderer.graphCodeToDataSource(propBottomFieldShows);
+            values[:dataBottomGraph] = bottomGraphRenderer.getCachedDataArray(ds, currentMinute);
+            values[:dataBottomGraph2b] = (ds == 10) ? bottomGraphRenderer.cachedGraphData2 : null;
+            values[:dataBottom] = "";
+        } else {
+            values[:dataBottomGraph] = null;
         }
 
         values[:dataLabelTopLeft] = resolver.strLabelTopLeft;
@@ -980,8 +992,10 @@ class Segment34View extends WatchUi.WatchFace {
         values[:dataBottomMiddle] = resolver.getValueByType(propMiddleValueShows, fieldWidths[1]);
         values[:dataBottomRight] = resolver.getValueByType(propRightValueShows, fieldWidths[2]);
         values[:dataBottomFourth] = resolver.getValueByType(propFourthValueShows, fieldWidths[3]);
-        values[:dataBottom] = resolver.getValueByType(propBottomFieldShows, 5);
-        computeBottomField2Values(values);
+        if(!GraphRenderer.isGraphCode(propBottomFieldShows)) {
+            values[:dataBottom] = resolver.getValueByType(propBottomFieldShows, 5);
+        }
+        computeBottomField2Values(values, currentMinute);
         values[:dataIcon1] = dataHelper.getIconState(propIcon1);
         values[:dataIcon2] = dataHelper.getIconState(propIcon2);
         values[:dataIcon1Count] = dataHelper.getIconCountOverlay(propIcon1);
@@ -1035,16 +1049,27 @@ class Segment34View extends WatchUi.WatchFace {
     }
 
     (:Square)
-    hidden function computeBottomField2Values(values as Dictionary) as Void {
-        values[:dataBottom2] = resolver.getValueByType(propBottomField2Shows, 5);
+    hidden function computeBottomField2Values(values as Dictionary, currentMinute as Number) as Void {
+        if(GraphRenderer.isGraphCode(propBottomField2Shows)) {
+            var ds = GraphRenderer.graphCodeToDataSource(propBottomField2Shows);
+            values[:dataBottom2Graph] = bottomGraphRenderer2.getCachedDataArray(ds, currentMinute);
+            values[:dataBottom2Graph2b] = (ds == 10) ? bottomGraphRenderer2.cachedGraphData2 : null;
+            values[:dataBottom2] = "";
+        } else {
+            values[:dataBottom2] = resolver.getValueByType(propBottomField2Shows, 5);
+        }
         if (propBottomFieldShows != -2 and propBottomField2Shows != -2) {
-            values[:dataLabelBottom] = resolver.getLabelByType(propBottomFieldShows, 2);
-            values[:dataLabelBottom2] = resolver.getLabelByType(propBottomField2Shows, 2);
+            if(!GraphRenderer.isGraphCode(propBottomFieldShows)) {
+                values[:dataLabelBottom] = resolver.getLabelByType(propBottomFieldShows, 2);
+            }
+            if(!GraphRenderer.isGraphCode(propBottomField2Shows)) {
+                values[:dataLabelBottom2] = resolver.getLabelByType(propBottomField2Shows, 2);
+            }
         }
     }
 
     (:Round)
-    hidden function computeBottomField2Values(values as Dictionary) as Void {
+    hidden function computeBottomField2Values(values as Dictionary, currentMinute as Number) as Void {
         // No-op for non-square devices devices
     }
 
@@ -1401,21 +1426,29 @@ class Segment34View extends WatchUi.WatchFace {
             var field1Left = bottomFive1X - (field1Width / 2);
             var field2Left = bottomFive2X - (field2Width / 2);
 
-            // Draw labels above fields - left aligned with field edge
+            // Draw labels above fields - only for non-graph fields
             if (propLabelVisibility == 0 or propLabelVisibility == 2) {
                 dc.setColor(theme.colors[fieldLbl], Graphics.COLOR_TRANSPARENT);
-                dc.drawText(field1Left, bottomFiveYOriginal, fontLabel, values[:dataLabelBottom], Graphics.TEXT_JUSTIFY_LEFT);
-                dc.drawText(field2Left, bottomFiveYOriginal, fontLabel, values[:dataLabelBottom2], Graphics.TEXT_JUSTIFY_LEFT);
+                if(!GraphRenderer.isGraphCode(propBottomFieldShows)) {
+                    dc.drawText(field1Left, bottomFiveYOriginal, fontLabel, values[:dataLabelBottom], Graphics.TEXT_JUSTIFY_LEFT);
+                }
+                if(!GraphRenderer.isGraphCode(propBottomField2Shows)) {
+                    dc.drawText(field2Left, bottomFiveYOriginal, fontLabel, values[:dataLabelBottom2], Graphics.TEXT_JUSTIFY_LEFT);
+                }
             }
 
-            // Draw both fields
-            drawDataField(dc, bottomFive1X, bottomFiveY, 3,
-                null, values[:dataBottom], 5,
-                fontBottomData, field1Width);
+            // Draw both fields (graph or text)
+            if(GraphRenderer.isGraphCode(propBottomFieldShows)) {
+                bottomGraphRenderer.drawGraph(dc, values[:dataBottomGraph], values[:dataBottomGraph2b], bottomFive1X, bottomFiveY, largeDataHeight, theme.colors);
+            } else {
+                drawDataField(dc, bottomFive1X, bottomFiveY, 3, null, values[:dataBottom], 5, fontBottomData, field1Width);
+            }
 
-            drawDataField(dc, bottomFive2X, bottomFiveY, 3,
-                null, values[:dataBottom2], 5,
-                fontBottomData, field2Width);
+            if(GraphRenderer.isGraphCode(propBottomField2Shows)) {
+                bottomGraphRenderer2.drawGraph(dc, values[:dataBottom2Graph], values[:dataBottom2Graph2b], bottomFive2X, bottomFiveY, largeDataHeight, theme.colors);
+            } else {
+                drawDataField(dc, bottomFive2X, bottomFiveY, 3, null, values[:dataBottom2], 5, fontBottomData, field2Width);
+            }
 
             // Icons on outer edges
             drawIconWithOverlay(dc, field1Left - (marginX / 2),
@@ -1425,8 +1458,14 @@ class Segment34View extends WatchUi.WatchFace {
                 bottomFiveY + (largeDataHeight / 2) + iconYAdj,
                 Graphics.TEXT_JUSTIFY_LEFT, values[:dataIcon2], values[:dataIcon2Count] as String, values[:dataIcon2Color] as Number?);
         } else {
-            // Single field - original behavior
-            var step_width = drawDataField(dc, centerX, bottomFiveY, 3, null, values[:dataBottom], 5, fontBottomData, bottomDataWidth * 5);
+            // Single field - graph or text
+            var step_width;
+            if(GraphRenderer.isGraphCode(propBottomFieldShows)) {
+                bottomGraphRenderer.drawGraph(dc, values[:dataBottomGraph], values[:dataBottomGraph2b], centerX, bottomFiveY, largeDataHeight, theme.colors);
+                step_width = bottomDataWidth * 5;
+            } else {
+                step_width = drawDataField(dc, centerX, bottomFiveY, 3, null, values[:dataBottom], 5, fontBottomData, bottomDataWidth * 5);
+            }
             var iconY = getBottomIconY(step_width);
 
             // Draw icons
@@ -1447,7 +1486,13 @@ class Segment34View extends WatchUi.WatchFace {
 
     (:Round)
     hidden function drawBottomFieldsWithIcons(dc as Dc, values as Dictionary) as Void {
-        var step_width = drawDataField(dc, centerX, bottomFiveY, 3, null, values[:dataBottom], 5, fontBottomData, bottomDataWidth * 5);
+        var step_width;
+        if(GraphRenderer.isGraphCode(propBottomFieldShows)) {
+            bottomGraphRenderer.drawGraph(dc, values[:dataBottomGraph], values[:dataBottomGraph2b], centerX, bottomFiveY, largeDataHeight, theme.colors);
+            step_width = bottomDataWidth * 5;
+        } else {
+            step_width = drawDataField(dc, centerX, bottomFiveY, 3, null, values[:dataBottom], 5, fontBottomData, bottomDataWidth * 5);
+        }
         var iconY = getBottomIconY(step_width);
 
         // Draw icons
@@ -1635,11 +1680,28 @@ class Segment34View extends WatchUi.WatchFace {
     (:Square)
     hidden function loadBottomField2Property() as Void {
         propBottomField2Shows = Application.Properties.getValue("bottomField2Shows") as Number;
+        bottomGraphRenderer2.clearCache();
     }
 
     (:Round)
     hidden function loadBottomField2Property() as Void {
         // No-op for non-square devices devices
+    }
+
+    (:Square)
+    hidden function configureBottomGraphRenderer2(targetWidth as Number, halfWidth as Number) as Void {
+        var ds = GraphRenderer.isGraphCode(propBottomField2Shows)
+            ? GraphRenderer.graphCodeToDataSource(propBottomField2Shows) : 0;
+        bottomGraphRenderer2.configure(
+            1, 1, targetWidth, halfWidth, halfMarginY,
+            fontLabel, labelHeight, ds, 0, false, false,
+            0, propIs24H, propIsMetricDistance
+        );
+    }
+
+    (:Round)
+    hidden function configureBottomGraphRenderer2(targetWidth as Number, halfWidth as Number) as Void {
+        // No-op for non-square devices
     }
 
 }

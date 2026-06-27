@@ -815,6 +815,17 @@
             <listEntry value="45">@Strings.settings_next_calendar_event_time</listEntry>
             <listEntry value="53">@Strings.settings_cgm_glucose_trend</listEntry>
             <listEntry value="30">@Strings.settings_battery_percentage</listEntry>
+            <listEntry value="100">@Strings.settings_graph_prefix_body_battery_history</listEntry>
+            <listEntry value="101">@Strings.settings_graph_prefix_elevation_history</listEntry>
+            <listEntry value="102">@Strings.settings_graph_prefix_heart_rate_history</listEntry>
+            <listEntry value="103">@Strings.settings_graph_prefix_oxygen_saturation_history</listEntry>
+            <listEntry value="104">@Strings.settings_graph_prefix_pressure_history</listEntry>
+            <listEntry value="105">@Strings.settings_graph_prefix_stress_history</listEntry>
+            <listEntry value="106">@Strings.settings_graph_prefix_temperature_sensor_history</listEntry>
+            <listEntry value="107">@Strings.settings_graph_prefix_stress_rest_orange_blue</listEntry>
+            <listEntry value="108">@Strings.settings_graph_prefix_daily_distance_7d</listEntry>
+            <listEntry value="109">@Strings.settings_graph_prefix_daily_steps_7d</listEntry>
+            <listEntry value="110">@Strings.settings_graph_prefix_daily_active_minutes_7d</listEntry>
         </settingConfig>
     </setting>
 
@@ -858,6 +869,17 @@
             <listEntry value="45">@Strings.settings_next_calendar_event_time</listEntry>
             <listEntry value="53">@Strings.settings_cgm_glucose_trend</listEntry>
             <listEntry value="30">@Strings.settings_battery_percentage</listEntry>
+            <listEntry value="100">@Strings.settings_graph_prefix_body_battery_history</listEntry>
+            <listEntry value="101">@Strings.settings_graph_prefix_elevation_history</listEntry>
+            <listEntry value="102">@Strings.settings_graph_prefix_heart_rate_history</listEntry>
+            <listEntry value="103">@Strings.settings_graph_prefix_oxygen_saturation_history</listEntry>
+            <listEntry value="104">@Strings.settings_graph_prefix_pressure_history</listEntry>
+            <listEntry value="105">@Strings.settings_graph_prefix_stress_history</listEntry>
+            <listEntry value="106">@Strings.settings_graph_prefix_temperature_sensor_history</listEntry>
+            <listEntry value="107">@Strings.settings_graph_prefix_stress_rest_orange_blue</listEntry>
+            <listEntry value="108">@Strings.settings_graph_prefix_daily_distance_7d</listEntry>
+            <listEntry value="109">@Strings.settings_graph_prefix_daily_steps_7d</listEntry>
+            <listEntry value="110">@Strings.settings_graph_prefix_daily_active_minutes_7d</listEntry>
         </settingConfig>
     </setting>
 
