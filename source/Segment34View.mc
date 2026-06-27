@@ -233,12 +233,12 @@ class Segment34View extends WatchUi.WatchFace {
         );
 
         var bottomFieldWidth = bottomDataWidth * 5;
-        var bottomGraphTargetWidth = Math.round(bottomFieldWidth / 2);
+        var bottomGraphTargetWidth = Math.round(bottomFieldWidth / (graphBarWidth + graphBarSpacing));
         var bottomGraphHalfWidth = Math.round(bottomFieldWidth / 2);
         var bottomGraphDataSource = GraphRenderer.isGraphCode(propBottomFieldShows)
             ? GraphRenderer.graphCodeToDataSource(propBottomFieldShows) : 0;
         bottomGraphRenderer.configure(
-            1, 1, bottomGraphTargetWidth, bottomGraphHalfWidth, halfMarginY,
+            graphBarWidth, graphBarSpacing, bottomGraphTargetWidth, bottomGraphHalfWidth, halfMarginY,
             fontLabel, labelHeight, bottomGraphDataSource, 0, false, false,
             0, propIs24H, propIsMetricDistance
         );
@@ -1693,7 +1693,7 @@ class Segment34View extends WatchUi.WatchFace {
         var ds = GraphRenderer.isGraphCode(propBottomField2Shows)
             ? GraphRenderer.graphCodeToDataSource(propBottomField2Shows) : 0;
         bottomGraphRenderer2.configure(
-            1, 1, targetWidth, halfWidth, halfMarginY,
+            graphBarWidth, graphBarSpacing, targetWidth, halfWidth, halfMarginY,
             fontLabel, labelHeight, ds, 0, false, false,
             0, propIs24H, propIsMetricDistance
         );
