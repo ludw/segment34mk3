@@ -176,6 +176,8 @@
     <string id="LABEL_ACC_2">POS GEN</string>
     <string id="LABEL_UV_1">UV</string>
     <string id="LABEL_UV_2">UV INDEX</string>
+    <string id="LABEL_UVMAX_1">UVMX</string>
+    <string id="LABEL_UVMAX_2">MAX UV (8H)</string>
     <string id="LABEL_HUM_1">FEUCHT</string>
     <string id="LABEL_HUM_2">LUFTFEUCHTIGKEIT</string>
 

@@ -176,6 +176,8 @@
     <string id="LABEL_ACC_2">POS ACC</string>
     <string id="LABEL_UV_1">UV</string>
     <string id="LABEL_UV_2">UV INDEX</string>
+    <string id="LABEL_UVMAX_1">UVMX</string>
+    <string id="LABEL_UVMAX_2">MAX UV (8H)</string>
     <string id="LABEL_HUM_1">HUM</string>
     <string id="LABEL_HUM_2">HUMIDITY</string>
     <string id="LABEL_CGM">CGM</string>
@@ -321,6 +323,7 @@
     <string id="settings_weather_chance_precipitation" scope="settings">Weather: Chance of Precipitation</string>
     <string id="settings_weather_humidity" scope="settings">Weather: Humidity</string>
     <string id="settings_weather_uv_index" scope="settings">Weather: UV index</string>
+    <string id="settings_weather_uv_index_max" scope="settings">Weather: Max UV index (next 8h)</string>
     <string id="settings_next_calendar_event" scope="settings">Next calendar event time</string>
     <string id="settings_next_calendar_event_time" scope="settings">Next calendar event time</string>
     <string id="settings_top_right_small" scope="settings">Top right small data field:</string>
@@ -369,8 +372,8 @@
     <string id="settings_date" scope="settings">Date</string>
     <string id="settings_weather_data_1" scope="settings">Weather data 1 (specify format below)</string>
     <string id="settings_weather_data_2" scope="settings">Weather data 2 (specify format below)</string>
-    <string id="settings_weather_format_1" scope="settings">Weather data 1 format (t=temp w=wind g=gust h=humidity p=precip% r=precip_amount u=UV l=high/low f=feels c=conditions s=shortened conditions n=city(OWM only) o=obs_time)</string>
-    <string id="settings_weather_format_2" scope="settings">Weather data 2 format (t=temp w=wind g=gust h=humidity p=precip% r=precip_amount u=UV l=high/low f=feels c=conditions s=shortened conditions n=city(OWM only) o=obs_time)</string>
+    <string id="settings_weather_format_1" scope="settings">Weather data 1 format (t=temp w=wind g=gust h=humidity p=precip% r=precip_amount u=UV m=max UV next 8h l=high/low f=feels c=conditions s=shortened conditions n=city(OWM only) o=obs_time)</string>
+    <string id="settings_weather_format_2" scope="settings">Weather data 2 format (t=temp w=wind g=gust h=humidity p=precip% r=precip_amount u=UV m=max UV next 8h l=high/low f=feels c=conditions s=shortened conditions n=city(OWM only) o=obs_time)</string>
     <string id="settings_steps_day" scope="settings">Steps / day (thousands if not enough room)</string>
     <string id="settings_wheelchair_pushes_day" scope="settings">Wheelchair pushes / day</string>
     <string id="settings_calories_kcal_day_2" scope="settings">Calories (kcal) / day</string>
@@ -528,6 +531,7 @@
     <string id="settings_owm_api_key" scope="settings">OWM API key</string>
     <string id="settings_owm_location_override" scope="settings">Location override (lat,lon e.g. 51.5,-0.1 — leave empty to use Garmin location)</string>
     <string id="settings_owm_refresh_interval" scope="settings">Weather refresh interval</string>
+    <string id="settings_uv_index_clear_sky" scope="settings">UV index: clear sky (Open-Meteo only)</string>
     <string id="settings_every_15_min" scope="settings">Every 15 min</string>
     <string id="settings_every_30_min" scope="settings">Every 30 min</string>
     <string id="settings_every_hour" scope="settings">Every hour</string>

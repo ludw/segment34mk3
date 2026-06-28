@@ -176,6 +176,8 @@
     <string id="LABEL_ACC_2">PRÉC. POS</string>
     <string id="LABEL_UV_1">UV</string>
     <string id="LABEL_UV_2">INDICE UV</string>
+    <string id="LABEL_UVMAX_1">UVMX</string>
+    <string id="LABEL_UVMAX_2">INDICE UV MAX (8H)</string>
     <string id="LABEL_HUM_1">HUM</string>
     <string id="LABEL_HUM_2">HUMIDITÉ</string>
 

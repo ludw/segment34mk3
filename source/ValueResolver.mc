@@ -203,6 +203,7 @@ class ValueResolver {
             case 49: return _dataHelper.getLocationMgrsFormatted();
             case 50: return _dataHelper.getLocationAccuracyFormatted(width);
             case 51: return _weatherHelper.getUVIndex();
+            case 75: return _weatherHelper.getMaxUvIndexNext8h();
             case 52: return _weatherHelper.getHumidity();
             case 53: return _dataHelper.getCgmReading();
             case 54: return _dataHelper.getCgmAge();
@@ -340,6 +341,7 @@ class ValueResolver {
             case 47: return formatLabel(Rez.Strings.LABEL_OX_1, Rez.Strings.LABEL_OX_2, labelSize);
             case 50: return formatLabel(Rez.Strings.LABEL_ACC_1, Rez.Strings.LABEL_ACC_2, labelSize);
             case 51: return formatLabel(Rez.Strings.LABEL_UV_1, Rez.Strings.LABEL_UV_2, labelSize);
+            case 75: return formatLabel(Rez.Strings.LABEL_UVMAX_1, Rez.Strings.LABEL_UVMAX_2, labelSize);
             case 52: return formatLabel(Rez.Strings.LABEL_HUM_1, Rez.Strings.LABEL_HUM_2, labelSize);
             case 53: return WatchUi.loadResource(Rez.Strings.LABEL_CGM) as String;
             case 54: return WatchUi.loadResource(Rez.Strings.LABEL_CGMAGE) as String;

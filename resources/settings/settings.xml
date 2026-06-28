@@ -213,6 +213,7 @@
             <listEntry value="42">@Strings.settings_weather_chance_precipitation</listEntry>
             <listEntry value="52">@Strings.settings_weather_humidity</listEntry>
             <listEntry value="51">@Strings.settings_weather_uv_index</listEntry>
+            <listEntry value="75">@Strings.settings_weather_uv_index_max</listEntry>
             <listEntry value="45">@Strings.settings_next_calendar_event</listEntry>
             <listEntry value="53">@Strings.settings_cgm_glucose_trend</listEntry>
             <listEntry value="54">@Strings.settings_cgm_age</listEntry>
@@ -282,6 +283,7 @@
             <listEntry value="42">@Strings.settings_weather_chance_precipitation</listEntry>
             <listEntry value="52">@Strings.settings_weather_humidity</listEntry>
             <listEntry value="51">@Strings.settings_weather_uv_index</listEntry>
+            <listEntry value="75">@Strings.settings_weather_uv_index_max</listEntry>
             <listEntry value="45">@Strings.settings_next_calendar_event</listEntry>
             <listEntry value="53">@Strings.settings_cgm_glucose_trend</listEntry>
             <listEntry value="54">@Strings.settings_cgm_age</listEntry>
@@ -353,6 +355,10 @@
             <listEntry value="3600">@Strings.settings_every_hour</listEntry>
             <listEntry value="7200">@Strings.settings_every_2_hours</listEntry>
         </settingConfig>
+    </setting>
+
+    <setting propertyKey="@Properties.uvIndexClearSky" title="@Strings.settings_uv_index_clear_sky">
+        <settingConfig type="boolean" />
     </setting>
 
     <setting propertyKey="@Properties.weatherLine1Shows" title="@Strings.settings_line_1_above_clock">
@@ -439,6 +445,7 @@
             <listEntry value="31">@Strings.settings_battery_days_remaining</listEntry>
             <listEntry value="38">@Strings.settings_alarms_count</listEntry>
             <listEntry value="51">@Strings.settings_weather_uv_index</listEntry>
+            <listEntry value="75">@Strings.settings_weather_uv_index_max</listEntry>
             <listEntry value="13">@Strings.settings_body_battery</listEntry>
             <listEntry value="12">@Strings.settings_stress_score</listEntry>
             <listEntry value="47">@Strings.settings_pulse_ox</listEntry>
@@ -463,6 +470,7 @@
             <listEntry value="31">@Strings.settings_battery_days_remaining</listEntry>
             <listEntry value="38">@Strings.settings_alarms_count</listEntry>
             <listEntry value="51">@Strings.settings_weather_uv_index</listEntry>
+            <listEntry value="75">@Strings.settings_weather_uv_index_max</listEntry>
             <listEntry value="13">@Strings.settings_body_battery</listEntry>
             <listEntry value="12">@Strings.settings_stress_score</listEntry>
             <listEntry value="47">@Strings.settings_pulse_ox</listEntry>
@@ -562,6 +570,7 @@
             <listEntry value="42">@Strings.settings_weather_chance_precipitation</listEntry>
             <listEntry value="52">@Strings.settings_weather_humidity</listEntry>
             <listEntry value="51">@Strings.settings_weather_uv_index</listEntry>
+            <listEntry value="75">@Strings.settings_weather_uv_index_max</listEntry>
             <listEntry value="50">@Strings.settings_current_location_accuracy</listEntry>
             <listEntry value="45">@Strings.settings_next_calendar_event</listEntry>
             <listEntry value="53">@Strings.settings_cgm_glucose_trend</listEntry>
@@ -631,6 +640,7 @@
             <listEntry value="42">@Strings.settings_weather_chance_precipitation</listEntry>
             <listEntry value="52">@Strings.settings_weather_humidity</listEntry>
             <listEntry value="51">@Strings.settings_weather_uv_index</listEntry>
+            <listEntry value="75">@Strings.settings_weather_uv_index_max</listEntry>
             <listEntry value="50">@Strings.settings_current_location_accuracy</listEntry>
             <listEntry value="45">@Strings.settings_next_calendar_event</listEntry>
             <listEntry value="53">@Strings.settings_cgm_glucose_trend</listEntry>
@@ -700,6 +710,7 @@
             <listEntry value="42">@Strings.settings_weather_chance_precipitation</listEntry>
             <listEntry value="52">@Strings.settings_weather_humidity</listEntry>
             <listEntry value="51">@Strings.settings_weather_uv_index</listEntry>
+            <listEntry value="75">@Strings.settings_weather_uv_index_max</listEntry>
             <listEntry value="50">@Strings.settings_current_location_accuracy</listEntry>
             <listEntry value="45">@Strings.settings_next_calendar_event</listEntry>
             <listEntry value="53">@Strings.settings_cgm_glucose_trend</listEntry>
@@ -769,6 +780,7 @@
             <listEntry value="42">@Strings.settings_weather_chance_precipitation</listEntry>
             <listEntry value="52">@Strings.settings_weather_humidity</listEntry>
             <listEntry value="51">@Strings.settings_weather_uv_index</listEntry>
+            <listEntry value="75">@Strings.settings_weather_uv_index_max</listEntry>
             <listEntry value="50">@Strings.settings_current_location_accuracy</listEntry>
             <listEntry value="45">@Strings.settings_next_calendar_event</listEntry>
             <listEntry value="53">@Strings.settings_cgm_glucose_trend</listEntry>
@@ -1026,6 +1038,7 @@
             <listEntry value="42">@Strings.settings_weather_chance_precipitation</listEntry>
             <listEntry value="52">@Strings.settings_weather_humidity</listEntry>
             <listEntry value="51">@Strings.settings_weather_uv_index</listEntry>
+            <listEntry value="75">@Strings.settings_weather_uv_index_max</listEntry>
             <listEntry value="50">@Strings.settings_current_location_accuracy</listEntry>
             <listEntry value="45">@Strings.settings_next_calendar_event</listEntry>
             <listEntry value="53">@Strings.settings_cgm_glucose_trend</listEntry>

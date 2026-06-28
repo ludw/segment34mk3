@@ -21,7 +21,7 @@ class OpenMeteoService {
                 "latitude"        => lat,
                 "longitude"       => lon,
                 "current"         => "temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m",
-                "hourly"          => "temperature_2m,precipitation_probability,precipitation,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m,uv_index",
+                "hourly"          => "temperature_2m,precipitation_probability,precipitation,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m,uv_index,uv_index_clear_sky",
                 "daily"           => "temperature_2m_max,temperature_2m_min",
                 "timeformat"      => "unixtime",
                 "forecast_days"   => 2,
@@ -86,6 +86,13 @@ class OpenMeteoService {
             var wDirs   = hourly.get("wind_direction_10m")       as Array?;
             var wGusts  = hourly.get("wind_gusts_10m")           as Array?;
             var uvArr   = hourly.get("uv_index")                 as Array?;
+            var uvClear = hourly.get("uv_index_clear_sky")        as Array?;
+
+            // UV source toggle (Open-Meteo only). When enabled, use clear-sky UV
+            // (matching Garmin's convention); otherwise use the cloud-adjusted value.
+            var useClearSky = false;
+            var toggle = Application.Properties.getValue("uvIndexClearSky");
+            if (toggle != null && (toggle as Boolean)) { useClearSky = true; }
 
             if (times != null) {
                 var count = times.size();
@@ -102,7 +109,8 @@ class OpenMeteoService {
                     if (wSpeeds != null && wSpeeds[i]  != null) { tmp["windSpeed"]          = (wSpeeds[i] as Float).toFloat(); }
                     if (wDirs   != null && wDirs[i]    != null) { tmp["windBearing"]        = (wDirs[i]   as Float).toNumber(); }
                     if (wGusts  != null && wGusts[i]   != null) { tmp["windGust"]           = (wGusts[i]  as Float).toFloat(); }
-                    if (uvArr   != null && uvArr[i]    != null) { tmp["uvIndex"]            = (uvArr[i]   as Float).toFloat(); }
+                    var uvSrc = useClearSky ? uvClear : uvArr;
+                    if (uvSrc   != null && uvSrc[i]    != null) { tmp["uvIndex"]            = (uvSrc[i]   as Float).toFloat(); }
                     hf_data.add(tmp);
                 }
             }
@@ -113,7 +121,9 @@ class OpenMeteoService {
                 var pop0 = first.get("precipitationChance");
                 if (pop0 != null) { cc_data["precipitationChance"] = pop0; }
                 var uv0 = first.get("uvIndex");
-                if (uv0 != null) { cc_data["uvIndex"] = uv0; }
+                if (uv0 != null) {
+                    cc_data["uvIndex"] = uv0;
+                }
             }
         }
 

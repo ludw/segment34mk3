@@ -181,6 +181,37 @@ class WeatherDisplayHelper {
         return ret;
     }
 
+    // Max UV index over the next 8 hours from hourly_forecast in Application.Storage.
+    // Window matches getPrecipitationDataArray: -3600 <= secsAhead < 8*3600.
+    // Static so it can be exercised by unit tests and reused outside the helper.
+    static function maxUvIndexNext8h(hf_data as Array?, nowEpoch as Number) as Lang.Float or Null {
+        if (hf_data == null || hf_data.size() == 0) { return null; }
+        var maxUv = null as Lang.Float?;
+        for (var i = 0; i < hf_data.size(); i++) {
+            var entry = hf_data[i] as Dictionary?;
+            if (entry == null) { continue; }
+            var ft = entry.get("forecastTime");
+            if (ft == null) { continue; }
+            var secsAhead = (ft as Number) - nowEpoch;
+            if (secsAhead < -3600 or secsAhead >= 8 * 3600) { continue; }
+            var uv = entry.get("uvIndex");
+            if (uv == null) { continue; }
+            var uvF = uv as Float;
+            if (maxUv == null or uvF > (maxUv as Float)) {
+                maxUv = uvF;
+            }
+        }
+        return maxUv;
+    }
+
+    // String wrapper for ValueResolver and the weather-format token 'U'.
+    public function getMaxUvIndexNext8h() as String {
+        var hf_data = Application.Storage.getValue("hourly_forecast") as Array?;
+        var maxUv = maxUvIndexNext8h(hf_data, Time.now().value());
+        if (maxUv == null) { return ""; }
+        return (maxUv as Float).format("%d");
+    }
+
     function getHighLow() as String {
         var ret = "";
         if (_w != null) {
@@ -213,6 +244,7 @@ class WeatherDisplayHelper {
             else if (ch.equals("p")) { result = result + getPrecip(); }
             else if (ch.equals("r")) { result = result + getPrecipAmount(); }
             else if (ch.equals("u")) { result = result + getUVIndex(); }
+            else if (ch.equals("m")) { result = result + getMaxUvIndexNext8h(); }
             else if (ch.equals("l")) { result = result + getHighLow(); }
             else if (ch.equals("f")) { result = result + getFeelsLike(); }
             else if (ch.equals("c")) { result = result + getWeatherCondition(); }

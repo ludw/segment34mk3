@@ -71,6 +71,7 @@ class GraphRenderer {
 
     function clearCache() as Void {
         _cachedData = null;
+        _cachedXLabelEpochMin = -1;
     }
 
     function configure(
@@ -103,6 +104,8 @@ class GraphRenderer {
         _xLabelYOffset = xLabelYOffset;
         _propIs24H = propIs24H;
         _propIsMetricDistance = propIsMetricDistance;
+        // Invalidate X-axis label cache: graph type / time format may have changed.
+        _cachedXLabelEpochMin = -1;
     }
 
     function drawGraph(dc as Graphics.Dc, data as Array<Number>?, data2 as Array<Number>?, x as Number, y as Number, h as Number, themeColors as Array<Graphics.ColorType>) as Void {
@@ -521,22 +524,10 @@ class GraphRenderer {
 
         var hf_data = Application.Storage.getValue("hourly_forecast") as Array?;
         if(hf_data == null || hf_data.size() == 0) {
-            Toybox.System.println("[Precip] no hourly_forecast in Storage");
             return [];
         }
 
         var nowEpoch = Time.now().value();
-        Toybox.System.println("[Precip] hourly_forecast entries=" + hf_data.size());
-        for(var k = 0; k < hf_data.size(); k++) {
-            var e = hf_data[k] as Dictionary?;
-            if(e == null) { continue; }
-            var ft = e.get("forecastTime");
-            var pop = e.get("precipitationChance");
-            var amt = e.get("precipitationAmount");
-            var sa = ft != null ? (ft as Number) - nowEpoch : -999999;
-            Toybox.System.println("[Precip] [" + k + "] secsAhead=" + sa + " pop=" + pop + " amount=" + amt);
-        }
-
         var ret = [];
 
         for(var i = 0; i < hf_data.size(); i++) {
@@ -556,7 +547,6 @@ class GraphRenderer {
             }
         }
 
-        Toybox.System.println("[Precip] probability bars=" + ret.size());
         return ret;
     }
 
@@ -588,8 +578,6 @@ class GraphRenderer {
             ret.add(mm);
             if(mm > maxMm) { maxMm = mm; }
         }
-
-        Toybox.System.println("[PrecipAmt] bars=" + ret.size() + " maxMm=" + maxMm);
 
         if(maxMm > 0) {
             cachedGraphYMax = maxMm;

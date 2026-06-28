@@ -176,6 +176,8 @@
     <string id="LABEL_ACC_2">DOKŁ. POZ</string>
     <string id="LABEL_UV_1">UV</string>
     <string id="LABEL_UV_2">INDEKS UV</string>
+    <string id="LABEL_UVMAX_1">UVMX</string>
+    <string id="LABEL_UVMAX_2">MAKS UV (8H)</string>
     <string id="LABEL_HUM_1">WILG</string>
     <string id="LABEL_HUM_2">WILG</string>
 

@@ -84,7 +84,9 @@ For refactorings and optimizations keep in mind that:
 ## Change log
 2.1
 - Option to show a small graph instead of the bottom 5 digit field
-
+- Percipitation chance or amount next 8h as graph
+- Option for max UV index next 8h
+- Toggle for UV index for clear sky or incl cloud coverage
 
 2.0
 - Option for a narrow ":" separating hours and min
