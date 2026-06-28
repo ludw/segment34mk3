@@ -78,9 +78,11 @@ function formatGraphAxisValue(val as Float) as String {
     if(n < 0) {
         var abs = (-val).toNumber();
         if(abs >= 1000) { return "-" + (abs / 1000).toString() + "K"; }
+        if(abs < 10) { return "-" + val.format("%.1f"); }
         return "-" + abs.toString();
     }
     if(n >= 1000) { return (n / 1000).toString() + "K"; }
+    if(n < 10) { return val.format("%.1f"); }
     return n.toString();
 }
 

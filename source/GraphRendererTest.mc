@@ -7,14 +7,14 @@ import Toybox.Lang;
 (:test)
 function testIsGraphCodeTrue(logger as Test.Logger) as Boolean {
     return GraphRenderer.isGraphCode(100)
-        && GraphRenderer.isGraphCode(111)
+        && GraphRenderer.isGraphCode(112)
         && GraphRenderer.isGraphCode(105);
 }
 
 (:test)
 function testIsGraphCodeFalse(logger as Test.Logger) as Boolean {
     return !GraphRenderer.isGraphCode(99)
-        && !GraphRenderer.isGraphCode(112)
+        && !GraphRenderer.isGraphCode(113)
         && !GraphRenderer.isGraphCode(16)
         && !GraphRenderer.isGraphCode(-2);
 }
@@ -22,7 +22,7 @@ function testIsGraphCodeFalse(logger as Test.Logger) as Boolean {
 (:test)
 function testGraphCodeToDataSource(logger as Test.Logger) as Boolean {
     return GraphRenderer.graphCodeToDataSource(100) == 0
-        && GraphRenderer.graphCodeToDataSource(111) == 11
+        && GraphRenderer.graphCodeToDataSource(112) == 12
         && GraphRenderer.graphCodeToDataSource(105) == 5
         && GraphRenderer.graphCodeToDataSource(108) == 8;
 }

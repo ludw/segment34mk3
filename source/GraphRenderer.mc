@@ -11,10 +11,10 @@ import Toybox.WatchUi;
 
 class GraphRenderer {
 
-    // Mini graph field codes: 100–111 map to graph data sources 0–11.
+    // Mini graph field codes: 100–112 map to graph data sources 0–12.
     // Used by bottomFieldShows / bottomField2Shows to select a graph instead of a data value.
     static function isGraphCode(code as Number) as Boolean {
-        return code >= 100 and code <= 111;
+        return code >= 100 and code <= 112;
     }
 
     static function graphCodeToDataSource(code as Number) as Number {
@@ -113,7 +113,7 @@ class GraphRenderer {
 
         if(_propGraphYAxisLabels) { y = y + _halfMarginY; }
 
-        if(_propGraphData == 11) {
+        if(_propGraphData == 11 or _propGraphData == 12) {
             // Precipitation: fill graph area with tighter spacing than daily data
             var n = data.size();
             bs = 2;
@@ -276,7 +276,7 @@ class GraphRenderer {
         var epochMin = nowMoment.value() / 60;
         if (epochMin == _cachedXLabelEpochMin) { return; }
         _cachedXLabelEpochMin = epochMin;
-        if (_propGraphData == 11) {
+        if (_propGraphData == 11 or _propGraphData == 12) {
             // Precipitation: show current time and time +8h
             var infoNow = Time.Gregorian.info(nowMoment, Time.FORMAT_SHORT);
             var target8h = nowMoment.add(new Time.Duration(8 * 3600));
@@ -317,6 +317,9 @@ class GraphRenderer {
         }
         if(dataSource == 11) {
             return getPrecipitationDataArray();
+        }
+        if(dataSource == 12) {
+            return getPrecipitationAmountDataArray();
         }
 
         var twoHours = new Time.Duration(7200);
@@ -508,9 +511,57 @@ class GraphRenderer {
         return 0;
     }
 
-    // Precipitation probability (0–100%) for the next 12 hours from hourly forecast.
+    // Precipitation probability (0–100%) for the next 8 hours from hourly forecast.
     // Works with any weather provider that stores hourly_forecast in Application.Storage.
     hidden function getPrecipitationDataArray() as Array<Number> {
+        graphGoalLine = null;
+        cachedGraphData2 = null;
+        cachedGraphYMin = 0.0;
+        cachedGraphYMax = 100.0;
+
+        var hf_data = Application.Storage.getValue("hourly_forecast") as Array?;
+        if(hf_data == null || hf_data.size() == 0) {
+            Toybox.System.println("[Precip] no hourly_forecast in Storage");
+            return [];
+        }
+
+        var nowEpoch = Time.now().value();
+        Toybox.System.println("[Precip] hourly_forecast entries=" + hf_data.size());
+        for(var k = 0; k < hf_data.size(); k++) {
+            var e = hf_data[k] as Dictionary?;
+            if(e == null) { continue; }
+            var ft = e.get("forecastTime");
+            var pop = e.get("precipitationChance");
+            var amt = e.get("precipitationAmount");
+            var sa = ft != null ? (ft as Number) - nowEpoch : -999999;
+            Toybox.System.println("[Precip] [" + k + "] secsAhead=" + sa + " pop=" + pop + " amount=" + amt);
+        }
+
+        var ret = [];
+
+        for(var i = 0; i < hf_data.size(); i++) {
+            var entry = hf_data[i] as Dictionary?;
+            if(entry == null) { continue; }
+            var forecastTime = entry.get("forecastTime");
+            if(forecastTime == null) { continue; }
+
+            var secsAhead = (forecastTime as Number) - nowEpoch;
+            if(secsAhead < -3600 or secsAhead >= 8 * 3600) { continue; }
+
+            var pop = entry.get("precipitationChance");
+            if(pop != null) {
+                ret.add(pop as Number);
+            } else {
+                ret.add(0);
+            }
+        }
+
+        Toybox.System.println("[Precip] probability bars=" + ret.size());
+        return ret;
+    }
+
+    // Precipitation amount (mm) for the next 8 hours from hourly forecast.
+    hidden function getPrecipitationAmountDataArray() as Array<Number> {
         graphGoalLine = null;
         cachedGraphData2 = null;
         cachedGraphYMin = 0.0;
@@ -521,6 +572,7 @@ class GraphRenderer {
 
         var nowEpoch = Time.now().value();
         var ret = [];
+        var maxMm = 0.0;
 
         for(var i = 0; i < hf_data.size(); i++) {
             var entry = hf_data[i] as Dictionary?;
@@ -529,14 +581,23 @@ class GraphRenderer {
             if(forecastTime == null) { continue; }
 
             var secsAhead = (forecastTime as Number) - nowEpoch;
-            if(secsAhead < 0 or secsAhead >= 8 * 3600) { continue; }
+            if(secsAhead < -3600 or secsAhead >= 8 * 3600) { continue; }
 
-            var pop = entry.get("precipitationChance");
-            if(pop != null) {
-                ret.add(pop as Number);
-            } else {
-                ret.add(0);
+            var amount = entry.get("precipitationAmount");
+            var mm = amount != null ? (amount as Float).toFloat() : 0.0;
+            ret.add(mm);
+            if(mm > maxMm) { maxMm = mm; }
+        }
+
+        Toybox.System.println("[PrecipAmt] bars=" + ret.size() + " maxMm=" + maxMm);
+
+        if(maxMm > 0) {
+            cachedGraphYMax = maxMm;
+            var normalized = [];
+            for(var j = 0; j < ret.size(); j++) {
+                normalized.add(Math.round((ret[j] as Float) / maxMm * 100).toNumber());
             }
+            return normalized;
         }
 
         return ret;

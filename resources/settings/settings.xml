@@ -303,6 +303,7 @@
                 <listEntry value="9">@Strings.settings_daily_steps_7d</listEntry>
                 <listEntry value="10">@Strings.settings_daily_active_minutes_7d</listEntry>
                 <listEntry value="11">@Strings.settings_precipitation_next_8h</listEntry>
+                <listEntry value="12">@Strings.settings_precipitation_amount_next_8h</listEntry>
             </settingConfig>
         </setting>
 
@@ -828,6 +829,7 @@
             <listEntry value="109">@Strings.settings_graph_prefix_daily_steps_7d</listEntry>
             <listEntry value="110">@Strings.settings_graph_prefix_daily_active_minutes_7d</listEntry>
             <listEntry value="111">@Strings.settings_graph_prefix_precipitation_next_8h</listEntry>
+            <listEntry value="112">@Strings.settings_graph_prefix_precipitation_amount_next_8h</listEntry>
         </settingConfig>
     </setting>
 
@@ -883,6 +885,7 @@
             <listEntry value="109">@Strings.settings_graph_prefix_daily_steps_7d</listEntry>
             <listEntry value="110">@Strings.settings_graph_prefix_daily_active_minutes_7d</listEntry>
             <listEntry value="111">@Strings.settings_graph_prefix_precipitation_next_8h</listEntry>
+            <listEntry value="112">@Strings.settings_graph_prefix_precipitation_amount_next_8h</listEntry>
         </settingConfig>
     </setting>
 
