@@ -227,6 +227,7 @@ class ValueResolver {
             case 72:
             case 73: return _weatherHelper.getGoldenHourFormatted(complicationType, width);
             case 74: return getMoonIllumination();
+            case 76: return _dataHelper.getSleepScoreFormatted();
         }
         return "";
     }
@@ -360,6 +361,7 @@ class ValueResolver {
             case 72: return formatLabel(Rez.Strings.LABEL_GOLDEND_1, Rez.Strings.LABEL_GOLDEND_2, labelSize);
             case 73: return formatLabel(Rez.Strings.LABEL_GOLDENS_1, Rez.Strings.LABEL_GOLDENS_2, labelSize);
             case 74: return formatLabel(Rez.Strings.LABEL_MOON_ILLUM_1, Rez.Strings.LABEL_MOON_ILLUM_2, labelSize);
+            case 76: return Application.loadResource(Rez.Strings.LABEL_SLEEP);
         }
         return "";
     }

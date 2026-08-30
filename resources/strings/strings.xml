@@ -116,6 +116,7 @@
     <string id="LABEL_STRESS">STRESS</string>
     <string id="LABEL_BBAT_1">B BAT</string>
     <string id="LABEL_BBAT_2">BODY BATT</string>
+    <string id="LABEL_SLEEP">SLEEP</string>
     <string id="LABEL_STEPS">STEPS</string>
     <string id="LABEL_DIST_1">DIST</string>
     <string id="LABEL_DIST_2">M TODAY</string>
@@ -294,6 +295,7 @@
     <string id="settings_altitude_ft" scope="settings">Altitude (ft)</string>
     <string id="settings_stress_score" scope="settings">Stress score</string>
     <string id="settings_body_battery" scope="settings">Body battery</string>
+    <string id="settings_sleep_score" scope="settings">Sleep score</string>
     <string id="settings_sunrise_time" scope="settings">Sunrise time</string>
     <string id="settings_sunset_time" scope="settings">Sunset time</string>
     <string id="settings_next_sun_event" scope="settings">Next sun event (sunset/sunrise) time</string>

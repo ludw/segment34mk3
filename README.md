@@ -84,9 +84,13 @@ For refactorings and optimizations keep in mind that:
 - When is next rain/non-rain
     - 100% in 50 minutes - 60% in 2 days - Dry in 30 minutes - Dry 3 days - Dry 5 days
 - No spacing between notifications and seconds fields if high values
-- COMPLICATION_TYPE_SLEEP_SCORE
 
 ## Change log
+3.0
+- Fenix 9 series support
+- Sleep score as option
+- 
+
 2.1
 - Option to show a small graph instead of the bottom 5 digit field
 - Percipitation chance or amount next 8h as graph

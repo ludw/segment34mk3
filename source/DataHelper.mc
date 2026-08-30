@@ -55,6 +55,8 @@ class DataHelper {
             return getActMinGoalProgress();
         } else if (data_source == 6) {
             return getMoveBar();
+        } else if (data_source == 7) {
+            return getSleepScoreData();
         }
         return null;
     }
@@ -77,6 +79,15 @@ class DataHelper {
         try {
             var complication_bb = Complications.getComplication(new Complications.Id(Complications.COMPLICATION_TYPE_BODY_BATTERY));
             if (complication_bb != null && complication_bb.value != null) { return complication_bb.value; }
+        } catch(e) {}
+        return null;
+    }
+
+    function getSleepScoreData() as Number? {
+        try {
+            if (!(Complications has :COMPLICATION_TYPE_SLEEP_SCORE)) { return null; }
+            var complication_sleep = Complications.getComplication(new Complications.Id(Complications.COMPLICATION_TYPE_SLEEP_SCORE));
+            if (complication_sleep != null && complication_sleep.value != null) { return complication_sleep.value; }
         } catch(e) {}
         return null;
     }
@@ -637,6 +648,12 @@ class DataHelper {
     function getBBFormatted() as String {
         var bb = getBBData();
         if (bb != null) { return bb.format("%d"); }
+        return "";
+    }
+
+    function getSleepScoreFormatted() as String {
+        var sleep = getSleepScoreData();
+        if (sleep != null) { return sleep.format("%d"); }
         return "";
     }
 
