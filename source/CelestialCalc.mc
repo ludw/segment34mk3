@@ -117,7 +117,7 @@ function julianDay(year as Number, month as Number, day as Number) as Number {
 
 // Moon illumination percentage (0–100).
 // Based on the synodic month length of 29.53059 days.
-// Known new moon epoch: JD 2459966 (2023-01-22).
+// Known new moon epoch: JD 2459966 (2023-01-21, ~20:53 UTC).
 function moonIlluminationPercent(year as Number, month as Number, day as Number) as Number {
     var jd = julianDay(year, month, day);
     var days_since_new_moon = jd - 2459966;
@@ -139,32 +139,14 @@ function moonPhaseIndex(year as Number, month as Number, day as Number, propHemi
     var phase_frac = (days_since_new_moon / lunar_cycle);
     phase_frac = phase_frac - Math.floor(phase_frac);
     if (phase_frac < 0) { phase_frac += 1.0; }
-    var into_cycle = phase_frac * lunar_cycle;
 
     if (month == 5 && day == 4) {
         return 8;
     }
 
-    var moonPhaseIdx;
-    if (into_cycle < 3) {
-        moonPhaseIdx = 0;
-    } else if (into_cycle < 6) {
-        moonPhaseIdx = 1;
-    } else if (into_cycle < 10) {
-        moonPhaseIdx = 2;
-    } else if (into_cycle < 14) {
-        moonPhaseIdx = 3;
-    } else if (into_cycle < 18) {
-        moonPhaseIdx = 4;
-    } else if (into_cycle < 22) {
-        moonPhaseIdx = 5;
-    } else if (into_cycle < 26) {
-        moonPhaseIdx = 6;
-    } else if (into_cycle < 29) {
-        moonPhaseIdx = 7;
-    } else {
-        moonPhaseIdx = 0;
-    }
+    // 8 equal-width buckets (cycle/8 each), centered on the 8 named phases
+    // rather than starting at them, so each icon spans its exact phase ±half a bucket.
+    var moonPhaseIdx = Math.round(phase_frac * 8).toNumber() % 8;
 
     if (propHemisphere == 1) {
         moonPhaseIdx = (8 - moonPhaseIdx) % 8;

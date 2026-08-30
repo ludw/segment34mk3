@@ -249,8 +249,10 @@ class ValueResolver {
     }
 
     hidden function getMoonIllumination() as String {
-        var now = Time.Gregorian.info(Time.now(), Time.FORMAT_SHORT);
-        return moonIlluminationPercent(now.year, now.month, now.day).format("%d");
+        // Moon phase is a UTC-anchored calculation; using the device's local
+        // date here would shift the result by up to a day depending on timezone.
+        var utcNow = Time.Gregorian.utcInfo(Time.now(), Time.FORMAT_SHORT);
+        return moonIlluminationPercent(utcNow.year, utcNow.month, utcNow.day).format("%d");
     }
 
     hidden function getUnitByType(complicationType as Number) as String {
