@@ -18,6 +18,7 @@ fenix7.excludeAnnotations = Round280;Round360;Round390;Round416;Round454;AMOLED;
 fenix7pro.excludeAnnotations = Round280;Round360;Round390;Round416;Round454;AMOLED;Square
 fenix7pronowifi.excludeAnnotations = Round280;Round360;Round390;Round416;Round454;AMOLED;Square
 fenix8solar47mm.excludeAnnotations = Round280;Round360;Round390;Round416;Round454;AMOLED;Square
+fenix9prosolar47mm.excludeAnnotations = Round280;Round360;Round390;Round416;Round454;AMOLED;Square
 
 # -----------------------------------------------------------------------------
 # 280x280 MIP DEVICES
@@ -28,6 +29,7 @@ fenix7xpro.excludeAnnotations = Round260;Round360;Round390;Round416;Round454;AMO
 fenix7xpronowifi.excludeAnnotations = Round260;Round360;Round390;Round416;Round454;AMOLED;Square
 fenix8solar51mm.excludeAnnotations = Round260;Round360;Round390;Round416;Round454;AMOLED;Square
 enduro3.excludeAnnotations = Round260;Round360;Round390;Round416;Round454;AMOLED;Square
+fenix9prosolar51mm.excludeAnnotations = Round260;Round360;Round390;Round416;Round454;AMOLED;Square
 
 # -----------------------------------------------------------------------------
 # 390x390 AMOLED DEVICES
@@ -66,6 +68,8 @@ fr265.excludeAnnotations = Round260;Round280;Round360;Round390;Round454;MIP;Squa
 fenix843mm.excludeAnnotations = Round260;Round280;Round360;Round390;Round454;MIP;Square
 fenixe.excludeAnnotations = Round260;Round280;Round360;Round390;Round454;MIP;Square
 instinct3amoled50mm.excludeAnnotations = Round260;Round280;Round360;Round390;Round454;MIP;Square
+fenix943mm.excludeAnnotations = Round260;Round280;Round360;Round390;Round454;MIP;Square
+fenix9pro43mm.excludeAnnotations = Round260;Round280;Round360;Round390;Round454;MIP;Square
 
 # -----------------------------------------------------------------------------
 # 454x454 AMOLED DEVICES
@@ -82,6 +86,9 @@ descentmk351mm.excludeAnnotations = Round260;Round280;Round360;Round390;Round416
 d2mach2.excludeAnnotations = Round260;Round280;Round360;Round390;Round416;MIP;Square
 approachs7047mm.excludeAnnotations = Round260;Round280;Round360;Round390;Round416;MIP;Square
 venu445mm.excludeAnnotations = Round260;Round280;Round360;Round390;Round416;MIP;Square
+fenix947mm.excludeAnnotations = Round260;Round280;Round360;Round390;Round416;MIP;Square
+fenix9pro47mm.excludeAnnotations = Round260;Round280;Round360;Round390;Round416;MIP;Square
+fenix9pro51mm.excludeAnnotations = Round260;Round280;Round360;Round390;Round416;MIP;Square
 
 # -----------------------------------------------------------------------------
 # 448x486 RECTANGLE AMOLED DEVICES
