@@ -120,3 +120,8 @@ CPU usage directly impacts battery life. Avoid unnecessary CPU cycles. Balance C
 ### Settings properties vs. runtime storage
 - `Application.Properties` — user-visible settings defined in `resources/settings/properties.xml`. Read-only at runtime; loaded into `prop*` vars.
 - `Application.Storage` — runtime key/value store used for OWM weather cache (`current_conditions`, `hourly_forecast`, `owm_last_update`, `owm_error`) and persistent counters (`dailyCounter`, etc.). This is the only channel between background and foreground contexts.
+
+### Build performance & Monkey C type checker (`as Dictionary`)
+Always annotate local dictionary literals with `as Dictionary` when keys are added conditionally or mutated across branches (e.g., `var cc_data = {} as Dictionary;`, `var values = {} as Dictionary;`).
+
+Without `as Dictionary`, the Monkey C compiler (`FunctionTypeChecker` / `ControlFlowProcessor`) infers a structural `DictionaryType` and clones it on every `dict["key"] = val` assignment. Across $N$ sequential `if (...) { dict["k"] = v; }` statements, the control-flow join merges both branches into a `PolyType` union of $2^N$ distinct `DictionaryType` shapes and calls `DictionaryType.equals()` $O(4^N)$ times. Even a single untyped dictionary with ~12 conditional key assignments adds 3–5+ seconds per device build (and 15+ minutes when exporting all ~82 device variants).

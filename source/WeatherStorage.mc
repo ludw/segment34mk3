@@ -41,7 +41,7 @@ class WeatherStorage {
         var newCcHash = _ccHash(cc);
 
         if (_lastCcHash == null || _lastCcHash != newCcHash || _lastCcStoreTime == null || now - _lastCcStoreTime >= 1800) {
-            var cc_data = {};
+            var cc_data = {} as Dictionary;
             if(cc != null) {
                 if(cc.observationLocationPosition != null) {
                     cc_data["observationLocationPosition"] = cc.observationLocationPosition.toDegrees();
@@ -92,7 +92,7 @@ class WeatherStorage {
                     "temperature" => hf[i].temperature,
                     "windBearing" => hf[i].windBearing,
                     "windSpeed" => hf[i].windSpeed
-                };
+                } as Dictionary;
                 if((hf[i] has :uvIndex) && hf[i].uvIndex != null) { tmp["uvIndex"] = hf[i].uvIndex; }
 
                 hf_data.add(tmp);

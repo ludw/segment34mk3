@@ -49,7 +49,7 @@ class OpenWeatherService {
         Application.Storage.deleteValue("wx_error");
 
         var now = Time.now().value();
-        var cc_data = {};
+        var cc_data = {} as Dictionary;
 
         var main = data.get("main") as Dictionary?;
         if (main != null) {

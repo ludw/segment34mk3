@@ -26,7 +26,7 @@ class OpenMeteoService {
             "forecast_days"   => rainEnabled ? 4 : 2,
             "forecast_hours"  => 8,
             "wind_speed_unit" => "ms"
-        };
+        } as Dictionary;
         if (rainEnabled) {
             params["timezone"] = "auto";
         }
@@ -51,7 +51,7 @@ class OpenMeteoService {
         Application.Storage.deleteValue("wx_error");
 
         var now = Time.now().value();
-        var cc_data = {};
+        var cc_data = {} as Dictionary;
 
         // Current conditions block.
         var current = data.get("current") as Dictionary?;

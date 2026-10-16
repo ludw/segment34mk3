@@ -1072,7 +1072,7 @@ class Segment34View extends WatchUi.WatchFace {
     // === UPDATE VALUES ===
 
     hidden function computeDisplayValues(now as Gregorian.Info) as Dictionary {
-        var values = {};
+        var values = {} as Dictionary;
         
         values[:dataClock] = getClockData(now);
         values[:dataMoon] = (propTopPartShows == 0) ? moonPhase(now, propHemisphere) : "";
