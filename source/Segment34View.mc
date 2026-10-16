@@ -231,7 +231,7 @@ class Segment34View extends WatchUi.WatchFace {
         halfMarginY = Math.round(marginY / 2);
         halfClockHeight = Math.round(clockHeight / 2);
         if(clockBgText.length() == 4) {
-            halfClockWidth = Math.round((clockWidth / 5 * 4.2) / 2);
+            halfClockWidth = Math.round((clockWidth / 5 * 4.2) / 2).toNumber();
         } else {
             halfClockWidth = Math.round(clockWidth / 2);
         }
@@ -483,6 +483,8 @@ class Segment34View extends WatchUi.WatchFace {
             bottomFiveXAdj = -25;
             batteryXAdj = 29;
             bottomIconYAdj = -5;
+            batteryStepWidth = 0;
+            batteryHiddenYAdj = 0;
         }
 
         fontIcons = Application.loadResource(Rez.Fonts.icons);
@@ -710,7 +712,6 @@ class Segment34View extends WatchUi.WatchFace {
             marginY = 13;
             labelHeight = 10;
             smallDataHeight = 20;
-            bottomFiveAdj = 4;
             baseY = centerY - smallDataHeight - 4;
             bottomFieldWidths = [4, 4, 4, 0];
         } else {
@@ -725,7 +726,6 @@ class Segment34View extends WatchUi.WatchFace {
             marginY = 12;
             labelHeight = 13;
             smallDataHeight = 27;
-            bottomFiveAdj = 6;
             baseY = centerY - 5;
             bottomFieldWidths = [4, 3, 4, 0];
         }
@@ -742,7 +742,7 @@ class Segment34View extends WatchUi.WatchFace {
         bottomDataWidth = 24;
         baseX = centerX;
         barBottomAdj = 2;
-        bottomFiveAdj = 8;
+        //bottomFiveAdj = 8;
         graphHeight = (propGraphSize == 1) ? 35 : 25;
         graphTargetWidth = 32;
         graphHalfWidth = screenWidth / 7;
@@ -899,10 +899,10 @@ class Segment34View extends WatchUi.WatchFace {
             var d3 = digits[3].toFloat();
             var tot = tot_digits.toFloat();
 
-            fieldXCoords[0] = left_edge + Math.round((d0 / 2.0) * data_width / tot);
-            fieldXCoords[1] = left_edge + Math.round((d0 + d1 / 2.0) * data_width / tot);
-            fieldXCoords[2] = left_edge + Math.round((d0 + d1 + d2 / 2.0) * data_width / tot);
-            fieldXCoords[3] = left_edge + Math.round((d0 + d1 + d2 + d3 / 2.0) * data_width / tot);
+            fieldXCoords[0] = left_edge + Math.round((d0 / 2.0) * data_width / tot).toNumber();
+            fieldXCoords[1] = left_edge + Math.round((d0 + d1 / 2.0) * data_width / tot).toNumber();
+            fieldXCoords[2] = left_edge + Math.round((d0 + d1 + d2 / 2.0) * data_width / tot).toNumber();
+            fieldXCoords[3] = left_edge + Math.round((d0 + d1 + d2 + d3 / 2.0) * data_width / tot).toNumber();
         }
 
         bottomFiveY = y3 + halfMarginY + bottomFiveAdj;
@@ -1685,7 +1685,7 @@ class Segment34View extends WatchUi.WatchFace {
         // Scale bar height proportionally within the effective bar range.
         // maxSideBarHeight equals clockHeight when limitBarHeight is off, so
         // this formula is correct in both cases.
-        var barHeight = Math.round(barVal * (maxSideBarHeight / 100.0));
+        var barHeight = Math.round(barVal * (maxSideBarHeight / 100.0)).toNumber();
         var barBottom = baseY + halfClockHeight + barBottomAdj;
 
         var barColor = useDynamic ? dataHelper.getStressColor(barVal) : theme.colors[baseColor];

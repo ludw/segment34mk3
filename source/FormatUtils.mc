@@ -20,13 +20,13 @@ function convertTemperature(temp as Numeric, unit as String) as Numeric {
 
 function formatWindSpeed(mps as Float, propWindUnit as Number) as String {
     if (propWindUnit == 0) {
-        return Math.round(mps).format("%d");
+        return Math.round(mps).toNumber().format("%d");
     } else if (propWindUnit == 1) {
-        return Math.round(mps * 3.6).format("%d");
+        return Math.round(mps * 3.6).toNumber().format("%d");
     } else if (propWindUnit == 2) {
-        return Math.round(mps * 2.237).format("%d");
+        return Math.round(mps * 2.237).toNumber().format("%d");
     } else if (propWindUnit == 3) {
-        return Math.round(mps * 1.944).format("%d");
+        return Math.round(mps * 1.944).toNumber().format("%d");
     } else { // beaufort
         if (mps < 0.5f) { return "0"; }
         if (mps < 1.5f) { return "1"; }
@@ -65,22 +65,23 @@ function formatPressure(pressureHpa as Float, width as Number, propPressureUnit 
 
 function formatDistanceByWidth(distance as Float, width as Number) as String {
     if (width == 3) {
-        return distance < 9.9 ? distance.format("%.1f") : Math.round(distance).format("%d");
+        return distance < 9.9 ? distance.format("%.1f") : Math.round(distance).toNumber().format("%d");
     } else if (width == 4) {
-        return distance < 100 ? distance.format("%.1f") : distance.format("%d");
+        return distance < 100 ? distance.format("%.1f") : distance.toNumber().format("%d");
     } else {  // width == 5
-        return distance < 1000 ? distance.format("%05.1f") : distance.format("%05d");
+        return distance < 1000 ? distance.format("%05.1f") : distance.toNumber().format("%05d");
     }
 }
 
 function formatGraphAxisValue(val as Float) as String {
-    var n = val.toNumber();
-    if(n < 0) {
-        var abs = (-val).toNumber();
+    if(val < 0.0f) {
+        var absVal = -val;
+        var abs = absVal.toNumber();
         if(abs >= 1000) { return "-" + (abs / 1000).toString() + "K"; }
-        if(abs < 10) { return "-" + val.format("%.1f"); }
+        if(abs < 10) { return "-" + absVal.format("%.1f"); }
         return "-" + abs.toString();
     }
+    var n = val.toNumber();
     if(n >= 1000) { return (n / 1000).toString() + "K"; }
     if(n < 10) { return val.format("%.1f"); }
     return n.toString();
@@ -88,7 +89,7 @@ function formatGraphAxisValue(val as Float) as String {
 
 function goalPercent(val as Number, goal as Number) as Number {
     if(goal == 0 || val == 0) { return 0; }
-    return Math.round(val.toFloat() / goal.toFloat() * 100.0);
+    return Math.round(val.toFloat() / goal.toFloat() * 100.0).toNumber();
 }
 
 function moonPhase(time, propHemisphere as Number) as String {

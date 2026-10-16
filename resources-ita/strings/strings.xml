@@ -116,6 +116,7 @@
     <string id="LABEL_STRESS">STRESS:</string>
     <string id="LABEL_BBAT_1">BAT C</string>
     <string id="LABEL_BBAT_2">BAT CORPO</string>
+    <string id="LABEL_SLEEP">SONNO</string>
     <string id="LABEL_STEPS">PASSI:</string>
     <string id="LABEL_DIST_1">DIST</string>
     <string id="LABEL_DIST_2">M OGGI</string>
@@ -200,6 +201,7 @@
     <string id="settings_golden_hour_start" scope="settings">Inizio ora dorata (sera)</string>
     <string id="settings_moon_illumination" scope="settings">Illuminazione luna % (approssimativa)</string>
     <string id="settings_phone_connected" scope="settings">Telefono connesso</string>
+    <string id="settings_sleep_score" scope="settings">Punteggio sonno</string>
     <string id="settings_weather_format_1" scope="settings">Formato meteo 1 (t=temp w=vento g=raffiche h=umidità p=%precip r=quant_precip x=pross_pioggia u=UV m=UV max 8h l=max/min f=percepita c=condizioni s=condizioni brevi n=città(solo OWM) o=ora_oss)</string>
     <string id="settings_weather_format_2" scope="settings">Formato meteo 2 (t=temp w=vento g=raffiche h=umidità p=%precip r=quant_precip x=pross_pioggia u=UV m=UV max 8h l=max/min f=percepita c=condizioni s=condizioni brevi n=città(solo OWM) o=ora_oss)</string>
 </strings>

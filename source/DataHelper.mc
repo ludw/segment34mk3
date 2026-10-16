@@ -129,7 +129,7 @@ class DataHelper {
 
         if(propBatteryVariant == 0) {
             if (System.getSystemStats().batteryInDays != null){
-                var sample = Math.round(System.getSystemStats().batteryInDays);
+                var sample = Math.round(System.getSystemStats().batteryInDays).toNumber();
                 value = sample.format("%0d") + "D";
             }
         }
@@ -174,7 +174,7 @@ class DataHelper {
         var profile = UserProfile.getProfile();
 
         if (profile.birthYear == null || profile.weight == null || profile.height == null) {
-            return 0;
+            return -1;
         }
 
         var age = today.year - profile.birthYear;
@@ -189,7 +189,7 @@ class DataHelper {
 
         // Calculate rest calories for the current time of day
         rest_calories = Math.round((today.hour * 60 + today.min) * rest_calories / 1440).toNumber();
-        return rest_calories;
+        return rest_calories >= 0 ? rest_calories : 0;
     }
 
     function getWeeklyDistance() as Number {
@@ -394,12 +394,14 @@ class DataHelper {
     }
 
     function getRecoveryTimeVal(numberFormat as String) as String {
-        var complication = Complications.getComplication(new Complications.Id(Complications.COMPLICATION_TYPE_RECOVERY_TIME));
-        if (complication != null && complication.value != null) {
-            var recovery_h = complication.value / 60.0;
-            if(recovery_h < 9.9 and recovery_h != 0) { return recovery_h.format("%.1f"); }
-            return Math.round(recovery_h).format(numberFormat);
-        }
+        try {
+            var complication = Complications.getComplication(new Complications.Id(Complications.COMPLICATION_TYPE_RECOVERY_TIME));
+            if (complication != null && complication.value != null) {
+                var recovery_h = complication.value / 60.0;
+                if(recovery_h < 9.9 and recovery_h != 0) { return recovery_h.format("%.1f"); }
+                return Math.round(recovery_h).toNumber().format(numberFormat);
+            }
+        } catch(e) {}
         return "";
     }
 
@@ -412,23 +414,33 @@ class DataHelper {
     }
 
     function getCalendarEventVal(width as Number) as String {
-        var complication = Complications.getComplication(new Complications.Id(Complications.COMPLICATION_TYPE_CALENDAR_EVENTS));
         var colon_index = null;
         var val = "";
-        if (complication != null && complication.value != null) {
-            val = complication.value;
-            colon_index = val.find(":");
-            if (colon_index != null && colon_index < 2) { val = "0" + val; }
-        } else {
-            val = "--:--";
+        try {
+            var complication = Complications.getComplication(new Complications.Id(Complications.COMPLICATION_TYPE_CALENDAR_EVENTS));
+            if (complication != null && complication.value != null) {
+                val = complication.value.toString();
+                colon_index = val.find(":");
+                if (colon_index != null && colon_index < 2) {
+                    val = "0" + val;
+                    colon_index = val.find(":");
+                }
+            }
+        } catch(e) {}
+        if (val.length() == 0) {
+            return width < 5 ? "----" : "--:--";
         }
-        if (width < 5 and colon_index != null) { val = val.substring(0, 2) + val.substring(3, 5); }
+        if (width < 5 and colon_index != null and val.length() >= colon_index + 3) {
+            val = val.substring(0, colon_index) + val.substring(colon_index + 1, colon_index + 3);
+        }
         return val;
     }
 
     function getPulseOxVal(numberFormat as String) as String {
-        var complication = Complications.getComplication(new Complications.Id(Complications.COMPLICATION_TYPE_PULSE_OX));
-        if (complication != null && complication.value != null) { return complication.value.format(numberFormat); }
+        try {
+            var complication = Complications.getComplication(new Complications.Id(Complications.COMPLICATION_TYPE_PULSE_OX));
+            if (complication != null && complication.value != null) { return complication.value.format(numberFormat); }
+        } catch(e) {}
         return "";
     }
 
@@ -697,7 +709,7 @@ class DataHelper {
     function getActiveCaloriesFormatted() as String {
         var info = ActivityMonitor.getInfo();
         var rest_calories = getRestCalories();
-        if (info.calories != null && rest_calories > 0) {
+        if (info.calories != null && rest_calories >= 0) {
             var active_calories = info.calories - rest_calories;
             return active_calories > 0 ? active_calories.format("%d") : "0";
         }
@@ -707,6 +719,7 @@ class DataHelper {
     function getActiveTotalCaloriesFormatted() as String {
         var info = ActivityMonitor.getInfo();
         var rest_calories = getRestCalories();
+        if (rest_calories < 0) { rest_calories = 0; }
         var total_calories = info.calories != null ? info.calories : 0;
         var active_calories = total_calories - rest_calories;
         active_calories = active_calories > 0 ? active_calories : 0;
@@ -715,7 +728,7 @@ class DataHelper {
 
     function getBatteryDaysFormatted() as String {
         var stats = System.getSystemStats();
-        if (stats.batteryInDays != null) { return Math.round(stats.batteryInDays).format("%d"); }
+        if (stats.batteryInDays != null) { return Math.round(stats.batteryInDays).toNumber().format("%d"); }
         return "";
     }
 
@@ -780,7 +793,9 @@ class DataHelper {
         var acc = Activity.getActivityInfo().currentLocationAccuracy;
         if (acc != null) {
             if (width < 4) { return (acc as Number).format("%d"); }
-            return ["N/A", "LAST", "POOR", "USBL", "GOOD"][acc];
+            if (acc >= 0 && acc < 5) {
+                return ["N/A", "LAST", "POOR", "USBL", "GOOD"][acc];
+            }
         }
         return "";
     }

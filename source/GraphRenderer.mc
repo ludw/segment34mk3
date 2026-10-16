@@ -177,7 +177,7 @@ class GraphRenderer {
         }
 
         if(graphGoalLine != null) {
-            var goal_y = y + (h - Math.round(graphGoalLine / scale));
+            var goal_y = y + (h - Math.round(graphGoalLine / scale).toNumber());
             dc.setColor(themeColors[fieldLbl], Graphics.COLOR_TRANSPARENT);
             dc.drawLine(graphLeft, goal_y, graphRight, goal_y);
         }
@@ -196,10 +196,10 @@ class GraphRenderer {
                 dc.setColor(themeColors[clock], Graphics.COLOR_TRANSPARENT);
                 continue;
             }
-            var bar_height = Math.round(data[i] / scale);
+            var bar_height = Math.round(data[i] / scale).toNumber();
             if(data2 != null && i < data2.size() && data2[i] > 0) {
                 // Stacked bar: bottom = moderate (date color), top = vigorous (clock color)
-                var vigorous_height = Math.round(data2[i] / scale);
+                var vigorous_height = Math.round(data2[i] / scale).toNumber();
                 if(vigorous_height > bar_height) { vigorous_height = bar_height; }
                 var moderate_height = bar_height - vigorous_height;
                 if(moderate_height > 0) {
@@ -251,8 +251,8 @@ class GraphRenderer {
         var prevY = -1;
         for(var i = 0; i < n; i++) {
             if(data[i] < 0) { prevX = -1; prevY = -1; continue; } // gap
-            var ptX = n > 1 ? graphLeft + Math.round(i.toFloat() * totalW / (n - 1)) : x;
-            var ptY = y + h - 1 - Math.round(data[i] / scale);
+            var ptX = n > 1 ? graphLeft + Math.round(i.toFloat() * totalW / (n - 1)).toNumber() : x;
+            var ptY = y + h - 1 - Math.round(data[i] / scale).toNumber();
             if(ptY < y) { ptY = y; }
 
             if(prevX >= 0) {
@@ -407,7 +407,9 @@ class GraphRenderer {
         // so take whichever is actually later as the right edge of the window.
         var windowEndEpoch = newestEpoch > oldestEpoch ? newestEpoch : oldestEpoch;
         var windowStartEpoch = windowEndEpoch - windowSecs;
+        if (_targetWidth <= 0) { return []; }
         var secsPerSlot = windowSecs / _targetWidth;
+        if (secsPerSlot <= 0) { secsPerSlot = 1; }
         var isStress = (dataSource == 5 or dataSource == 7);
         var diff = max - (min * 0.9);
 
@@ -430,7 +432,7 @@ class GraphRenderer {
                 }
             } else if(dataSource == 1 or dataSource == 4) {
                 if(sample.data != null) {
-                    normalized = Math.round((sample.data.toFloat() - Math.round(min * 0.9)) / diff * 100).toNumber();
+                    normalized = diff != 0 ? Math.round((sample.data.toFloat() - Math.round(min * 0.9)) / diff * 100).toNumber() : 0;
                 }
             } else if(dataSource == 3) {
                 if(sample.data != null) {
@@ -438,7 +440,7 @@ class GraphRenderer {
                 }
             } else {
                 if(sample.data != null) {
-                    normalized = Math.round(sample.data.toFloat() / max * 100).toNumber();
+                    normalized = max != 0 ? Math.round(sample.data.toFloat() / max * 100).toNumber() : 0;
                 }
                 // for stress, null data stays -1 (not measurable — explicit gap)
             }
@@ -588,16 +590,19 @@ class GraphRenderer {
             if(mm > maxMm) { maxMm = mm; }
         }
 
+        var normalized = [] as Array<Number>;
         if(maxMm > 0) {
             cachedGraphYMax = maxMm;
-            var normalized = [];
             for(var j = 0; j < ret.size(); j++) {
                 normalized.add(Math.round((ret[j] as Float) / maxMm * 100).toNumber());
             }
-            return normalized;
+        } else {
+            for(var j = 0; j < ret.size(); j++) {
+                normalized.add(0);
+            }
         }
 
-        return ret;
+        return normalized;
     }
 
 }

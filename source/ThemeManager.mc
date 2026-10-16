@@ -111,25 +111,20 @@ class ThemeManager {
     }
 
     hidden function _parseThemeString(override as String) as Array<Graphics.ColorType> {
-        if(override.length() == 0) { return _setColorTheme(-1); }
-        var ret = [];
-        var color_str = "";
-        var color = null;
-        for(var i=0; i<override.length(); i += 8) {
-            color_str = override.substring(i+1, i+7);
-            color = color_str.toNumberWithBase(16) as Graphics.ColorType;
-            ret.add(color);
+        if(override == null or override.length() < 103) { return _setColorTheme(-1); }
+        var ret = [] as Array<Graphics.ColorType>;
+        for(var i=0; i + 7 <= override.length(); i += 8) {
+            var color_str = override.substring(i+1, i+7);
+            if(color_str == null) { return _setColorTheme(-1); }
+            var color = color_str.toNumberWithBase(16);
+            if(color == null or color < 0 or color > 16777215) {
+                return _setColorTheme(-1);
+            }
+            ret.add(color as Graphics.ColorType);
         }
 
         if(ret.size() != 13) {
-            ret = _setColorTheme(-1);
-        }
-
-        for(var j=0; j<ret.size(); j++) {
-            if(ret[j] == null or ret[j] < 0 or ret[j] > 16777215) {
-                ret = _setColorTheme(-1);
-                break;
-            }
+            return _setColorTheme(-1);
         }
 
         return ret;
@@ -160,8 +155,7 @@ class ThemeManager {
 
             if(propNightThemeActivation == 1) {
                 // Start two hours before sleep time
-                var twoHours = new Time.Duration(7200);
-                sleepTime = sleepTime.subtract(twoHours);
+                sleepTime = new Time.Duration((sleepTime.value() - 7200 + 86400) % 86400);
             }
 
             if(sleepTime.greaterThan(wakeTime)) {

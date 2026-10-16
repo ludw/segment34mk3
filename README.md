@@ -86,7 +86,8 @@ For refactorings and optimizations keep in mind that:
 - Support for Enduro 4, Marq gen3 and Approach S72
 - Support for 240x240 devices Fenix 7s and Fenix 7s pro thanks to aliasadrashid
 - Pressure trend over 6h instead of 2h
-- Weather field to show when it will start/stop raining (thanks Ondrej!)
+- Weather field to show when it will start/stop raining (thanks Ondrej for the idea)
+- Bug fixes
 
 3.0
 - Fenix 9 series support

@@ -56,7 +56,7 @@ class OpenWeatherService {
             var temp = main.get("temp");
             if (temp != null) { cc_data["temperature"] = (temp as Float).toNumber(); }
             var feelsLike = main.get("feels_like");
-            if (feelsLike != null) { cc_data["feelsLikeTemperature"] = (feelsLike as Float); }
+            if (feelsLike != null) { cc_data["feelsLikeTemperature"] = (feelsLike as Numeric).toFloat(); }
             var humidity = main.get("humidity");
             if (humidity != null) { cc_data["relativeHumidity"] = humidity as Number; }
             // High/low come from forecast aggregation (owm_forecast_high/low), not
@@ -103,7 +103,7 @@ class OpenWeatherService {
         // Grab UV index from Garmin's live data if available (OWM free tier lacks it).
         if ((Weather has :getCurrentConditions)) {
             var garminCc = Weather.getCurrentConditions();
-            if (garminCc != null && garminCc.uvIndex != null) {
+            if (garminCc != null && (garminCc has :uvIndex) && garminCc.uvIndex != null) {
                 cc_data["uvIndex"] = garminCc.uvIndex;
             }
         }

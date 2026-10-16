@@ -41,8 +41,10 @@ class Segment34App extends Application.AppBase {
         Application.Storage.deleteValue("owm_forecast_low");
         Application.Storage.deleteValue("rain_forecast");
         updateTemporalEvent();
-        mView.onSettingsChanged();
-        WatchUi.requestUpdate();
+        if (mView != null) {
+            mView.onSettingsChanged();
+            WatchUi.requestUpdate();
+        }
     }
 
     hidden function updateTemporalEvent() as Void {

@@ -12,11 +12,14 @@ class WeatherStorage {
     var isLowMem as Boolean = false;
     hidden var _lastHfTime as Number? = null;
     hidden var _lastCcHash as Number? = null;
+    hidden var _lastCcStoreTime as Number? = null;
 
     function initialize() {}
 
     function invalidate() as Void {
         _lastHfTime = null;
+        _lastCcHash = null;
+        _lastCcStoreTime = null;
     }
 
     function store() as Void {
@@ -37,7 +40,7 @@ class WeatherStorage {
         }
         var newCcHash = _ccHash(cc);
 
-        if (_lastCcHash == null || _lastCcHash != newCcHash) {
+        if (_lastCcHash == null || _lastCcHash != newCcHash || _lastCcStoreTime == null || now - _lastCcStoreTime >= 1800) {
             var cc_data = {};
             if(cc != null) {
                 if(cc.observationLocationPosition != null) {
@@ -60,6 +63,7 @@ class WeatherStorage {
             Application.Storage.setValue("current_conditions", cc_data);
 
             _lastCcHash = newCcHash;
+            _lastCcStoreTime = now;
         }
 
         if (isLowMem) { return; }
@@ -130,7 +134,9 @@ class WeatherStorage {
         var cc_data = Application.Storage.getValue("current_conditions") as Dictionary<String, Application.PropertyValueType>?;
         if(cc_data == null) { return ret; }
 
-        var data_age_s = now - (cc_data.get("timestamp") as Number);
+        var ccTimestamp = cc_data.get("timestamp") as Number?;
+        if (ccTimestamp == null) { return ret; }
+        var data_age_s = now - ccTimestamp;
         var pos = cc_data.get("observationLocationPosition") as Array?;
         if (pos != null) {
             ret.observationLocationPosition = new Position.Location({:latitude => pos[0], :longitude => pos[1], :format => :degrees});
@@ -144,7 +150,9 @@ class WeatherStorage {
         if (hf_data != null) {
             var nearestDist = 2147483647;
             for (var i = 0; i < hf_data.size(); i++) {
-                var diff = now - (hf_data[i].get("forecastTime") as Number);
+                var ft = hf_data[i].get("forecastTime") as Number?;
+                if (ft == null) { continue; }
+                var diff = now - ft;
                 if (diff < 0) { diff = -diff; }
                 if (diff < nearestDist) { nearestDist = diff; nearestEntry = hf_data[i]; }
             }
@@ -153,11 +161,10 @@ class WeatherStorage {
         // Current conditions are valid for at least 1 hour (Garmin path), or until the
         // first forecast slot starts — whichever is later. For OWM the first slot is always
         // in the future (~3h boundary), so this covers the gap without regressing Garmin.
-        var ccTimestamp = cc_data.get("timestamp") as Number;
         var ccValidUntil = ccTimestamp + 3600;
         if (hf_data != null && hf_data.size() > 0) {
-            var firstForecastTime = hf_data[0].get("forecastTime") as Number;
-            if (firstForecastTime > ccValidUntil) { ccValidUntil = firstForecastTime; }
+            var firstForecastTime = hf_data[0].get("forecastTime") as Number?;
+            if (firstForecastTime != null && firstForecastTime > ccValidUntil) { ccValidUntil = firstForecastTime; }
         }
         if(data_age_s >= 0 and now < ccValidUntil) {
             ret.condition = cc_data.get("condition") as Number;
@@ -174,7 +181,7 @@ class WeatherStorage {
             ret.uvIndex = cc_data.get("uvIndex") as Float;
             ret.cityName = cc_data.get("cityName") as String?;
             var obsTime = cc_data.get("observationTime");
-            if (obsTime == null) { obsTime = cc_data.get("timestamp"); }
+            if (obsTime == null) { obsTime = ccTimestamp; }
             ret.observationTimestamp = obsTime as Number;
             // OWM only includes windGust and precipitationAmount "where available" in
             // current conditions. Fill gaps from the nearest forecast entry.
@@ -191,7 +198,9 @@ class WeatherStorage {
             var bestEntry = null;
             var bestAge = 86401;
             for(var i=0; i<hf_data.size(); i++) {
-                var forecast_age = now - (hf_data[i].get("forecastTime") as Number);
+                var ft = hf_data[i].get("forecastTime") as Number?;
+                if (ft == null) { continue; }
+                var forecast_age = now - ft;
                 if(forecast_age >= 0 and forecast_age < bestAge) {
                     bestAge = forecast_age;
                     bestEntry = hf_data[i];
@@ -205,14 +214,16 @@ class WeatherStorage {
                 ret.windSpeed = bestEntry.get("windSpeed") as Float;
                 ret.windGust = bestEntry.get("windGust") as Float;
                 ret.precipitationAmount = bestEntry.get("precipitationAmount") as Float;
-                // Forecast entries lack feelsLike/humidity/high/low — use last known values.
+                // Forecast entries lack feelsLike/humidity/high/low/cityName — use last known values.
                 ret.feelsLikeTemperature = cc_data.get("feelsLikeTemperature") as Float;
                 ret.relativeHumidity = cc_data.get("relativeHumidity") as Number;
                 ret.highTemperature = cc_data.get("highTemperature") as Number;
                 ret.lowTemperature = cc_data.get("lowTemperature") as Number;
-                ret.uvIndex = cc_data.get("uvIndex") as Float;
+                var bestUv = bestEntry.get("uvIndex");
+                ret.uvIndex = (bestUv != null ? bestUv : cc_data.get("uvIndex")) as Float;
+                ret.cityName = cc_data.get("cityName") as String?;
                 var obsTime2 = cc_data.get("observationTime");
-                if (obsTime2 == null) { obsTime2 = cc_data.get("timestamp"); }
+                if (obsTime2 == null) { obsTime2 = ccTimestamp; }
                 ret.observationTimestamp = obsTime2 as Number;
             }
         }
@@ -223,7 +234,7 @@ class WeatherStorage {
     hidden function _ccHash(cc) as Number {
         if (cc == null) { return 0; }
         var h = 17;
-        var t = (cc.temperature != null) ? cc.temperature : -127;
+        var t = (cc.temperature != null) ? cc.temperature.toNumber() : -127;
         h = 31 * h + t;
         var c = (cc.condition != null) ? cc.condition : -1;
         h = 31 * h + c;
@@ -231,6 +242,14 @@ class WeatherStorage {
         h = 31 * h + w;
         var b = (cc.windBearing != null) ? cc.windBearing : -1;
         h = 31 * h + b;
+        var p = (cc.precipitationChance != null) ? cc.precipitationChance : -1;
+        h = 31 * h + p;
+        var hi = (cc.highTemperature != null) ? cc.highTemperature.toNumber() : -127;
+        h = 31 * h + hi;
+        var lo = (cc.lowTemperature != null) ? cc.lowTemperature.toNumber() : -127;
+        h = 31 * h + lo;
+        var obs = (cc.observationTime != null) ? cc.observationTime.value() : 0;
+        h = 31 * h + obs;
 
         return h;
     }

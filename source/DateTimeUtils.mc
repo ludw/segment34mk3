@@ -123,7 +123,7 @@ function secondaryTimezone(offset, width, propIs24H as Boolean, propHourFormat a
     var now = Time.now();
     var utc = Time.Gregorian.utcInfo(now, Time.FORMAT_MEDIUM);
     var min = utc.min + (offset % 60);
-    var hour = (utc.hour + Math.floor(offset / 60)) % 24;
+    var hour = (utc.hour + (offset / 60)) % 24;
 
     if(min > 59) {
         min -= 60;
