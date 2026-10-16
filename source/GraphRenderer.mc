@@ -27,6 +27,22 @@ class GraphRenderer {
         return code - 100;
     }
 
+    // Computes [yMinHpa, yMaxHpa] for the 6h barometric pressure graph.
+    // Guarantees at least 0.5 hPa padding on each side and a minimum 6 hPa window
+    // so steady pressure sits near 50% height while 2–6 hPa weather trends are clearly visible.
+    static function pressureBoundsHpa(minPa as Numeric, maxPa as Numeric) as Array<Float> {
+        var minHpa = minPa.toFloat() / 100.0f;
+        var maxHpa = maxPa.toFloat() / 100.0f;
+        var yMin = Math.floor(minHpa - 0.5f).toFloat();
+        var yMax = Math.ceil(maxHpa + 0.5f).toFloat();
+        if (yMax - yMin < 6.0f) {
+            var mid = (minHpa + maxHpa) / 2.0f;
+            yMin = Math.round(mid - 3.0f).toFloat();
+            yMax = yMin + 6.0f;
+        }
+        return [yMin, yMax];
+    }
+
     // Layout params (set via configure())
     hidden var _barWidth as Number = 2;
     hidden var _barSpacing as Number = 2;
@@ -44,6 +60,7 @@ class GraphRenderer {
     hidden var _xLabelYOffset as Number = 0;
     hidden var _propIs24H as Boolean = false;
     hidden var _propIsMetricDistance as Boolean = true;
+    hidden var _propPressureUnit as Number = 0;
 
     // State — written by getDataArrayByType, read by draw functions
     var graphGoalLine as Number? = null;
@@ -94,7 +111,8 @@ class GraphRenderer {
         propGraphYAxisLabels as Boolean,
         xLabelYOffset as Number,
         propIs24H as Boolean,
-        propIsMetricDistance as Boolean
+        propIsMetricDistance as Boolean,
+        propPressureUnit as Number
     ) as Void {
         _barWidth = barWidth;
         _barSpacing = barSpacing;
@@ -110,6 +128,7 @@ class GraphRenderer {
         _xLabelYOffset = xLabelYOffset;
         _propIs24H = propIs24H;
         _propIsMetricDistance = propIsMetricDistance;
+        _propPressureUnit = propPressureUnit;
         // Invalidate X-axis label cache: graph type / time format may have changed.
         _cachedXLabelEpochMin = -1;
     }
@@ -162,9 +181,9 @@ class GraphRenderer {
 
         if(_propGraphYAxisLabels) {
             dc.setColor(themeColors[dataVal], Graphics.COLOR_TRANSPARENT);
-            var maxStr = formatGraphAxisValue(cachedGraphYMax);
+            var maxStr = formatYAxisLabel(cachedGraphYMax);
             dc.drawText(graphLeft - 2, y - 3, _fontLabel, maxStr, Graphics.TEXT_JUSTIFY_RIGHT);
-            var minStr = formatGraphAxisValue(cachedGraphYMin);
+            var minStr = formatYAxisLabel(cachedGraphYMin);
             dc.drawText(graphLeft - 2, y - 3 + h - _labelHeight, _fontLabel, minStr, Graphics.TEXT_JUSTIFY_RIGHT);
         }
 
@@ -231,8 +250,8 @@ class GraphRenderer {
         // Draw axis labels if enabled
         if(_propGraphYAxisLabels) {
             dc.setColor(themeColors[dataVal], Graphics.COLOR_TRANSPARENT);
-            var maxStr = formatGraphAxisValue(cachedGraphYMax);
-            var minStr = formatGraphAxisValue(cachedGraphYMin);
+            var maxStr = formatYAxisLabel(cachedGraphYMax);
+            var minStr = formatYAxisLabel(cachedGraphYMin);
             dc.drawText(graphLeft - 2, y - 3, _fontLabel, maxStr, Graphics.TEXT_JUSTIFY_RIGHT);
             dc.drawText(graphLeft - 2, y - 3 + h - _labelHeight, _fontLabel, minStr, Graphics.TEXT_JUSTIFY_RIGHT);
         }
@@ -270,6 +289,13 @@ class GraphRenderer {
             prevX = ptX;
             prevY = ptY;
         }
+    }
+
+    function formatYAxisLabel(val as Float) as String {
+        if (_propGraphData == 4) {
+            return formatPressure(val, 4, _propPressureUnit);
+        }
+        return formatGraphAxisValue(val);
     }
 
     // Returns the X-axis label for the leftmost (isLeft=true) or rightmost point.
@@ -376,12 +402,18 @@ class GraphRenderer {
         }
 
         // Set Y axis bounds for axis labels
+        var yMinRaw = Math.round(min * 0.9);
         if(dataSource == 0) {
             cachedGraphYMin = 0.0; cachedGraphYMax = 100.0;
-        } else if(dataSource == 1 or dataSource == 4) {
-            var rawMin = min * 0.9;
-            cachedGraphYMin = dataSource == 4 ? (rawMin / 100.0).toFloat() : rawMin.toFloat();
-            cachedGraphYMax = dataSource == 4 ? (max.toFloat() / 100.0) : max.toFloat();
+        } else if(dataSource == 1) {
+            cachedGraphYMin = (min * 0.9).toFloat();
+            cachedGraphYMax = max.toFloat();
+        } else if(dataSource == 4) {
+            var bounds = pressureBoundsHpa(min, max);
+            cachedGraphYMin = bounds[0];
+            cachedGraphYMax = bounds[1];
+            yMinRaw = cachedGraphYMin * 100.0f;
+            max = cachedGraphYMax * 100.0f;
         } else if(dataSource == 2) {
             cachedGraphYMin = hrMin.toFloat(); cachedGraphYMax = max.toFloat();
         } else if(dataSource == 3) {
@@ -411,7 +443,7 @@ class GraphRenderer {
         var secsPerSlot = windowSecs / _targetWidth;
         if (secsPerSlot <= 0) { secsPerSlot = 1; }
         var isStress = (dataSource == 5 or dataSource == 7);
-        var diff = max - (min * 0.9);
+        var diff = max - yMinRaw;
 
         // ORDER_OLDEST_FIRST: older samples write first, newer samples overwrite → newest wins per slot.
         var ret = [] as Array<Number>;
@@ -432,7 +464,7 @@ class GraphRenderer {
                 }
             } else if(dataSource == 1 or dataSource == 4) {
                 if(sample.data != null) {
-                    normalized = diff != 0 ? Math.round((sample.data.toFloat() - Math.round(min * 0.9)) / diff * 100).toNumber() : 0;
+                    normalized = diff != 0 ? Math.round((sample.data.toFloat() - yMinRaw) / diff * 100).toNumber() : 0;
                 }
             } else if(dataSource == 3) {
                 if(sample.data != null) {

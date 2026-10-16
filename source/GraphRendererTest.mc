@@ -34,6 +34,32 @@ function testHistoryWindowPressureIsSixHours(logger as Test.Logger) as Boolean {
 }
 
 (:test)
+function testPressureBoundsSteadyUsesSixHpaWindow(logger as Test.Logger) as Boolean {
+    var bounds = GraphRenderer.pressureBoundsHpa(100780.0f, 100840.0f);
+    return bounds[0] == 1005.0f && bounds[1] == 1011.0f;
+}
+
+(:test)
+function testPressureBoundsModerateFrontTrend(logger as Test.Logger) as Boolean {
+    var bounds = GraphRenderer.pressureBoundsHpa(100610.0f, 101020.0f);
+    return bounds[0] == 1005.0f && bounds[1] == 1011.0f;
+}
+
+(:test)
+function testPressureBoundsLargeStormChangeExpands(logger as Test.Logger) as Boolean {
+    var bounds = GraphRenderer.pressureBoundsHpa(100400.0f, 101400.0f);
+    return bounds[0] == 1003.0f && bounds[1] == 1015.0f;
+}
+
+(:test)
+function testPressureYAxisLabelShowsFullHpaNot1K(logger as Test.Logger) as Boolean {
+    var gr = new GraphRenderer();
+    gr.configure(2, 2, 40, 60, 2, null, 8, 4, 0, false, true, 0, true, true, 0);
+    return gr.formatYAxisLabel(1011.0f).equals("1011")
+        && gr.formatYAxisLabel(1005.0f).equals("1005");
+}
+
+(:test)
 function testHistoryWindowOthersAreTwoHours(logger as Test.Logger) as Boolean {
     return GraphRenderer.historyWindowSecs(0) == 7200
         && GraphRenderer.historyWindowSecs(2) == 7200
