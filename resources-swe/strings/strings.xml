@@ -200,4 +200,6 @@
     <string id="settings_golden_hour_start" scope="settings">Guldtimme börjar (kväll)</string>
     <string id="settings_moon_illumination" scope="settings">Månbelysning % (ungefärlig)</string>
     <string id="settings_phone_connected" scope="settings">Telefon ansluten</string>
+    <string id="settings_weather_format_1" scope="settings">Väderdata 1 format (t=temp w=vind g=byvind h=fuktighet p=nederb% r=nederb_mängd x=nästa_regn u=UV m=max UV 8h l=hög/låg f=känns c=väderlek s=kort väderlek n=stad(endast OWM) o=obs_tid)</string>
+    <string id="settings_weather_format_2" scope="settings">Väderdata 2 format (t=temp w=vind g=byvind h=fuktighet p=nederb% r=nederb_mängd x=nästa_regn u=UV m=max UV 8h l=hög/låg f=känns c=väderlek s=kort väderlek n=stad(endast OWM) o=obs_tid)</string>
 </strings>

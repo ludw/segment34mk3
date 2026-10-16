@@ -1004,6 +1004,7 @@ class Segment34View extends WatchUi.WatchFace {
     }
 
     function onSettingsChanged() as Void {
+        weatherStorage.invalidate();
         reloadSettings();
         lastUpdate = null;
         lastSlowUpdate = null;

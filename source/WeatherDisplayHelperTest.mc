@@ -69,3 +69,47 @@ function testMaxUvNext8hAllNull(logger as Test.Logger) as Boolean {
     ];
     return WeatherDisplayHelper.maxUvIndexNext8h(hf, now) == null;
 }
+
+// --- Tests for WeatherDisplayHelper.formatRainForecast ---
+
+(:test)
+function testFormatRainForecastNullAndStale(logger as Test.Logger) as Boolean {
+    var now = 100000;
+    if (!WeatherDisplayHelper.formatRainForecast(null, now).equals("")) { return false; }
+    if (!WeatherDisplayHelper.formatRainForecast([], now).equals("")) { return false; }
+    // Stale: at <= now
+    if (!WeatherDisplayHelper.formatRainForecast([0, now, 60], now).equals("")) { return false; }
+    if (!WeatherDisplayHelper.formatRainForecast([1, now - 60, 0], now).equals("")) { return false; }
+    return true;
+}
+
+(:test)
+function testFormatRainForecastKind0And1Boundaries(logger as Test.Logger) as Boolean {
+    var now = 100000;
+    // < 60 min -> Xm
+    if (!WeatherDisplayHelper.formatRainForecast([0, now + 30 * 60, 100], now).equals("100% IN 30M")) { return false; }
+    if (!WeatherDisplayHelper.formatRainForecast([1, now + 59 * 60, 0], now).equals("DRY IN 59M")) { return false; }
+    // 60 min -> 1h
+    if (!WeatherDisplayHelper.formatRainForecast([0, now + 60 * 60, 60], now).equals("60% IN 1H")) { return false; }
+    // 23h -> 23h
+    if (!WeatherDisplayHelper.formatRainForecast([1, now + 23 * 3600, 0], now).equals("DRY IN 23H")) { return false; }
+    // 24h -> 1d
+    if (!WeatherDisplayHelper.formatRainForecast([0, now + 24 * 3600, 75], now).equals("75% IN 1D")) { return false; }
+    // 2.5 days -> floor to 2d
+    if (!WeatherDisplayHelper.formatRainForecast([0, now + 60 * 3600, 60], now).equals("60% IN 2D")) { return false; }
+    return true;
+}
+
+(:test)
+function testFormatRainForecastKind2And3(logger as Test.Logger) as Boolean {
+    var now = 100000;
+    // 3 days lookahead
+    if (!WeatherDisplayHelper.formatRainForecast([2, now + 3 * 86400, 0], now).equals("DRY 3D+")) { return false; }
+    if (!WeatherDisplayHelper.formatRainForecast([3, now + 3 * 86400 + 3600, 0], now).equals("RAIN 3D+")) { return false; }
+    // 2 days lookahead
+    if (!WeatherDisplayHelper.formatRainForecast([2, now + 2 * 86400, 0], now).equals("DRY 2D+")) { return false; }
+    // < 1d remaining -> ""
+    if (!WeatherDisplayHelper.formatRainForecast([2, now + 23 * 3600, 0], now).equals("")) { return false; }
+    if (!WeatherDisplayHelper.formatRainForecast([3, now + 3600, 0], now).equals("")) { return false; }
+    return true;
+}

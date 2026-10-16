@@ -22,6 +22,7 @@ class WeatherDisplayHelper {
     // Cached weather condition string (invalidated by update())
     hidden var _cachedConditionStr as String? = null;
     hidden var _cachedConditionIdx as Number = -1;
+    hidden var _rain as Array? = null;
 
     function initialize() {}
 
@@ -45,6 +46,7 @@ class WeatherDisplayHelper {
         _hourFormat = hourFormat;
         _cachedConditionStr = null;
         _cachedConditionIdx = -1;
+        _rain = Application.Storage.getValue("rain_forecast") as Array?;
     }
 
     function getTempUnit(propTempUnit as Number) as String {
@@ -232,6 +234,38 @@ class WeatherDisplayHelper {
         return ret;
     }
 
+    static function formatRainForecast(r as Array?, now as Number) as String {
+        if (r == null || r.size() < 3) { return ""; }
+        var kind = r[0] as Number;
+        var at   = r[1] as Number;
+        var diff = at - now;
+        if (diff <= 0) { return ""; }
+        if (kind == 2 || kind == 3) {
+            var days = diff / 86400;
+            if (days < 1) { return ""; }
+            return ((kind == 2) ? "DRY " : "RAIN ") + days.toString() + "D+";
+        }
+        var dur = "";
+        if (diff < 3600) {
+            var mins = (diff + 30) / 60;
+            if (mins < 1) { mins = 1; }
+            dur = mins.toString() + "M";
+        } else if (diff < 86400) {
+            var hrs = (diff + 1800) / 3600;
+            if (hrs >= 24) {
+                dur = "1D";
+            } else {
+                dur = hrs.toString() + "H";
+            }
+        } else {
+            dur = (diff / 86400).toString() + "D";
+        }
+        if (kind == 0) {
+            return (r[2] as Number).toString() + "% IN " + dur;
+        }
+        return "DRY IN " + dur;
+    }
+
     function getWeatherByFormat(format as String) as String {
         var result = "";
         var i = 0;
@@ -251,6 +285,7 @@ class WeatherDisplayHelper {
             else if (ch.equals("s")) { result = result + getWeatherConditionShort(); }
             else if (ch.equals("n")) { result = result + getCityName(); }
             else if (ch.equals("o")) { result = result + getObservationTime(); }
+            else if (ch.equals("x")) { result = result + formatRainForecast(_rain, Time.now().value()); }
             else { result = result + ch; }
             i += 1;
         }

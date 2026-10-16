@@ -200,4 +200,6 @@
     <string id="settings_golden_hour_start" scope="settings">Début heure dorée (soir)</string>
     <string id="settings_moon_illumination" scope="settings">Illumination lune % (approximative)</string>
     <string id="settings_phone_connected" scope="settings">Téléphone connecté</string>
+    <string id="settings_weather_format_1" scope="settings">Format météo 1 (t=temp w=vent g=rafales h=humidité p=%précip r=qté_précip x=proch_pluie u=UV m=UV max 8h l=max/min f=ressenti c=conditions s=conditions abrégées n=ville(OWM uniq.) o=heure_obs)</string>
+    <string id="settings_weather_format_2" scope="settings">Format météo 2 (t=temp w=vent g=rafales h=humidité p=%précip r=qté_précip x=proch_pluie u=UV m=UV max 8h l=max/min f=ressenti c=conditions s=conditions abrégées n=ville(OWM uniq.) o=heure_obs)</string>
 </strings>

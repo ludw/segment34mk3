@@ -198,4 +198,6 @@
     <string id="settings_golden_hour_start" scope="settings">Inicio hora dorada (tarde)</string>
     <string id="settings_moon_illumination" scope="settings">Iluminación lunar % (aproximada)</string>
     <string id="settings_phone_connected" scope="settings">Teléfono conectado</string>
+    <string id="settings_weather_format_1" scope="settings">Formato clima 1 (t=temp w=viento g=ráfagas h=humedad p=%precip r=cant_precip x=próx_lluvia u=UV m=UV máx 8h l=máx/mín f=sensación c=condiciones s=condiciones breves n=ciudad(solo OWM) o=hora_obs)</string>
+    <string id="settings_weather_format_2" scope="settings">Formato clima 2 (t=temp w=viento g=ráfagas h=humedad p=%precip r=cant_precip x=próx_lluvia u=UV m=UV máx 8h l=máx/mín f=sensación c=condiciones s=condiciones breves n=ciudad(solo OWM) o=hora_obs)</string>
 </strings>

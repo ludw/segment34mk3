@@ -15,6 +15,10 @@ class WeatherStorage {
 
     function initialize() {}
 
+    function invalidate() as Void {
+        _lastHfTime = null;
+    }
+
     function store() as Void {
         var now = Time.now().value();
         var sysStats = System.getSystemStats();
@@ -71,12 +75,16 @@ class WeatherStorage {
 
         if (_lastHfTime == null || _lastHfTime != firstForecastTime) {
             var hf_data = [];
+            var rf = RainForecast.isEnabled() ? new RainForecast() : null;
+            var rfDecided = false;
 
             for(var i=0; i<hf.size(); i++) {
+                var ft = hf[i].forecastTime.value();
+                var pop = hf[i].precipitationChance;
                 var tmp = {
-                    "forecastTime" => hf[i].forecastTime.value(),
+                    "forecastTime" => ft,
                     "condition" => hf[i].condition,
-                    "precipitationChance" => hf[i].precipitationChance,
+                    "precipitationChance" => pop,
                     "temperature" => hf[i].temperature,
                     "windBearing" => hf[i].windBearing,
                     "windSpeed" => hf[i].windSpeed
@@ -84,6 +92,31 @@ class WeatherStorage {
                 if((hf[i] has :uvIndex) && hf[i].uvIndex != null) { tmp["uvIndex"] = hf[i].uvIndex; }
 
                 hf_data.add(tmp);
+                if (rf != null && !rfDecided && pop != null) {
+                    rfDecided = (rf as RainForecast).feed(ft, pop as Number);
+                }
+            }
+
+            if (rf != null) {
+                if (!rfDecided && (Weather has :getDailyForecast)) {
+                    var df = Weather.getDailyForecast();
+                    if (df != null) {
+                        var dCount = df.size();
+                        if (dCount > 4) { dCount = 4; }
+                        for (var i = 0; i < dCount; i++) {
+                            var d = df[i];
+                            if (d != null && (d has :forecastTime) && d.forecastTime != null && d.precipitationChance != null) {
+                                if ((rf as RainForecast).feed(d.forecastTime.value() + 43200, d.precipitationChance as Number)) {
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                var rfRes = (rf as RainForecast).result();
+                if (rfRes != null) {
+                    Application.Storage.setValue("rain_forecast", rfRes);
+                }
             }
 
             Application.Storage.setValue("hourly_forecast", hf_data);

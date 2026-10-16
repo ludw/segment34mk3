@@ -39,6 +39,7 @@ class Segment34App extends Application.AppBase {
         Application.Storage.deleteValue("wx_error");
         Application.Storage.deleteValue("owm_forecast_high");
         Application.Storage.deleteValue("owm_forecast_low");
+        Application.Storage.deleteValue("rain_forecast");
         updateTemporalEvent();
         mView.onSettingsChanged();
         WatchUi.requestUpdate();

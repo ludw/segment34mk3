@@ -24,9 +24,10 @@ class OpenWeatherService {
               :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON },
             method(:onCurrentResponse)
         );
+        var cnt = RainForecast.isEnabled() ? 24 : 8;
         Communications.makeWebRequest(
             "https://api.openweathermap.org/data/2.5/forecast",
-            { "lat" => lat, "lon" => lon, "appid" => apiKey, "units" => "metric", "cnt" => 8 },
+            { "lat" => lat, "lon" => lon, "appid" => apiKey, "units" => "metric", "cnt" => cnt },
             { :method => Communications.HTTP_REQUEST_METHOD_GET,
               :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON },
             method(:onForecastResponse)
@@ -128,8 +129,10 @@ class OpenWeatherService {
         var list = data.get("list") as Array?;
         if (list == null || list.size() == 0) { return; }
 
+        var size = list.size();
+        var hfCount = (size < 8) ? size : 8;
         var hf_data = [] as Array<Dictionary>;
-        for (var i = 0; i < list.size(); i++) {
+        for (var i = 0; i < hfCount; i++) {
             var entry = list[i] as Dictionary;
             var tmp = {} as Dictionary;
 
@@ -180,22 +183,44 @@ class OpenWeatherService {
 
         Application.Storage.setValue("hourly_forecast", hf_data);
 
-        // Aggregate daily high/low across all forecast periods.
+        // Aggregate daily high/low across the first 8 forecast periods (24h),
+        // and feed all entries into RainForecast when enabled.
         var dailyHigh = null as Number?;
         var dailyLow  = null as Number?;
-        for (var i = 0; i < list.size(); i++) {
-            var fMain = (list[i] as Dictionary).get("main") as Dictionary?;
-            if (fMain != null) {
-                var tMax = fMain.get("temp_max");
-                var tMin = fMain.get("temp_min");
-                if (tMax != null) {
-                    var v = (tMax as Float).toNumber();
-                    if (dailyHigh == null || v > (dailyHigh as Number)) { dailyHigh = v; }
+        var rf = RainForecast.isEnabled() ? new RainForecast() : null;
+        var rfDecided = false;
+        for (var i = 0; i < size; i++) {
+            var entry = list[i] as Dictionary;
+            if (i < 8) {
+                var fMain = entry.get("main") as Dictionary?;
+                if (fMain != null) {
+                    var tMax = fMain.get("temp_max");
+                    var tMin = fMain.get("temp_min");
+                    if (tMax != null) {
+                        var v = (tMax as Float).toNumber();
+                        if (dailyHigh == null || v > (dailyHigh as Number)) { dailyHigh = v; }
+                    }
+                    if (tMin != null) {
+                        var v = (tMin as Float).toNumber();
+                        if (dailyLow == null || v < (dailyLow as Number)) { dailyLow = v; }
+                    }
                 }
-                if (tMin != null) {
-                    var v = (tMin as Float).toNumber();
-                    if (dailyLow == null || v < (dailyLow as Number)) { dailyLow = v; }
+            }
+            if (rf != null && !rfDecided) {
+                var dt = entry.get("dt");
+                var pop = entry.get("pop");
+                if (dt != null && pop != null) {
+                    rfDecided = (rf as RainForecast).feed(dt as Number, ((pop as Float) * 100).toNumber());
                 }
+            }
+            if (i >= 7 && (rf == null || rfDecided)) {
+                break;
+            }
+        }
+        if (rf != null) {
+            var rfRes = (rf as RainForecast).result();
+            if (rfRes != null) {
+                Application.Storage.setValue("rain_forecast", rfRes);
             }
         }
         if (dailyHigh != null) { Application.Storage.setValue("owm_forecast_high", dailyHigh); }

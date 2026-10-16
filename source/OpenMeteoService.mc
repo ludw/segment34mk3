@@ -15,19 +15,24 @@ class OpenMeteoService {
     function fetchWeather(lat as Float, lon as Float) as Void {
         _lat = lat;
         _lon = lon;
+        var rainEnabled = RainForecast.isEnabled();
+        var params = {
+            "latitude"        => lat,
+            "longitude"       => lon,
+            "current"         => "temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m",
+            "hourly"          => "temperature_2m,precipitation_probability,precipitation,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m,uv_index,uv_index_clear_sky",
+            "daily"           => rainEnabled ? "temperature_2m_max,temperature_2m_min,precipitation_probability_max" : "temperature_2m_max,temperature_2m_min",
+            "timeformat"      => "unixtime",
+            "forecast_days"   => rainEnabled ? 4 : 2,
+            "forecast_hours"  => 8,
+            "wind_speed_unit" => "ms"
+        };
+        if (rainEnabled) {
+            params["timezone"] = "auto";
+        }
         Communications.makeWebRequest(
             "https://api.open-meteo.com/v1/forecast",
-            {
-                "latitude"        => lat,
-                "longitude"       => lon,
-                "current"         => "temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m",
-                "hourly"          => "temperature_2m,precipitation_probability,precipitation,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m,uv_index,uv_index_clear_sky",
-                "daily"           => "temperature_2m_max,temperature_2m_min",
-                "timeformat"      => "unixtime",
-                "forecast_days"   => 2,
-                "forecast_hours"  => 8,
-                "wind_speed_unit" => "ms"
-            },
+            params,
             { :method => Communications.HTTP_REQUEST_METHOD_GET,
               :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON },
             method(:onResponse)
@@ -76,6 +81,7 @@ class OpenMeteoService {
         // Hourly block: build forecast array and harvest UV + precip chance for slot 0.
         var hf_data = [] as Array<Dictionary>;
         var hourly = data.get("hourly") as Dictionary?;
+        var rf = RainForecast.isEnabled() ? new RainForecast() : null;
         if (hourly != null) {
             var times   = hourly.get("time")                     as Array?;
             var temps   = hourly.get("temperature_2m")           as Array?;
@@ -98,9 +104,14 @@ class OpenMeteoService {
                 var count = times.size();
                 for (var i = 0; i < count; i++) {
                     var tmp = {} as Dictionary;
-                    tmp["forecastTime"] = times[i] as Number;
+                    var t = times[i] as Number;
+                    tmp["forecastTime"] = t;
                     if (temps   != null && temps[i]    != null) { tmp["temperature"]        = (temps[i]    as Float).toNumber(); }
-                    if (popArr  != null && popArr[i]   != null) { tmp["precipitationChance"] = popArr[i]  as Number; }
+                    if (popArr  != null && popArr[i]   != null) {
+                        var p = popArr[i] as Number;
+                        tmp["precipitationChance"] = p;
+                        if (rf != null) { (rf as RainForecast).feed(t, p); }
+                    }
                     if (precipArr != null && precipArr[i] != null) {
                         var pa = (precipArr[i] as Float).toFloat();
                         if (pa > 0.0f) { tmp["precipitationAmount"] = pa; }
@@ -127,7 +138,7 @@ class OpenMeteoService {
             }
         }
 
-        // Daily block: today's high and low (index 0).
+        // Daily block: today's high and low (index 0) and daily rain probability (indices 1..3).
         var daily = data.get("daily") as Dictionary?;
         if (daily != null) {
             var maxArr = daily.get("temperature_2m_max") as Array?;
@@ -137,6 +148,27 @@ class OpenMeteoService {
             }
             if (minArr != null && minArr.size() > 0 && minArr[0] != null) {
                 cc_data["lowTemperature"] = (minArr[0] as Float).toNumber();
+            }
+            if (rf != null) {
+                var dTimes = daily.get("time") as Array?;
+                var dPop   = daily.get("precipitation_probability_max") as Array?;
+                if (dTimes != null && dPop != null) {
+                    var dCount = dTimes.size();
+                    if (dCount > 4) { dCount = 4; }
+                    for (var i = 1; i < dCount; i++) {
+                        if (dTimes[i] != null && dPop[i] != null) {
+                            if ((rf as RainForecast).feed((dTimes[i] as Number) + 43200, (dPop[i] as Numeric).toNumber())) {
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (rf != null) {
+            var rfRes = (rf as RainForecast).result();
+            if (rfRes != null) {
+                Application.Storage.setValue("rain_forecast", rfRes);
             }
         }
 

@@ -200,4 +200,6 @@
     <string id="settings_golden_hour_start" scope="settings">Goldene Stunde Beginn (Abend)</string>
     <string id="settings_moon_illumination" scope="settings">Mondbeleuchtung % (ungefähr)</string>
     <string id="settings_phone_connected" scope="settings">Telefon verbunden</string>
+    <string id="settings_weather_format_1" scope="settings">Wetterdaten 1 Format (t=Temp w=Wind g=Böen h=Feuchte p=Niederschl.% r=Niederschl.menge x=nächster Regen u=UV m=max UV 8h l=Hoch/Tief f=Gefühlt c=Bedingungen s=kurze Bedingungen n=Stadt(nur OWM) o=Messzeit)</string>
+    <string id="settings_weather_format_2" scope="settings">Wetterdaten 2 Format (t=Temp w=Wind g=Böen h=Feuchte p=Niederschl.% r=Niederschl.menge x=nächster Regen u=UV m=max UV 8h l=Hoch/Tief f=Gefühlt c=Bedingungen s=kurze Bedingungen n=Stadt(nur OWM) o=Messzeit)</string>
 </strings>

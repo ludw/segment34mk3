@@ -374,8 +374,8 @@
     <string id="settings_date" scope="settings">Date</string>
     <string id="settings_weather_data_1" scope="settings">Weather data 1 (specify format below)</string>
     <string id="settings_weather_data_2" scope="settings">Weather data 2 (specify format below)</string>
-    <string id="settings_weather_format_1" scope="settings">Weather data 1 format (t=temp w=wind g=gust h=humidity p=precip% r=precip_amount u=UV m=max UV next 8h l=high/low f=feels c=conditions s=shortened conditions n=city(OWM only) o=obs_time)</string>
-    <string id="settings_weather_format_2" scope="settings">Weather data 2 format (t=temp w=wind g=gust h=humidity p=precip% r=precip_amount u=UV m=max UV next 8h l=high/low f=feels c=conditions s=shortened conditions n=city(OWM only) o=obs_time)</string>
+    <string id="settings_weather_format_1" scope="settings">Weather data 1 format (t=temp w=wind g=gust h=humidity p=precip% r=precip_amount x=next_rain u=UV m=max UV next 8h l=high/low f=feels c=conditions s=shortened conditions n=city(OWM only) o=obs_time)</string>
+    <string id="settings_weather_format_2" scope="settings">Weather data 2 format (t=temp w=wind g=gust h=humidity p=precip% r=precip_amount x=next_rain u=UV m=max UV next 8h l=high/low f=feels c=conditions s=shortened conditions n=city(OWM only) o=obs_time)</string>
     <string id="settings_steps_day" scope="settings">Steps / day (thousands if not enough room)</string>
     <string id="settings_wheelchair_pushes_day" scope="settings">Wheelchair pushes / day</string>
     <string id="settings_calories_kcal_day_2" scope="settings">Calories (kcal) / day</string>
