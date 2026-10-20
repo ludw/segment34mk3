@@ -111,6 +111,9 @@ class Segment34View extends WatchUi.WatchFace {
     hidden var lastSlowUpdate as Number? = null;
     hidden var cachedValues as Dictionary = {};
     hidden var cachedTempUnit as String = "C";
+    hidden var _cachedClockMin as Number = -1;
+    hidden var _cachedClockStr as String = "";
+    hidden var _activeFieldWidths as Array<Number> = [3, 3, 3, 0];
 
     hidden var weatherStorage as WeatherStorage = new WeatherStorage();
 
@@ -257,7 +260,9 @@ class Segment34View extends WatchUi.WatchFace {
 
         calculateLayout();
         calculateBarLimits();
+        updateActiveLabels();
         updateWeather();
+        _cachedClockMin = -1;
     }
 
     hidden function updateProperties() as Void {
@@ -357,7 +362,6 @@ class Segment34View extends WatchUi.WatchFace {
             propSunriseFieldShows, propSunsetFieldShows,
             propLeftValueShows, propMiddleValueShows, propRightValueShows, propFourthValueShows
         );
-        updateActiveLabels();
 
         if(propTimeSeparator == 2) {
             clockBgText = "####";
@@ -881,12 +885,13 @@ class Segment34View extends WatchUi.WatchFace {
     }
 
     hidden function updateActiveLabels() as Void {
-        resolver.updateActiveLabels(getFieldWidths());
+        resolver.updateActiveLabels(_activeFieldWidths);
     }
 
     // === LAYOUT ===
 
     hidden function calculateLayout() as Void {
+        _activeFieldWidths = getFieldWidths();
         var y1 = baseY + halfClockHeight + marginY;
         var y2 = y1 + smallDataHeight + marginY;
         var y3 = y2 + labelHeight + labelMargin + largeDataHeight;
@@ -898,7 +903,7 @@ class Segment34View extends WatchUi.WatchFace {
         
         // Compute each field center in a single expression to avoid accumulated rounding errors.
         // This keeps symmetric layouts (e.g. 3-5-3) perfectly centered relative to data_width.
-        var digits = getFieldWidths();
+        var digits = _activeFieldWidths;
         var tot_digits = digits[0] + digits[1] + digits[2] + digits[3];
         if (tot_digits != 0) {
             var d0 = digits[0].toFloat();
@@ -1120,7 +1125,7 @@ class Segment34View extends WatchUi.WatchFace {
         values[:dataLabelBottomRight] = resolver.strLabelBottomRight;
         values[:dataLabelBottomFourth] = resolver.strLabelBottomFourth;
 
-        var fieldWidths = getFieldWidths();
+        var fieldWidths = _activeFieldWidths;
         if(propTopPartShows != 2) {
             values[:dataTopLeft] = resolver.getValueByType(propSunriseFieldShows, 5);
             values[:dataTopRight] = resolver.getValueByType(propSunsetFieldShows, 5);
@@ -1160,21 +1165,22 @@ class Segment34View extends WatchUi.WatchFace {
     }
 
     hidden function getClockData(now as Gregorian.Info) as String {
+        var key = now.hour * 60 + now.min;
+        if(key == _cachedClockMin) { return _cachedClockStr; }
+        _cachedClockMin = key;
         var separator = ":";
         var after = "";
         if(propTimeSeparator == 1) { separator = " "; }
-        if(propTimeSeparator == 2) { separator = ""; }
-        if(propTimeSeparator == 3) {
+        else if(propTimeSeparator == 2) { separator = ""; }
+        else if(propTimeSeparator == 3) {
             separator = ""; 
             if(now.hour >= 12) { after = "P"; } else { after = "A"; }
         }
-        if(propTimeSeparator == 5) { separator = ";"; }
+        else if(propTimeSeparator == 5) { separator = ";"; }
 
-        if(propZeropadHour) {
-            return formatHour(now.hour, propIs24H, propHourFormat).format("%02d") + separator + now.min.format("%02d") + after;
-        } else {
-            return formatHour(now.hour, propIs24H, propHourFormat).format("%2d") + separator + now.min.format("%02d") + after;
-        }
+        var h = formatHour(now.hour, propIs24H, propHourFormat);
+        _cachedClockStr = h.format(propZeropadHour ? "%02d" : "%2d") + separator + now.min.format("%02d") + after;
+        return _cachedClockStr;
     }
 
     hidden function getValueForSeconds(now as Gregorian.Info) as String {
@@ -1217,39 +1223,12 @@ class Segment34View extends WatchUi.WatchFace {
     hidden function getFieldWidths() as Array<Number> {
         if(propFieldLayout == 0) { // Auto
             return bottomFieldWidths;
-        } else if(propFieldLayout == 1) {
-            return [3, 3, 3, 0];
-        } else if(propFieldLayout == 2) {
-            return [3, 4, 3, 0];
-        } else if(propFieldLayout == 3) {
-            return [3, 3, 4, 0];
-        } else if(propFieldLayout == 4) {
-            return [4, 3, 3, 0];
-        } else if(propFieldLayout == 5) {
-            return [4, 3, 4, 0];
-        } else if(propFieldLayout == 6) {
-            return [3, 4, 4, 0];
-        } else if(propFieldLayout == 7) {
-            return [4, 4, 3, 0];
-        } else if(propFieldLayout == 8) {
-            return [4, 4, 4, 0];
-        } else if(propFieldLayout == 9) {
-            return [3, 3, 3, 3];
-        } else if(propFieldLayout == 10) {
-            return [3, 3, 3, 4];
-        } else if(propFieldLayout == 11) {
-            return [4, 3, 3, 3];
-        } else if(propFieldLayout == 12) {
-            return [4, 4, 0, 0];
-        } else if(propFieldLayout == 13) {
-            return [5, 3, 3, 0];
-        } else if(propFieldLayout == 14) {
-            return [5, 0, 0, 0];
-        } else if(propFieldLayout == 15) {
-            return [5, 5, 0, 0];
-        } else {
-            return [3, 5, 3, 0];
         }
+        var packed = [
+            3330, 3430, 3340, 4330, 4340, 3440, 4430, 4440,
+            3333, 3334, 4333, 4400, 5330, 5000, 5500, 3530
+        ][(propFieldLayout >= 1 and propFieldLayout <= 15) ? (propFieldLayout - 1) : 15];
+        return [packed / 1000, (packed / 100) % 10, (packed / 10) % 10, packed % 10];
     }
 
     hidden function updateColorTheme() {
@@ -1394,29 +1373,32 @@ class Segment34View extends WatchUi.WatchFace {
         }
 
         // Draw Notification count
-        dc.setColor(theme.colors[notif], Graphics.COLOR_TRANSPARENT);
-        if(propDateAlignment == 0) {
-            if(!propShowSeconds) { // No seconds, notification on right side
-                dc.drawText(baseX + halfClockWidth - textSideAdj, y1, fontSmallData, values[:dataNotifications], Graphics.TEXT_JUSTIFY_RIGHT);
-            } else {
-                var date_width = dc.getTextWidthInPixels(values[:dataBelow], fontSmallData);
-                var sec_width = dc.getTextWidthInPixels(values[:dataSeconds], fontSmallData); 
-                var date_right_edge = baseX - halfClockWidth + textSideAdj + date_width;
-                var sec_left = baseX + halfClockWidth - textSideAdj - sec_width;
-                var pos = sec_left - marginX;
-                if((sec_left - date_right_edge) < 3 * marginX) {
-                    pos = (date_right_edge + sec_left) / 2;
-                    dc.drawText(pos, y1, fontSmallData, values[:dataNotifications], Graphics.TEXT_JUSTIFY_CENTER);
+        var notifStr = values[:dataNotifications] as String;
+        if(notifStr.length() > 0) {
+            dc.setColor(theme.colors[notif], Graphics.COLOR_TRANSPARENT);
+            if(propDateAlignment == 0) {
+                if(!propShowSeconds) { // No seconds, notification on right side
+                    dc.drawText(baseX + halfClockWidth - textSideAdj, y1, fontSmallData, notifStr, Graphics.TEXT_JUSTIFY_RIGHT);
                 } else {
-                    dc.drawText(pos, y1, fontSmallData, values[:dataNotifications], Graphics.TEXT_JUSTIFY_RIGHT);
+                    var date_width = dc.getTextWidthInPixels(values[:dataBelow], fontSmallData);
+                    var sec_width = dc.getTextWidthInPixels(values[:dataSeconds], fontSmallData); 
+                    var date_right_edge = baseX - halfClockWidth + textSideAdj + date_width;
+                    var sec_left = baseX + halfClockWidth - textSideAdj - sec_width;
+                    var pos = sec_left - marginX;
+                    if((sec_left - date_right_edge) < 3 * marginX) {
+                        pos = (date_right_edge + sec_left) / 2;
+                        dc.drawText(pos, y1, fontSmallData, notifStr, Graphics.TEXT_JUSTIFY_CENTER);
+                    } else {
+                        dc.drawText(pos, y1, fontSmallData, notifStr, Graphics.TEXT_JUSTIFY_RIGHT);
+                    }
                 }
+            } else { // Date is centered, notification on left side
+                dc.drawText(baseX - halfClockWidth, y1, fontSmallData, notifStr, Graphics.TEXT_JUSTIFY_LEFT);
             }
-        } else { // Date is centered, notification on left side
-            dc.drawText(baseX - halfClockWidth, y1, fontSmallData, values[:dataNotifications], Graphics.TEXT_JUSTIFY_LEFT);
         }
 
         // Draw the three bottom data fields
-        var digits = getFieldWidths();
+        var digits = _activeFieldWidths;
 
         drawDataField(dc, fieldXCoords[0], fieldY, 3, values[:dataLabelBottomLeft], values[:dataBottomLeft], digits[0], fontBottomData, largeDataWidth * digits[0]);
         drawDataField(dc, fieldXCoords[1], fieldY, 3, values[:dataLabelBottomMiddle], values[:dataBottomMiddle], digits[1], fontBottomData, largeDataWidth * digits[1]);
@@ -1655,9 +1637,10 @@ class Segment34View extends WatchUi.WatchFace {
     }
 
     hidden function drawIconWithOverlay(dc as Dc, x as Number, y as Number, justify as Number, iconStr as String, countStr as String, iconColor as Number?) as Void {
+        if(iconStr.length() == 0) { return; }
         dc.setColor(iconColor != null ? iconColor : theme.colors[dataVal], Graphics.COLOR_TRANSPARENT);
         dc.drawText(x, y, fontIcons, iconStr, justify | Graphics.TEXT_JUSTIFY_VCENTER);
-        if(!countStr.equals("")) {
+        if(countStr.length() > 0) {
             var labelX = justify == Graphics.TEXT_JUSTIFY_RIGHT ? x - 8 : x + 10;
             var labelY = y - 4;
             if(screenWidth >= 390) {

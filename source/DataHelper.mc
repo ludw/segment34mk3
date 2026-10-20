@@ -24,9 +24,11 @@ function getStressColor(val as Number) as Graphics.ColorType {
 
 class DataHelper {
 
-    // Complication state
+    // Complication state & cached Complications.Id instances
     hidden var cgmComplicationId as Complications.Id? = null;
     hidden var cgmAgeComplicationId as Complications.Id? = null;
+    hidden var _stressId as Complications.Id = new Complications.Id(Complications.COMPLICATION_TYPE_STRESS);
+    hidden var _bbId as Complications.Id = new Complications.Id(Complications.COMPLICATION_TYPE_BODY_BATTERY);
     var vo2RunTrend as String = "";
     var vo2BikeTrend as String = "";
     var lastLowBattery as Boolean = false;
@@ -69,7 +71,7 @@ class DataHelper {
 
     function getStressData() as Number? {
         try {
-            var complication_stress = Complications.getComplication(new Complications.Id(Complications.COMPLICATION_TYPE_STRESS));
+            var complication_stress = Complications.getComplication(_stressId);
             if (complication_stress != null && complication_stress.value != null) {
                 return complication_stress.value;
             }
@@ -83,7 +85,7 @@ class DataHelper {
 
     function getBBData() as Number? {
         try {
-            var complication_bb = Complications.getComplication(new Complications.Id(Complications.COMPLICATION_TYPE_BODY_BATTERY));
+            var complication_bb = Complications.getComplication(_bbId);
             if (complication_bb != null && complication_bb.value != null) { return complication_bb.value; }
         } catch(e) {}
         return null;

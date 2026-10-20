@@ -29,6 +29,8 @@ class WeatherDisplayHelper {
     hidden var _cachedSunset as Time.Moment? = null;
 
     hidden var _maxUvNext8h as String? = null;
+    hidden var _cachedWeatherStr1 as String? = null;
+    hidden var _cachedWeatherStr2 as String? = null;
 
     function initialize() {}
 
@@ -55,6 +57,8 @@ class WeatherDisplayHelper {
         _cachedSunrise = null;
         _cachedSunset = null;
         _maxUvNext8h = null;
+        _cachedWeatherStr1 = null;
+        _cachedWeatherStr2 = null;
         _rain = Application.Storage.getValue("rain_forecast") as Array?;
     }
 
@@ -280,19 +284,21 @@ class WeatherDisplayHelper {
     function getWeatherByFormat(format as String) as String {
         var result = "";
         var i = 0;
-        while (i < format.length()) {
+        var len = format.length();
+        while (i < len) {
             var ch = format.substring(i, i + 1);
-            if      (ch.equals("t")) { result = result + getTemperature(); }
+            if      (ch.equals(" ")) { result = result + " "; }
+            else if (ch.equals("t")) { result = result + getTemperature(); }
             else if (ch.equals("w")) { result = result + getWind(); }
-            else if (ch.equals("g")) { result = result + getWindGust(); }
-            else if (ch.equals("h")) { result = result + getHumidity(); }
             else if (ch.equals("p")) { result = result + getPrecip(); }
+            else if (ch.equals("c")) { result = result + getWeatherCondition(); }
+            else if (ch.equals("h")) { result = result + getHumidity(); }
+            else if (ch.equals("f")) { result = result + getFeelsLike(); }
+            else if (ch.equals("g")) { result = result + getWindGust(); }
             else if (ch.equals("r")) { result = result + getPrecipAmount(); }
             else if (ch.equals("u")) { result = result + getUVIndex(); }
             else if (ch.equals("m")) { result = result + getMaxUvIndexNext8h(); }
             else if (ch.equals("l")) { result = result + getHighLow(); }
-            else if (ch.equals("f")) { result = result + getFeelsLike(); }
-            else if (ch.equals("c")) { result = result + getWeatherCondition(); }
             else if (ch.equals("s")) { result = result + getWeatherConditionShort(); }
             else if (ch.equals("n")) { result = result + getCityName(); }
             else if (ch.equals("o")) { result = result + getObservationTime(); }
@@ -301,6 +307,15 @@ class WeatherDisplayHelper {
             i += 1;
         }
         return result;
+    }
+
+    function getWeatherLine(isLine1 as Boolean, format as String) as String {
+        if (isLine1) {
+            if (_cachedWeatherStr1 == null) { _cachedWeatherStr1 = getWeatherByFormat(format); }
+            return _cachedWeatherStr1 as String;
+        }
+        if (_cachedWeatherStr2 == null) { _cachedWeatherStr2 = getWeatherByFormat(format); }
+        return _cachedWeatherStr2 as String;
     }
 
     // --- Formatted value getters for ValueResolver switch ---

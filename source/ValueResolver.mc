@@ -219,8 +219,8 @@ class ValueResolver {
             case 65:
             case 66:
             case 67: return _dataHelper.getRecentActivityDistFormatted(complicationType, distFactor, width);
-            case 60: return _weatherHelper.getWeatherByFormat(_propWeatherFormat1);
-            case 61: return _weatherHelper.getWeatherByFormat(_propWeatherFormat2);
+            case 60: return _weatherHelper.getWeatherLine(true, _propWeatherFormat1);
+            case 61: return _weatherHelper.getWeatherLine(false, _propWeatherFormat2);
             case 62: return _dataHelper.getActiveHoursWeekFormatted();
             case 63:
             case 64: return _weatherHelper.getCivilTwilightFormatted(complicationType, width);
