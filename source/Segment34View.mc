@@ -113,6 +113,7 @@ class Segment34View extends WatchUi.WatchFace {
     hidden var cachedTempUnit as String = "C";
     hidden var _cachedClockMin as Number = -1;
     hidden var _cachedClockStr as String = "";
+    hidden var _cachedMoonStr as String = "";
     hidden var _activeFieldWidths as Array<Number> = [3, 3, 3, 0];
 
     hidden var weatherStorage as WeatherStorage = new WeatherStorage();
@@ -230,6 +231,7 @@ class Segment34View extends WatchUi.WatchFace {
             fontMoon = Application.loadResource(Rez.Fonts.moon);
         } else {
             fontMoon = null;
+            _cachedMoonStr = "";
         }
 
         halfMarginY = Math.round(marginY / 2);
@@ -1047,6 +1049,7 @@ class Segment34View extends WatchUi.WatchFace {
             updateColorTheme();
             updateWeather();
             dataHelper.updateVo2History();
+            _cachedMoonStr = (propTopPartShows == 0) ? moonPhase(nowMoment, propHemisphere) : "";
         }
 
         if(lastUpdate == null or unix_timestamp - lastUpdate >= propUpdateFreq) {
@@ -1099,7 +1102,7 @@ class Segment34View extends WatchUi.WatchFace {
             return values;
         }
 
-        values[:dataMoon] = (propTopPartShows == 0) ? moonPhase(nowMoment, propHemisphere) : "";
+        values[:dataMoon] = _cachedMoonStr;
         var currentMinute = now.hour * 60 + now.min;
         if(propTopPartShows == 2) {
             values[:dataGraph1] = graphRenderer.getCachedDataArray(propGraphData, currentMinute);

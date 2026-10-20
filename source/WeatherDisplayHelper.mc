@@ -24,9 +24,9 @@ class WeatherDisplayHelper {
     hidden var _cachedConditionIdx as Number = -1;
     hidden var _rain as Array? = null;
 
-    // Cached sunrise/sunset (invalidated by update(), which runs once per minute)
-    hidden var _cachedSunrise as Time.Moment? = null;
-    hidden var _cachedSunset as Time.Moment? = null;
+    // Cached sunrise/sunset formatted strings (invalidated by update(), which runs once per minute)
+    hidden var _cachedSunriseStr as String? = null;
+    hidden var _cachedSunsetStr as String? = null;
 
     hidden var _maxUvNext8h as String? = null;
     hidden var _cachedWeatherStr1 as String? = null;
@@ -54,8 +54,8 @@ class WeatherDisplayHelper {
         _hourFormat = hourFormat;
         _cachedConditionStr = null;
         _cachedConditionIdx = -1;
-        _cachedSunrise = null;
-        _cachedSunset = null;
+        _cachedSunriseStr = null;
+        _cachedSunsetStr = null;
         _maxUvNext8h = null;
         _cachedWeatherStr1 = null;
         _cachedWeatherStr2 = null;
@@ -336,15 +336,16 @@ class WeatherDisplayHelper {
         if (_w != null) {
             var loc = (_w as StoredWeather).observationLocationPosition;
             if (loc != null) {
-                var s;
                 if (complicationType == 35) {
-                    if (_cachedSunrise == null) { _cachedSunrise = Weather.getSunrise(loc, nowMoment); }
-                    s = _cachedSunrise;
-                } else {
-                    if (_cachedSunset == null) { _cachedSunset = Weather.getSunset(loc, nowMoment); }
-                    s = _cachedSunset;
+                    if (_cachedSunriseStr == null) {
+                        _cachedSunriseStr = formatSunTime(Weather.getSunrise(loc, nowMoment), width, _is24H, _hourFormat);
+                    }
+                    return _cachedSunriseStr as String;
                 }
-                return formatSunTime(s, width, _is24H, _hourFormat);
+                if (_cachedSunsetStr == null) {
+                    _cachedSunsetStr = formatSunTime(Weather.getSunset(loc, nowMoment), width, _is24H, _hourFormat);
+                }
+                return _cachedSunsetStr as String;
             }
         }
         return "";
