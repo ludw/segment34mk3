@@ -16,9 +16,11 @@ class ValueResolver {
     hidden var _weatherHelper as WeatherDisplayHelper;
     hidden var _dataHelper as DataHelper;
 
-    // Weather data — updated via setWeatherData() each display cycle
+    // Weather and time data — updated via setWeatherData() each display cycle
     hidden var _weatherCondition as StoredWeather or Null;
     hidden var _cachedTempUnit as String = "C";
+    (:initialized) hidden var _nowMoment as Time.Moment;
+    (:initialized) hidden var _nowInfo as Gregorian.Info;
 
     // Stored props
     hidden var _propIs24H as Boolean = false;
@@ -117,9 +119,11 @@ class ValueResolver {
     }
 
     // Update weather-related runtime data. Call once at the start of each display cycle.
-    function setWeatherData(weatherCondition as StoredWeather or Null, cachedTempUnit as String) as Void {
+    function setWeatherData(weatherCondition as StoredWeather or Null, cachedTempUnit as String, nowMoment as Time.Moment, nowInfo as Gregorian.Info) as Void {
         _weatherCondition = weatherCondition;
         _cachedTempUnit = cachedTempUnit;
+        _nowMoment = nowMoment;
+        _nowInfo = nowInfo;
     }
 
     function updateActiveLabels(fieldWidths as Array<Number>) as Void {
@@ -147,10 +151,10 @@ class ValueResolver {
     }
 
     function getValueByType(complicationType as Number, width as Number) as String {
+        if (width == 0 || complicationType == -2) { return ""; }
         var distFactor = (_propIsMetricDistance ? 0.001 : 0.000621371) as Float;
         switch (complicationType) {
-            case -2: return "";
-            case -1: return formatDate(_propDateFormat, _propDateCustomFormat, _propFontSize, _propWeekOffset);
+            case -1: return formatDate(_propDateFormat, _propDateCustomFormat, _propFontSize, _propWeekOffset, _nowInfo);
             case 0:  return _dataHelper.getActiveMinutesWeekFormatted();
             case 1:  return _dataHelper.getDailyActiveMinutesFormatted();
             case 2:  return _dataHelper.getDailyDistanceFormatted(_propIsMetricDistance, width);
@@ -187,7 +191,7 @@ class ValueResolver {
             case 33: return _dataHelper.getSolarIntensityFormatted();
             case 34: return _weatherHelper.getSensorTemperatureFormatted();
             case 35:
-            case 36: return _weatherHelper.getSunriseOrSunsetFormatted(complicationType, width);
+            case 36: return _weatherHelper.getSunriseOrSunsetFormatted(complicationType, width, _nowMoment);
             case 37: return secondaryTimezone(_propTzOffset2, width, _propIs24H, _propHourFormat, _propTzHourFormat);
             case 38: var ac = System.getDeviceSettings().alarmCount; return (ac != null) ? ac.format("%d") : "0";
             case 39: return _weatherHelper.getHighTempFormatted();
@@ -220,7 +224,7 @@ class ValueResolver {
             case 62: return _dataHelper.getActiveHoursWeekFormatted();
             case 63:
             case 64: return _weatherHelper.getCivilTwilightFormatted(complicationType, width);
-            case 68: return _dataHelper.getDailyCounterFormatted();
+            case 68: return _dataHelper.getDailyCounterFormatted(_nowInfo);
             case 69: return _weatherHelper.getNextCivilTwilightEventFormatted(width);
             case 70:
             case 71: return "";
@@ -244,14 +248,13 @@ class ValueResolver {
     }
 
     hidden function getWeekNumberFormatted() as String {
-        var today = Time.Gregorian.info(Time.now(), Time.FORMAT_SHORT);
-        return isoWeekNumber(today.year, today.month, today.day, _propWeekOffset).format("%d");
+        return isoWeekNumber(_nowInfo.year, _nowInfo.month, _nowInfo.day, _propWeekOffset).format("%d");
     }
 
     hidden function getMoonIllumination() as String {
         // Moon phase is a UTC-anchored calculation; using the device's local
         // date here would shift the result by up to a day depending on timezone.
-        var utcNow = Time.Gregorian.utcInfo(Time.now(), Time.FORMAT_SHORT);
+        var utcNow = Time.Gregorian.utcInfo(_nowMoment, Time.FORMAT_SHORT);
         return moonIlluminationPercent(utcNow.year, utcNow.month, utcNow.day).format("%d");
     }
 

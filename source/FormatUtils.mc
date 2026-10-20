@@ -92,11 +92,11 @@ function goalPercent(val as Number, goal as Number) as Number {
     return Math.round(val.toFloat() / goal.toFloat() * 100.0).toNumber();
 }
 
-function moonPhase(time, propHemisphere as Number) as String {
-    if (time == null) { return "0"; }
+function moonPhase(nowMoment as Time.Moment?, propHemisphere as Number) as String {
+    if (nowMoment == null) { return "0"; }
     // Moon phase is a UTC-anchored calculation; using the device's local
     // date here would shift the result by up to a day depending on timezone.
-    var utcNow = Time.Gregorian.utcInfo(Time.now(), Time.FORMAT_SHORT);
+    var utcNow = Time.Gregorian.utcInfo(nowMoment, Time.FORMAT_SHORT);
     return moonPhaseIndex(utcNow.year, utcNow.month, utcNow.day, propHemisphere).toString();
 }
 

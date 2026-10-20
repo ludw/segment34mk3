@@ -29,6 +29,7 @@ class DataHelper {
     hidden var cgmAgeComplicationId as Complications.Id? = null;
     var vo2RunTrend as String = "";
     var vo2BikeTrend as String = "";
+    var lastLowBattery as Boolean = false;
 
     // Activity distance cache
     hidden var _cachedRunDist7Days as Number = 0;
@@ -37,6 +38,11 @@ class DataHelper {
     hidden var _cachedRunDistMonth as Number = 0;
     hidden var _cachedRunDist28Days as Number = 0;
     hidden var _lastActivityDistUpdate as Number = 0;
+
+    // VO2 history day cache & daily counter cache
+    hidden var _lastVo2CheckDay as Number = -1;
+    hidden var _dailyCounterDay as Number = -1;
+    public var dailyCounter as Number = 0;
 
     function initialize() {}
 
@@ -117,33 +123,32 @@ class DataHelper {
     }
 
     hidden function getMoveBar() as Number? {
-        if(ActivityMonitor.getInfo().moveBarLevel != null) {
-            var mov = ActivityMonitor.getInfo().moveBarLevel;
-            if(mov >= 1 && mov <= 5) { return 25 + mov * 15; }
-        }
+        var mov = ActivityMonitor.getInfo().moveBarLevel;
+        if(mov != null && mov >= 1 && mov <= 5) { return 25 + mov * 15; }
         return null;
     }
 
     function getBattData(propBatteryVariant as Number, screenHeight as Number, propFontSize as Number) as String {
         var value = "";
+        var stats = System.getSystemStats();
+        var batLevel = stats.battery;
+        lastLowBattery = batLevel <= 15;
 
         if(propBatteryVariant == 0) {
-            if (System.getSystemStats().batteryInDays != null){
-                var sample = Math.round(System.getSystemStats().batteryInDays).toNumber();
+            if (stats.batteryInDays != null){
+                var sample = Math.round(stats.batteryInDays).toNumber();
                 value = sample.format("%0d") + "D";
             }
         }
         if(propBatteryVariant == 1) {
-            var sample = System.getSystemStats().battery;
-            if(sample < 100) {
-                value = sample.format("%d") + "%";
+            if(batLevel < 100) {
+                value = batLevel.format("%d") + "%";
             } else {
-                value = sample.format("%d");
+                value = batLevel.format("%d");
             }
         } else if(propBatteryVariant == 3 or propBatteryVariant == -1) {
                 var sample = 0;
                 var max = 0;
-                var batLevel = System.getSystemStats().battery;
 
                 if(screenHeight > 280 and propFontSize == 1) {
                     // led_lines font: 2px/char, "T" outline interior → max = 24
@@ -205,8 +210,9 @@ class DataHelper {
             }
         }
         // Add today's distance
-        if(ActivityMonitor.getInfo().distance != null) {
-            weekly_distance += ActivityMonitor.getInfo().distance;
+        var todayDist = ActivityMonitor.getInfo().distance;
+        if(todayDist != null) {
+            weekly_distance += todayDist;
         }
         return weekly_distance;
     }
@@ -268,48 +274,45 @@ class DataHelper {
 
     // --- Complication data ---
 
-    function getIconState(setting as Number) as String {
+    function getIconState(setting as Number, devSettings as System.DeviceSettings) as String {
         if(setting == 1) { // Alarm
-            var alarms = System.getDeviceSettings().alarmCount;
+            var alarms = devSettings.alarmCount;
             if(alarms != null && alarms > 0) {
                 return "A";
             } else {
                 return "";
             }
         } else if(setting == 2) { // DND
-            var dnd = System.getDeviceSettings().doNotDisturb;
+            var dnd = devSettings.doNotDisturb;
             if(dnd != null && dnd) {
                 return "D";
             } else {
                 return "";
             }
         } else if(setting == 3) { // Bluetooth (on / off)
-            var bl = System.getDeviceSettings().phoneConnected;
+            var bl = devSettings.phoneConnected;
             if(bl != null && bl) {
                 return "L";
             } else {
                 return "M";
             }
         } else if(setting == 4) { // Bluetooth (just off)
-            var bl = System.getDeviceSettings().phoneConnected;
+            var bl = devSettings.phoneConnected;
             if(bl != null && bl) {
                 return "";
             } else {
                 return "M";
             }
         } else if(setting == 5) { // Move bar
-            var mov = 0;
-            if(ActivityMonitor.getInfo().moveBarLevel != null) {
-                mov = ActivityMonitor.getInfo().moveBarLevel;
-            }
-            if(mov == 0) { return ""; }
+            var mov = ActivityMonitor.getInfo().moveBarLevel;
+            if(mov == null || mov == 0) { return ""; }
             if(mov == 1) { return "N"; }
             if(mov == 2) { return "O"; }
             if(mov == 3) { return "P"; }
             if(mov == 4) { return "Q"; }
             if(mov == 5) { return "R"; }
         } else if(setting == 6 || setting == 7) { // Notification icon (6) or notification icon with count (7)
-            var notif = System.getDeviceSettings().notificationCount;
+            var notif = devSettings.notificationCount;
             if(notif != null && notif > 0) {
                 return "H";
             }
@@ -319,7 +322,7 @@ class DataHelper {
                 if(complication != null && complication.value != null) { return "V"; }
             } catch(e) {}
         } else if(setting == 9) { // Phone connected
-            var pc = System.getDeviceSettings().phoneConnected;
+            var pc = devSettings.phoneConnected;
             if(pc != null && pc) {
                 return "W";
             } else {
@@ -375,9 +378,9 @@ class DataHelper {
         return null;
     }
 
-    function getIconCountOverlay(setting as Number) as String {
+    function getIconCountOverlay(setting as Number, devSettings as System.DeviceSettings) as String {
         if(setting == 7) {
-            var notif = System.getDeviceSettings().notificationCount;
+            var notif = devSettings.notificationCount;
             if(notif != null && notif > 0) {
                 return notif > 9 ? "9+" : notif.format("%d");
             }
@@ -552,6 +555,9 @@ class DataHelper {
     }
 
     function updateVo2History() as Void {
+        var nowDays = (Time.now().value() / 86400).toNumber();
+        if (nowDays == _lastVo2CheckDay) { return; }
+        _lastVo2CheckDay = nowDays;
         var profile = UserProfile.getProfile();
         if (profile.vo2maxRunning != null) {
             vo2RunTrend = getVo2Trend("vo2run_hist", profile.vo2maxRunning as Number);
@@ -765,16 +771,21 @@ class DataHelper {
         return formatDistanceByWidth(dist * distFactor, width);
     }
 
-    function getDailyCounterFormatted() as String {
-        var today = Time.Gregorian.info(Time.now(), Time.FORMAT_SHORT);
+    function getDailyCounterFormatted(today as Time.Gregorian.Info) as String {
         var todayKey = today.year * 10000 + today.month * 100 + today.day;
-        var storedKey = Application.Storage.getValue("dailyCounterDay") as Number?;
-        if (storedKey == null || storedKey != todayKey) {
-            Application.Storage.setValue("dailyCounterDay", todayKey);
-            Application.Storage.setValue("dailyCounter", 0);
+        if (_dailyCounterDay != todayKey) {
+            var storedKey = Application.Storage.getValue("dailyCounterDay") as Number?;
+            if (storedKey == null || storedKey != todayKey) {
+                Application.Storage.setValue("dailyCounterDay", todayKey);
+                Application.Storage.setValue("dailyCounter", 0);
+                dailyCounter = 0;
+            } else {
+                var count = Application.Storage.getValue("dailyCounter") as Number?;
+                dailyCounter = count != null ? count : 0;
+            }
+            _dailyCounterDay = todayKey;
         }
-        var count = Application.Storage.getValue("dailyCounter") as Number?;
-        return (count != null ? count : 0).format("%d");
+        return dailyCounter.format("%d");
     }
 
     function getLocationDecDegFormatted() as String {

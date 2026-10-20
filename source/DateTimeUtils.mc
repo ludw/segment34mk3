@@ -78,10 +78,7 @@ function formatHour(hour as Number, propIs24H as Boolean, propHourFormat as Numb
     return hour;
 }
 
-function formatDate(propDateFormat as Number, propDateCustomFormat as String, propFontSize as Number, propWeekOffset as Number) as String {
-    var now = Time.now();
-    var today = Time.Gregorian.info(now, Time.FORMAT_SHORT);
-
+function formatDate(propDateFormat as Number, propDateCustomFormat as String, propFontSize as Number, propWeekOffset as Number, today as Time.Gregorian.Info) as String {
     if(propDateFormat == 1) {
         return formatCustomDate(today, propDateCustomFormat, propWeekOffset);
     }

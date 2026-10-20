@@ -61,6 +61,7 @@ class Segment34Delegate extends WatchUi.WatchFaceDelegate {
             var count = Application.Storage.getValue("dailyCounter") as Number?;
             var newCount = (count != null ? count : 0) + (cID == -2 ? 1 : -1);
             Application.Storage.setValue("dailyCounter", newCount);
+            view.dataHelper.dailyCounter = newCount;
             view.forceDataRefresh();
             WatchUi.requestUpdate();
         }

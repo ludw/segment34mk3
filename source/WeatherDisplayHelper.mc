@@ -24,6 +24,12 @@ class WeatherDisplayHelper {
     hidden var _cachedConditionIdx as Number = -1;
     hidden var _rain as Array? = null;
 
+    // Cached sunrise/sunset (invalidated by update(), which runs once per minute)
+    hidden var _cachedSunrise as Time.Moment? = null;
+    hidden var _cachedSunset as Time.Moment? = null;
+
+    hidden var _maxUvNext8h as String? = null;
+
     function initialize() {}
 
     function update(
@@ -46,6 +52,9 @@ class WeatherDisplayHelper {
         _hourFormat = hourFormat;
         _cachedConditionStr = null;
         _cachedConditionIdx = -1;
+        _cachedSunrise = null;
+        _cachedSunset = null;
+        _maxUvNext8h = null;
         _rain = Application.Storage.getValue("rain_forecast") as Array?;
     }
 
@@ -206,12 +215,14 @@ class WeatherDisplayHelper {
         return maxUv;
     }
 
-    // String wrapper for ValueResolver and the weather-format token 'U'.
+    // String wrapper for ValueResolver and the weather-format token 'm'.
     public function getMaxUvIndexNext8h() as String {
-        var hf_data = Application.Storage.getValue("hourly_forecast") as Array?;
-        var maxUv = maxUvIndexNext8h(hf_data, Time.now().value());
-        if (maxUv == null) { return ""; }
-        return (maxUv as Float).format("%d");
+        if (_maxUvNext8h == null) {
+            var hf_data = Application.Storage.getValue("hourly_forecast") as Array?;
+            var maxUv = maxUvIndexNext8h(hf_data, Time.now().value());
+            _maxUvNext8h = (maxUv != null) ? (maxUv as Float).format("%d") : "";
+        }
+        return _maxUvNext8h as String;
     }
 
     function getHighLow() as String {
@@ -306,12 +317,18 @@ class WeatherDisplayHelper {
         return "";
     }
 
-    function getSunriseOrSunsetFormatted(complicationType as Number, width as Number) as String {
+    function getSunriseOrSunsetFormatted(complicationType as Number, width as Number, nowMoment as Time.Moment) as String {
         if (_w != null) {
             var loc = (_w as StoredWeather).observationLocationPosition;
             if (loc != null) {
-                var now = Time.now();
-                var s = (complicationType == 35) ? Weather.getSunrise(loc, now) : Weather.getSunset(loc, now);
+                var s;
+                if (complicationType == 35) {
+                    if (_cachedSunrise == null) { _cachedSunrise = Weather.getSunrise(loc, nowMoment); }
+                    s = _cachedSunrise;
+                } else {
+                    if (_cachedSunset == null) { _cachedSunset = Weather.getSunset(loc, nowMoment); }
+                    s = _cachedSunset;
+                }
                 return formatSunTime(s, width, _is24H, _hourFormat);
             }
         }
