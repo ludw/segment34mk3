@@ -80,6 +80,7 @@ For refactorings and optimizations keep in mind that:
 
 ## Things people have asked for (may or may not be implemented)
 - Weather data in the grafs like precipitation over 12h
+- Weekly elevation climb
 
 ## Change log
 3.1
